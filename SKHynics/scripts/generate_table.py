@@ -33,6 +33,7 @@ datatable = pandas.DataFrame()
 
 
 def storage_inode_report_by_volume(data):
+    global datatable
     for volume in data["ontap_info"]["storage/volumes"]["records"]:
         add=pandas.DataFrame.from_records([{
             'Volume Name': volume["name"],
@@ -41,9 +42,11 @@ def storage_inode_report_by_volume(data):
             'Free Inodes': volume["files"]["maximum"] - volume["files"]["used"],
             'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100,2)
         }])
+        
         datatable=datatable._append(add,ignore_index = True)
 
 def storage_inode_report_by_cluster(data):
+    global datatable
     for cluster in data:
         inode_total=0
         inode_used=0
@@ -52,7 +55,7 @@ def storage_inode_report_by_cluster(data):
             inode_used= inode_used+volume["files"]["used"]
 
         add=pandas.DataFrame.from_records([{
-            'cluster name': volume["name"],
+            'cluster name': cluster["cluster"]["name"],
             'Total Inodes': inode_total,
             'Used Inodes': inode_used, 
             'Free Inodes': inode_total - inode_used,
@@ -73,7 +76,7 @@ def main():
     <html>
     <head></head>
     <body>
-        {0}
+      {0}
     </body>
     </html>
     """.format(datatable.to_html(index=False))

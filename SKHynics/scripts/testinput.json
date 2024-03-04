@@ -1,70 +1,105 @@
 {
-    "ontap_volumes": {
-        "changed": false,
-        "failed": false,
-        "ontap_info": {
-            "storage/volumes": {
-                "_links": {
-                    "self": {
-                        "href": "/api/storage/volumes?max_records=1024&fields=files%2Cname"
-                    }
+    "ansible_loop_var": "cluster",
+    "changed": false,
+    "cluster": {
+        "ID": "fsxadmin",
+        "PW": "Netapp1!",
+        "ip": "172.30.1.86",
+        "name": "fsxn"
+    },
+    "failed": false,
+    "invocation": {
+        "module_args": {
+            "cert_filepath": null,
+            "feature_flags": null,
+            "fields": [
+                "files",
+                "name"
+            ],
+            "force_ontap_version": null,
+            "gather_subset": [
+                "volume_info"
+            ],
+            "hal_linking": true,
+            "hostname": "172.30.1.86",
+            "http_port": null,
+            "https": true,
+            "ignore_api_errors": null,
+            "key_filepath": null,
+            "max_records": 1024,
+            "ontapi": null,
+            "owning_resource": null,
+            "parameters": null,
+            "password": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
+            "state": null,
+            "use_python_keys": false,
+            "use_rest": "auto",
+            "username": "fsxadmin",
+            "validate_certs": false
+        }
+    },
+    "ontap_info": {
+        "storage/volumes": {
+            "_links": {
+                "self": {
+                    "href": "/api/storage/volumes?max_records=1024&fields=files%2Cname"
+                }
+            },
+            "num_records": 4,
+            "records": [
+                {
+                    "_links": {
+                        "self": {
+                            "href": "/api/storage/volumes/0247efb8-d5e1-11ee-93e9-67ab2b152bbe"
+                        }
+                    },
+                    "files": {
+                        "maximum": 31122,
+                        "used": 104
+                    },
+                    "name": "catalog",
+                    "uuid": "0247efb8-d5e1-11ee-93e9-67ab2b152bbe"
                 },
-                "num_records": 167,
-                "records": [
-                    {
-                        "_links": {
-                            "self": {
-                                "href": "/api/storage/volumes/fde1aeba-2289-11ed-9a74-90e2baa80c8c"
-                            }
-                        },
-                        "files": {
-                            "maximum": 3579895,
-                            "used": 101
-                        },
-                        "name": "SC_data6",
-                        "uuid": "fde1aeba-2289-11ed-9a74-90e2baa80c8c"
+                {
+                    "_links": {
+                        "self": {
+                            "href": "/api/storage/volumes/30d4c833-d5e0-11ee-93e9-67ab2b152bbe"
+                        }
                     },
-                    {
-                        "_links": {
-                            "self": {
-                                "href": "/api/storage/volumes/f875fa6c-be5e-11ee-8d8a-90e2baa80d8c"
-                            }
-                        },
-                        "files": {
-                            "maximum": 311287,
-                            "used": 105
-                        },
-                        "name": "trident_pvc_ccb8fd98_8900_4941_b3e6_bd2e4ff37c45",
-                        "uuid": "f875fa6c-be5e-11ee-8d8a-90e2baa80d8c"
+                    "files": {
+                        "maximum": 311287,
+                        "used": 98
                     },
-                    {
-                        "_links": {
-                            "self": {
-                                "href": "/api/storage/volumes/fad6fda9-2289-11ed-9a74-90e2baa80c8c"
-                            }
-                        },
-                        "files": {
-                            "maximum": 3579895,
-                            "used": 101
-                        },
-                        "name": "SC_data5",
-                        "uuid": "fad6fda9-2289-11ed-9a74-90e2baa80c8c"
+                    "name": "vol2",
+                    "uuid": "30d4c833-d5e0-11ee-93e9-67ab2b152bbe"
+                },
+                {
+                    "_links": {
+                        "self": {
+                            "href": "/api/storage/volumes/78cfd8d4-d5da-11ee-b7b5-d3f393f63df6"
+                        }
                     },
-                    {
-                        "_links": {
-                            "self": {
-                                "href": "/api/storage/volumes/fde1aeba-2289-11ed-9a74-90e2baa80c8c"
-                            }
-                        },
-                        "files": {
-                            "maximum": 3579895,
-                            "used": 101
-                        },
-                        "name": "SC_data6",
-                        "uuid": "fde1aeba-2289-11ed-9a74-90e2baa80c8c"
-                    }
-                ]
-            }
+                    "files": {
+                        "maximum": 31122,
+                        "used": 105
+                    },
+                    "name": "fsx_root",
+                    "uuid": "78cfd8d4-d5da-11ee-b7b5-d3f393f63df6"
+                },
+                {
+                    "_links": {
+                        "self": {
+                            "href": "/api/storage/volumes/b3697ab5-d5da-11ee-93e9-67ab2b152bbe"
+                        }
+                    },
+                    "files": {
+                        "maximum": 31876709,
+                        "used": 97
+                    },
+                    "name": "vol1",
+                    "uuid": "b3697ab5-d5da-11ee-93e9-67ab2b152bbe"
+                }
+            ]
         }
     }
 }
