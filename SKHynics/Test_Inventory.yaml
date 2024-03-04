@@ -1,0 +1,28 @@
+---
+all:
+  children:
+    task_servers:
+      hosts:
+        task_server_1:
+          ansible_host: <<task server ip>>
+        #remote_server_2:
+        #  ansible_host: 192.168.1.101
+      vars:
+        clusters:
+          - name: fsxn
+            ip: <<cluster_ip>>
+            ID: fsxadmin
+            PW: <<password>>
+          - name: FAS8040
+            ip: <<cluster_ip>>
+            ID: admin
+            PW: <<password>>
+        scripts_dir: '/opt/awx/projects'
+        email_to: <<email>>
+        email_from: <<email>>
+        smtp_server: "smtp.gmail.com"
+        smtp_port: 587
+        smtp_username: <<email>>
+        smtp_password: <<app_password>>
+        ansible_user: root
+        ansible_ssh_private_key_file: ~/.ssh/SeanP.pem
