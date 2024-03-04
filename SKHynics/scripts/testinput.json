@@ -1,0 +1,70 @@
+{
+    "ontap_volumes": {
+        "changed": false,
+        "failed": false,
+        "ontap_info": {
+            "storage/volumes": {
+                "_links": {
+                    "self": {
+                        "href": "/api/storage/volumes?max_records=1024&fields=files%2Cname"
+                    }
+                },
+                "num_records": 167,
+                "records": [
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/storage/volumes/fde1aeba-2289-11ed-9a74-90e2baa80c8c"
+                            }
+                        },
+                        "files": {
+                            "maximum": 3579895,
+                            "used": 101
+                        },
+                        "name": "SC_data6",
+                        "uuid": "fde1aeba-2289-11ed-9a74-90e2baa80c8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/storage/volumes/f875fa6c-be5e-11ee-8d8a-90e2baa80d8c"
+                            }
+                        },
+                        "files": {
+                            "maximum": 311287,
+                            "used": 105
+                        },
+                        "name": "trident_pvc_ccb8fd98_8900_4941_b3e6_bd2e4ff37c45",
+                        "uuid": "f875fa6c-be5e-11ee-8d8a-90e2baa80d8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/storage/volumes/fad6fda9-2289-11ed-9a74-90e2baa80c8c"
+                            }
+                        },
+                        "files": {
+                            "maximum": 3579895,
+                            "used": 101
+                        },
+                        "name": "SC_data5",
+                        "uuid": "fad6fda9-2289-11ed-9a74-90e2baa80c8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/storage/volumes/fde1aeba-2289-11ed-9a74-90e2baa80c8c"
+                            }
+                        },
+                        "files": {
+                            "maximum": 3579895,
+                            "used": 101
+                        },
+                        "name": "SC_data6",
+                        "uuid": "fde1aeba-2289-11ed-9a74-90e2baa80c8c"
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,148 @@
+XCP
+=======
+
+NetApp XCP is used for copying data from source to destination.
+XCP works on both NFS and SMB protocol from any to NetApp
+or NetApp to NetApp sources.
+
+XCP can be used for the following purpose
+1. Data Migration in NFS and SMB
+2. File Analytics
+
+
+Prerequisites
+=================
+
+XCP NFS            - RHEL 8.0 with 4 CPU, 32GB RAM, 1 NICs
+                     (with 20GB free space)
+XCP SMB            - Windows 2012r2 with 4 CPU, 32GB RAM, 1 NICs.
+XCP File Analytics - RHEL 8.0 with 4 CPU, 32GB RAM, 1 NICs (Mandatory)
+                   - Windows 2012r2 with 4 CPU, 32GB RAM, 1 NICs (Optional if you do not need
+                     analytics for SMB shares)
+                   - Google chrome with minimum version 76.X for
+                     File Analytics GUI access.
+
+Please refer the IMT for all supported versions of OS.
+Have a valid XCP license or request one from https://xcp.netapp.com/
+
+
+Folder Structure
+====================
+
+|_/xcp/
+   |_linux        - Contains an XCP Linux build for NFS migration using CLI, a signed XCP Linux build and certificate chain for authenticity purposes
+   |_windows      - Contains a signed XCP Windows build for SMB  migration using CLI
+   |_xcp_gui      - Contains GUI binaries for XCP File Analytics
+   |_configure.sh - Shell script for installation and configuration of
+                    File Analytics GUI
+
+
+Usage
+=========
+
+   NFS Data Migration
+   =======================
+
+      Use CLI to run related XCP NFS commands
+          xcp help               -  Displays a list of commands,
+                                    command parameters, and a brief
+                                    description of each.
+          xcp activate           -  Activates the XCP license.
+          xcp show <IP>          -  Queries the RPC services and
+                                    NFS exports of one or more storage servers.
+          xcp scan <export_path> -  Recursively scans the entire NFS
+                                    share and lists all the files by
+                                    the end of the scan command.
+          xcp copy -newid id <source_export_path> <destination_export_path>
+                                 -  Scans and copies the entire source
+                                    directory structure to a destination.
+          xcp sync -id <id>      -  Source incremental changes are copied and
+                                    applied to the target directory.
+          xcp verify <source_export_path> <destination_export_path>
+                                 -  Checks for modification times
+                                    and other file or directory attributes
+                                    including permissions.
+         xcp resume -id <id>     -  Resumes baseline copy from the
+                                    point of interruption
+         xcp delete <export_path>
+                                 -  Deletes everything in the path
+
+
+   SMB Data Migration
+   ======================
+
+      Use CLI to run related XCP SMB commands
+          xcp help                - Displays a list of commands,
+                                    command parameters, and a brief description of each.
+          xcp activate            - Activates the XCP license.
+          xcp show <IP>           - Queries the RPC services and NFS exports of
+                                    one or more storage servers.
+          xcp scan <export_path>  - Recursively scans the entire SMB
+                                    share and lists all the files by the end
+                                    of the scan command.
+          xcp copy <source_export_path> <destination_export_path>
+                                  - Scans and copies the entire source
+                                    directory structure to a destination.
+          xcp sync                - Source incremental changes are copied and
+                                    applied to the target directory.
+          xcp verify <source_export_path> <destination_export_path>
+                                  - Checks for modification times and
+                                    other file or directory attributes
+                                    including permissions.
+
+
+   File Analytics
+   ===================
+
+      XCP File Analytics is GUI interface for XCP scan. It helps user to run file
+      systems analytics on NFS or SMB shares running on heterogeneous environment.
+      XCP File Analytics is supported from XCP-1.6 release onwards.
+
+      Installation of XCP File Analytics
+      ======================================
+
+      To install XCP File Analytics on Linux
+          Run " bash configure.sh " which will configure the required
+          packages from /xcp path. Select the options displayed for
+          installation. Successful installation message will be displayed.
+          If you have already setup the Linux machine with the PostgreSQL
+          and HTTPD, please refer the latest user guide
+
+      To install XCP File Analytics on Windows
+          Make sure, a Linux machine is configured using above step as File
+          Analytics GUI will be hosted using that machine IP.Copy the xcp
+          binary under /xcp/windows/ on the Linux machine and keep it under
+          C:\NetApp\XCP folder in Windows machine. Copy the license,
+          server.crt and server.key from /opt/NetApp/xFiles/xcp
+          on the Linux machine to C:\NetApp\XCP on Windows machine.
+          Run "xcp configure" from path C:\NetApp\XCP and provide
+          IP of your Linux machine and Postgres database user password.
+          Update the IP of your Windows machine by running configure.sh script.
+
+
+Other Information
+======================
+
+    - In Linux, the XCP CLI logs are generated at /opt/NetApp/xFiles/xcp/xcplogs.
+    - In Linux, the File Analytics logs are generated at /opt/NetApp/xFiles/xcp/xcpfalogs.
+    - In Windows, the XCP CLI logs are generated at C:\NetApp\XCP\Logs\xcp.txt.
+    - In Windows, the File Analytics logs are generated at C:\NetApp\XCP\Logs\xcp-fa.txt.
+    - The File Analytics installation logs are generated in the folder
+      containing the configure.sh installation script.
+    - In Linux, a certificate chain is provided to authenticate the binary.
+      You can use the certificate chain to obtain a public key to verify the binary.
+      Obtain the public key from the certificate chain by using the following command:
+      openssl x509 -in csc-prod-XCP-TAR.pem -pubkey -noout > csc-prod-XCP-TAR.pub
+      where "csc-prod-XCP-TAR.pem" is the certificate chain present in the linux directory
+      and "csc-prod-XCP-TAR.pub" is the public key obtained by using the certificate chain.
+      With the help of the public key and the signed XCP Linux build, you can verify the XCP Linux build by using the following command:
+      openssl dgst -sha256 -verify csc-prod-XCP-TAR.pub -signature xcp.sig xcp
+      where "xcp.sig" is the signed XCP Linux build.
+    - In Windows, you can authenticate XCP build by checking the digital signature under the xcp.exe properties.
+
+
+Support And Documentation
+============================
+    - For technical support, refer to https://www.netapp.com/us/contact-us/support.aspx.
+    - For XCP documentation, refer to
+      https://mysupport.netapp.com/documentation/productlibrary/index.html?productID=63064

@@ -1,0 +1,1 @@
+Place assets here and they will be copied to the dist like files, images, etc.
