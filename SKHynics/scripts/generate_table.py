@@ -5,7 +5,7 @@ import argparse
 import pandas
 import json
 import logging
-parser = argparse.ArgumentParser(description="Please refenace Netapp AIQUM doc : https://docs.netapp.com/us-en/active-iq-unified-manager/events/concept_how_scripts_work_with_alerts.html")
+parser = argparse.ArgumentParser(description="Please refenace Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, help="read filename",required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
 args= parser.parse_args()
