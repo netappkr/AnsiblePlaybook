@@ -108,5 +108,7 @@ python .\SKHynics\scripts\generate_table.py -r clusters_inode_info -f .\SKHynics
     </body>
     </html>
 ```
+### 스크립트 동작로그
+```generate_table.log``` 파일에 실행로그를 남기고 있습니다. 에러 발생 시 이 로그파일을 참조합니다.
 
 # 참조
