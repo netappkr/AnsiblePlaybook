@@ -28,7 +28,7 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 진행상황에 대해 업데이트를 아래와 같이 보여드리며 </br>
 진행방식은 [Agile 방법](https://www.redhat.com/ko/topics/devops/what-is-agile-methodology)과 유사한 방법으로 진행할 계획입니다.
 
-> # 상태값
+> ### 상태 설명
 > - New : 새로운 Task 등록
 > - Active : Task 진행중
 > - Pending : 외부또는 내부 이슈로 인해 대기 상태
@@ -38,19 +38,19 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 |분류|Task|담당자|상태|주석|
 |---|---|---|---|---|
 | AWX 구성 | AWX 설치 가이드 작성 | 안우영 | close | [가이드 문서](../AWX/install/Readme.md) |
-| | | | | |
-| | | | | |
+| AWX 구성 | AWX 설치를 위한 환경 구성 | 유한민 | Active | --- |
+| AWX 구성 | AWX 설치 진행 | 안우영 | New | --- |
 
 # Gantt
 ```mermaid
 gantt
     title Migrate WFA to Ansible
     dateFormat  YYYY-MM-DD
-    section AWX install
+    section AWX 구성
     AWX install Guide 작성  : a1, 2024-02-26, 4d
-    AWX 구성에 필요한 VM 환경 구성  : a2, 2024-03-01, 8d
-    AWX 설치 및 환경 진행 : a3, 2024-03-01, 3d
-    가상 얼굴 이미지 생성 및 분류 : after a1, 4d
+    AWX 구성에 필요한 환경 구성  : a2, 2024-03-01, 8d
+    AWX 설치 진행 : a3, after a2 , 3d
+    AWX 세부설정 추가 : a4, after a3, 2d
 
     section Front-end
     와이어프레임     :a1, 2024-03-01, 3d
