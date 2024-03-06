@@ -44,10 +44,10 @@ gantt
     excludes    weekends
 
     section AWX 구성
-    AWX install Guide 작성  : done, awx1, 2024-02-26, 4d
-    AWX 구성에 필요한 환경 구성  : active, awx2, 2024-03-05, 4d
-    AWX 설치 진행 : awx3, after awx2 , 3d
-    AWX 세부설정 추가 : awx4, after awx3, 2d
+    AWX install Guide 작성  : done, awx1, 2024-02-26, 5d
+    AWX 구성에 필요한 환경 구성  : active, awx2, 2024-03-05, 5d
+    AWX 설치 진행 : awx3, after awx2 , 5d
+    AWX 세부설정 추가 : awx4, after awx3, 5d
 
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : p1-1, 2024-03-04, 5d
