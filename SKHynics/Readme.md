@@ -47,21 +47,59 @@ gantt
     title Migrate WFA to Ansible
     dateFormat  YYYY-MM-DD
     section AWX 구성
-    AWX install Guide 작성  : a1, 2024-02-26, 4d
-    AWX 구성에 필요한 환경 구성  : a2, 2024-03-01, 8d
-    AWX 설치 진행 : a3, after a2 , 3d
-    AWX 세부설정 추가 : a4, after a3, 2d
+    AWX install Guide 작성  : awx1, 2024-02-26, 4d
+    AWX 구성에 필요한 환경 구성  : awx2, 2024-03-01, 8d
+    AWX 설치 진행 : awx3, after awx2 , 3d
+    AWX 세부설정 추가 : awx4, after awx3, 2d
 
-    section Front-end
-    와이어프레임     :a1, 2024-03-01, 3d
-    react 학습 및 적용 : after a1,  10d
-    사진 업로드 및 설정 기능 :after a1 , 10d
+    section Inode report by Cluster Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
 
-    section Back-end
-    django 학습 및 적용 : a1,2024-03-01, 3d
-    회원기능      :a2,after a1 , 10d
-    친구기능      :after a1  ,10d
-    결과 이미지저장,공유  : a3,after a2, 2d
-    스티커 기능  : a4,after a3, 2d
+    section Inode report by Volume Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section Capacity Report by cluster Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section Capacity Report by Volume Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section Big snapshot Alert by Volume Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section Snapmirror/vault Check Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section Check usage by Directory Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section check the File status Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section Inode Increase Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
+
+    section check the Data Life Cycle Playbook
+    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p1-2, after p1-1,  10d
+    Playbook 수정 : p1-3, after a1 , 10d
 ```
 
