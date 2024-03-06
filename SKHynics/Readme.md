@@ -48,65 +48,66 @@ gantt
     AWX 세부설정 추가 : awx4, after awx3, 2d
 
     section Inode report by Cluster Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
+    Sample Playbook 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
     Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Inode report by Volume Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p2-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p2-2, after p2-1,  10d
+    Playbook 수정 : p2-3, after p2-2 , 10d
 
     section Capacity Report by cluster Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p3-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p3-2, after p3-1,  10d
+    Playbook 수정 : p3-3, after p3-2 , 10d
 
     section Capacity Report by Volume Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p4-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p4-2, after p4-1,  10d
+    Playbook 수정 : p4-3, after p4-2 , 10d
 
     section Big snapshot Alert by Volume Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p5-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p5-2, after p5-1,  10d
+    Playbook 수정 : p5-3, after p5-2 , 10d
 
     section Snapmirror/vault Check Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p6-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p6-2, after p6-1,  10d
+    Playbook 수정 : p6-3, after p6-2 , 10d
 
     section Check usage by Directory Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p7-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p7-2, after p7-1,  10d
+    Playbook 수정 : p7-3, after p7-2 , 10d
 
     section check the File status Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p8-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p8-2, after p8-1,  10d
+    Playbook 수정 : p8-3, after p8-2 , 10d
 
     section Inode Increase Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p9-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p9-2, after p9-1,  10d
+    Playbook 수정 : p9-3, after p9-2 , 10d
 
     section check the Data Life Cycle Playbook
-    Sample Play book 작성 : p1-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after p1-2 , 10d
+    Sample Playbook 작성 : p10-1, 2024-03-01, 3d
+    Playbokk 적용 Test: p10-2, after p10-1,  10d
+    Playbook 수정 : p10-3, after p10-2 , 10d
 ```
 
 # 참조
+- [애자일과 워터폴 방법론 비교 | 정의, 차이, 장단점, 적합한 조직](https://www.codestates.com/blog/content/%EC%95%A0%EC%9E%90%EC%9D%BC%EB%B0%A9%EB%B2%95%EB%A1%A0-%EC%9B%8C%ED%84%B0%ED%8F%B4%EB%B0%A9%EB%B2%95%EB%A1%A0)
+- [](https://github.com/mermaid-js/mermaid)
+### Task 상태 설명
+- New : 새로운 Task 등록
+- Active : Task 진행중
+- Pending : 외부또는 내부 이슈로 인해 대기 상태
+- close : 완료
 
-> ### Task 상태 설명
-> - New : 새로운 Task 등록
-> - Active : Task 진행중
-> - Pending : 외부또는 내부 이슈로 인해 대기 상태
-> - close : 완료
-
-### Tips Agile 간략설명
+### Agile 간략설명
 ![Img](./Images/애자일-방법론-정의-장점-단점-프로세스.webp)
 ![Img](./Images/애자일-방법론-워터폴-방법론-비교-차이점-장단점-특징-요구사항.webp)
 
