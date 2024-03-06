@@ -35,10 +35,10 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | AWX 구성 | AWX 설치 가이드 작성 | 안우영 | done | [가이드 문서](../AWX/install/Readme.md) |
 | AWX 구성 | AWX 설치를 위한 환경 구성 | 유한민 | Active | --- |
 | AWX 구성 | AWX 설치 진행 | 안우영 | New | --- |
-| Inode report by Cluster Playbook | Sample Playbook 작성 | 안우영 | done | [Inode report by Cluster Playbook](./GetInodebyCluster.yaml) |
-| Inode report by Cluster Playbook | Sample SMTP loader Script 작성 | 안우영 | done | --- | [generate_table.py](./script/generate_table.py) |
-| Inode report by Volume | Sample Playbook 작성 | 안우영 | done | --- | [Inode report by Volume](./GetInodebyVolume.yaml) |
-| Inode report by Volume Playbook | Sample SMTP loader Script 작성 | 안우영 | done | --- | [generate_table.py](./script/generate_table.py) |
+| Inode report by Cluster Playbook | Sample Playbook 작성           | 안우영 | done | [Inode report by Cluster Playbook](./GetInodebyCluster.yaml) |
+| Inode report by Cluster Playbook | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
+| Inode report by Volume Playbook  | Sample Playbook 작성           | 안우영 | done | [Inode report by Volume Playbook](./GetInodebyVolume.yaml) |
+| Inode report by Volume Playbook  | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
 
 # Gantt
 ```mermaid
