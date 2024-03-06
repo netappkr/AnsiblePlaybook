@@ -28,6 +28,10 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 진행상황에 대해 업데이트를 아래와 같이 보여드리며 </br>
 진행방식은 [Agile 방법](https://www.redhat.com/ko/topics/devops/what-is-agile-methodology)과 유사한 방법으로 진행할 계획입니다.
 
+> ### Tips Agile 간략설명
+> ![Img](./Images/애자일-방법론-정의-장점-단점-프로세스.webp)
+> ![Img](./Images/애자일-방법론-워터폴-방법론-비교-차이점-장단점-특징-요구사항.webp)
+
 > ### 상태 설명
 > - New : 새로운 Task 등록
 > - Active : Task 진행중
