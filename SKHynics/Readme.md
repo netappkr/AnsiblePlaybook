@@ -42,28 +42,29 @@ gantt
     title Migrate WFA to Ansible
     dateFormat  YYYY-MM-DD
     section AWX 구성
-    AWX install Guide 작성  : awx1, 2024-02-26, 4d
-    AWX 구성에 필요한 환경 구성  : awx2, 2024-03-01, 8d
+    AWX install Guide 작성  : done, awx1, 2024-02-26, 4d
+    AWX 구성에 필요한 환경 구성  : active, awx2, 2024-03-01, 8d
     AWX 설치 진행 : awx3, after awx2 , 3d
     AWX 세부설정 추가 : awx4, after awx3, 2d
 
     section Inode report by Cluster Playbook
-    Sample Playbook 작성 : p1-1, 2024-03-01, 5d
-    Playbokk 적용 Test: p1-2, after p1-1,  5d
+    Sample Playbook 작성 : p1-1, 2024-03-04, 5d
+    weakend : weakend, 2024-03-09, 2d
+    Playbokk 적용 Test: p1-2, after p1-1,  7d
     Playbook 수정 : p1-3, after p1-2 , 5d
 
     section Inode report by Volume Playbook
-    Sample Playbook 작성 : p2-1, 2024-03-01, 5d
+    Sample Playbook 작성 : p2-1, 2024-03-04, 5d
     Playbokk 적용 Test: p2-2, after p2-1,  5d
     Playbook 수정 : p2-3, after p2-2 , 5d
 
     section Capacity Report by cluster Playbook
-    Sample Playbook 작성 : p3-1, 2024-03-01, 3d
+    Sample Playbook 작성 : p3-1, 2024-03-04, 3d
     Playbokk 적용 Test: p3-2, after p3-1,  10d
     Playbook 수정 : p3-3, after p3-2 , 10d
 
     section Capacity Report by Volume Playbook
-    Sample Playbook 작성 : p4-1, 2024-03-01, 3d
+    Sample Playbook 작성 : p4-1, 2024-03-04, 3d
     Playbokk 적용 Test: p4-2, after p4-1,  10d
     Playbook 수정 : p4-3, after p4-2 , 10d
 
