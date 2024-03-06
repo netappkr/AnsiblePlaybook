@@ -3,7 +3,7 @@ WFA가 곧 EOA 된다고 합니다.</br>
 Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니다.
 
 ## 프로젝트 상세 목표
-1. 인터넷이 제한된 환경에서 AWX 환경을 구성하는 가이드 작성
+1. AWX 환경을 구성하는 가이드 작성
 2. 아래 기능을 플레이북으로 구현
    1. Inode Summary : 전체 Cluster 별 Inode 현황을 매일 메일로 담당자에게 전송
    2. Inode Report: 전체 Volume 별 Inode 현황을 매일 메일로 담당자에게 전송
