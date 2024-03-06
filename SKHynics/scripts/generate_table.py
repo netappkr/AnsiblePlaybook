@@ -63,6 +63,7 @@ def storage_inode_report_by_cluster(data):
         }])
         datatable=datatable._append(add,ignore_index = True)
 
+        
 def main():
     if args.request == "clusters_indoe_info":
         storage_inode_report_by_cluster(data)
