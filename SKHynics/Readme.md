@@ -25,7 +25,7 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 ## Task table
 프로젝트 진행 중 예상치 못한 issue나 Task가 추가될 수 있습니다.</br>
 하지만 고객측에서는 전체적인 프로젝트 종료 예상날짜에 대해 업데이트 받기를 원합니다.</br>
-진행상황에 대해 업데이트를 아래와 같이 보여드리며 </br>
+진행상황에 대해 아래와 같이 보여드리며 </br>
 진행방식은 [Agile 방법](https://www.redhat.com/ko/topics/devops/what-is-agile-methodology)과 유사한 방법으로 진행할 계획입니다.
 
 > Task 상태에 대한 설명은 참조란을 확인합니다.
