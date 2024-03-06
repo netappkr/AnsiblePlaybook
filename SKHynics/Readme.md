@@ -55,51 +55,51 @@ gantt
     section Inode report by Cluster Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Inode report by Volume Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Capacity Report by cluster Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Capacity Report by Volume Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Big snapshot Alert by Volume Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Snapmirror/vault Check Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Check usage by Directory Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section check the File status Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section Inode Increase Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 
     section check the Data Life Cycle Playbook
     Sample Play book 작성 : p1-1, 2024-03-01, 3d
     Playbokk 적용 Test: p1-2, after p1-1,  10d
-    Playbook 수정 : p1-3, after a1 , 10d
+    Playbook 수정 : p1-3, after p1-2 , 10d
 ```
 
