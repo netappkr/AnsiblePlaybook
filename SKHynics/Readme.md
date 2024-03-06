@@ -41,6 +41,8 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | Inode report by Cluster Playbook | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
 | Inode report by Volume Playbook  | Sample Playbook 작성           | 안우영 | done | [Inode report by Volume Playbook](./GetInodebyVolume.yaml) |
 | Inode report by Volume Playbook  | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
+
+
 </details>
 
 # Gantt
