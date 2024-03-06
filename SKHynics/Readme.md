@@ -41,6 +41,8 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 gantt
     title Migrate WFA to Ansible
     dateFormat  YYYY-MM-DD
+    excludes    weekends
+
     section AWX 구성
     AWX install Guide 작성  : done, awx1, 2024-02-26, 4d
     AWX 구성에 필요한 환경 구성  : active, awx2, 2024-03-05, 4d
@@ -100,7 +102,7 @@ gantt
 
 # 참조
 - [애자일과 워터폴 방법론 비교 | 정의, 차이, 장단점, 적합한 조직](https://www.codestates.com/blog/content/%EC%95%A0%EC%9E%90%EC%9D%BC%EB%B0%A9%EB%B2%95%EB%A1%A0-%EC%9B%8C%ED%84%B0%ED%8F%B4%EB%B0%A9%EB%B2%95%EB%A1%A0)
-- [mermaid](https://github.com/mermaid-js/mermaid)
+- [mermaid](https://mermaid.js.org/syntax/gantt.html)
 - [Gantt example](https://github.com/mermaidjs/mermaidjs.github.io/blob/master/gantt.md)
 ### Task 상태 설명
 - New : 새로운 Task 등록
