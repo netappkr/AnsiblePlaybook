@@ -1,4 +1,5 @@
 # Ansible Playbook 작성
+WFA가 곧 EOA 된다고 합니다.</br>
 Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니다.
 
 ## 프로젝트 상세 목표
@@ -27,9 +28,9 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 진행상황에 대해 업데이트를 아래와 같이 보여드리며 </br>
 진행방식은 [Agile 방법](https://www.redhat.com/ko/topics/devops/what-is-agile-methodology)과 유사한 방법으로 진행할 계획입니다.
 
-|분류|Task|담당자|상태|
-|---|---|---|---|
-|
+|분류|Task|담당자|상태|주석|
+|---|---|---|---|---|
+|AWX install Guide 작성|
 # Gantt
 ```mermaid
 gantt
@@ -37,17 +38,17 @@ gantt
     dateFormat  YYYY-MM-DD
     section AWX install
     AWX install Guide 작성  : a1, 2024-02-26, 4d
-    AWX 구성에 필요한 VM 환경 구성  : 2020-03-01, 8d
-    AWX 설치 및 환경 진행 : after a1, 10d
+    AWX 구성에 필요한 VM 환경 구성  : a2, 2024-03-01, 8d
+    AWX 설치 및 환경 진행 : a3, 2024-03-01, 3d
     가상 얼굴 이미지 생성 및 분류 : after a1, 4d
 
     section Front-end
-    와이어프레임     :a1,2020-10-14  , 10d
+    와이어프레임     :a1, 2024-03-01, 3d
     react 학습 및 적용 : after a1,  10d
     사진 업로드 및 설정 기능 :after a1 , 10d
 
     section Back-end
-    django 학습 및 적용 : a1,2020-10-14 , 10d
+    django 학습 및 적용 : a1,2024-03-01, 3d
     회원기능      :a2,after a1 , 10d
     친구기능      :after a1  ,10d
     결과 이미지저장,공유  : a3,after a2, 2d
