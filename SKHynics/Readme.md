@@ -43,14 +43,13 @@ gantt
     dateFormat  YYYY-MM-DD
     section AWX 구성
     AWX install Guide 작성  : done, awx1, 2024-02-26, 4d
-    AWX 구성에 필요한 환경 구성  : active, awx2, 2024-03-01, 8d
+    AWX 구성에 필요한 환경 구성  : active, awx2, 2024-03-05, 4d
     AWX 설치 진행 : awx3, after awx2 , 3d
     AWX 세부설정 추가 : awx4, after awx3, 2d
 
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : p1-1, 2024-03-04, 5d
-    weakend : weakend, 2024-03-09, 2d
-    Playbokk 적용 Test: p1-2, after p1-1,  7d
+    Playbokk 적용 Test: p1-2, after p1-1,  5d
     Playbook 수정 : p1-3, after p1-2 , 5d
 
     section Inode report by Volume Playbook
@@ -59,44 +58,44 @@ gantt
     Playbook 수정 : p2-3, after p2-2 , 5d
 
     section Capacity Report by cluster Playbook
-    Sample Playbook 작성 : p3-1, 2024-03-04, 3d
-    Playbokk 적용 Test: p3-2, after p3-1,  10d
-    Playbook 수정 : p3-3, after p3-2 , 10d
+    Sample Playbook 작성 : p3-1, 2024-03-18, 5d
+    Playbokk 적용 Test: p3-2, after p3-1,  5d
+    Playbook 수정 : p3-3, after p3-2 , 5d
 
     section Capacity Report by Volume Playbook
-    Sample Playbook 작성 : p4-1, 2024-03-04, 3d
-    Playbokk 적용 Test: p4-2, after p4-1,  10d
-    Playbook 수정 : p4-3, after p4-2 , 10d
+    Sample Playbook 작성 : p4-1, 2024-03-18, 5d
+    Playbokk 적용 Test: p4-2, after p4-1,  5d
+    Playbook 수정 : p4-3, after p4-2 , 5d
 
     section Big snapshot Alert by Volume Playbook
-    Sample Playbook 작성 : p5-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p5-2, after p5-1,  10d
-    Playbook 수정 : p5-3, after p5-2 , 10d
+    Sample Playbook 작성 : p5-1, 2024-04-01, 5d
+    Playbokk 적용 Test: p5-2, after p5-1,  5d
+    Playbook 수정 : p5-3, after p5-2 , 5d
 
     section Snapmirror/vault Check Playbook
-    Sample Playbook 작성 : p6-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p6-2, after p6-1,  10d
-    Playbook 수정 : p6-3, after p6-2 , 10d
+    Sample Playbook 작성 : p6-1, 2024-04-01, 5d
+    Playbokk 적용 Test: p6-2, after p6-1,  5d
+    Playbook 수정 : p6-3, after p6-2 , 5d
 
     section Check usage by Directory Playbook
-    Sample Playbook 작성 : p7-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p7-2, after p7-1,  10d
-    Playbook 수정 : p7-3, after p7-2 , 10d
+    Sample Playbook 작성 : p7-1, 2024-04-15, 5d
+    Playbokk 적용 Test: p7-2, after p7-1,  5d
+    Playbook 수정 : p7-3, after p7-2 , 5d
 
     section check the File status Playbook
-    Sample Playbook 작성 : p8-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p8-2, after p8-1,  10d
-    Playbook 수정 : p8-3, after p8-2 , 10d
+    Sample Playbook 작성 : p8-1, 2024-04-15, 5d
+    Playbokk 적용 Test: p8-2, after p8-1,  5d
+    Playbook 수정 : p8-3, after p8-2 , 5d
 
     section Inode Increase Playbook
-    Sample Playbook 작성 : p9-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p9-2, after p9-1,  10d
-    Playbook 수정 : p9-3, after p9-2 , 10d
+    Sample Playbook 작성 : p9-1, 2024-04-29, 5d
+    Playbokk 적용 Test: p9-2, after p9-1,  5d
+    Playbook 수정 : p9-3, after p9-2 , 5d
 
     section check the Data Life Cycle Playbook
-    Sample Playbook 작성 : p10-1, 2024-03-01, 3d
-    Playbokk 적용 Test: p10-2, after p10-1,  10d
-    Playbook 수정 : p10-3, after p10-2 , 10d
+    Sample Playbook 작성 : p10-1, 2024-04-29, 5d
+    Playbokk 적용 Test: p10-2, after p10-1,  5d
+    Playbook 수정 : p10-3, after p10-2 , 5d
 ```
 
 # 참조
