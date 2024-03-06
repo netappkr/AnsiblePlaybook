@@ -22,6 +22,7 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 
 
 # Gantt
+```mermaid
 gantt
     title A Gantt Diagram
     dateFormat  YYYY-MM-DD
@@ -31,5 +32,5 @@ gantt
     section Another
     Task in sec      :2014-01-12  , 12d
     another task      : 24d
-
+```
 
