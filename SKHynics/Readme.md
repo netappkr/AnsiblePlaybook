@@ -101,7 +101,8 @@ gantt
 
 # 참조
 - [애자일과 워터폴 방법론 비교 | 정의, 차이, 장단점, 적합한 조직](https://www.codestates.com/blog/content/%EC%95%A0%EC%9E%90%EC%9D%BC%EB%B0%A9%EB%B2%95%EB%A1%A0-%EC%9B%8C%ED%84%B0%ED%8F%B4%EB%B0%A9%EB%B2%95%EB%A1%A0)
-- [](https://github.com/mermaid-js/mermaid)
+- [mermaid](https://github.com/mermaid-js/mermaid)
+- [Gantt example](https://github.com/mermaidjs/mermaidjs.github.io/blob/master/gantt.md)
 ### Task 상태 설명
 - New : 새로운 Task 등록
 - Active : Task 진행중
