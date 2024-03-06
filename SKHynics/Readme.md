@@ -29,6 +29,8 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 진행방식은 [Agile 방법](https://www.redhat.com/ko/topics/devops/what-is-agile-methodology)과 유사한 방법으로 진행할 계획입니다.
 
 > Task 상태에 대한 설명은 참조란을 확인합니다.
+<details>
+<summary>Task table</summary>
 
 |분류|Task|담당자|상태|주석|
 |---|---|---|---|---|
@@ -39,6 +41,7 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | Inode report by Cluster Playbook | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
 | Inode report by Volume Playbook  | Sample Playbook 작성           | 안우영 | done | [Inode report by Volume Playbook](./GetInodebyVolume.yaml) |
 | Inode report by Volume Playbook  | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
+</details>
 
 # Gantt
 ```mermaid
