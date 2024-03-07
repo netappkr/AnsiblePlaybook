@@ -44,7 +44,7 @@
       register: datafiles
       loop: "{{ ontap_aggrs.results }}"
       loop_control:
-        loop_var: cluster_volumes
+        loop_var: cluster_aggrs
 
     #- name: debug show
     #  ansible.builtin.debug:
