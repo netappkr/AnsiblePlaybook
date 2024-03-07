@@ -91,8 +91,9 @@ def storage_space_report_by_aggr(data):
         used_size=aggr["space"]["block_storage"]["used"]
         
         add=pandas.DataFrame.from_records([{
-            'cluster name': data["cluster"]["name"],
-            'aggr name': data["cluster"]["name"],
+            'Cluster Name': data["cluster"]["name"],
+            'Aggr Name': data["cluster"]["name"],
+            'Node Name': aggr["home_node"]["name"],
             'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
             'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
             'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
