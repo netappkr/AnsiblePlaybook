@@ -63,12 +63,31 @@ def storage_inode_report_by_cluster(data):
         }])
         datatable=datatable._append(add,ignore_index = True)
 
+def storage_space_report_by_cluster(data):
+    global datatable
+    for cluster in data:
+        inode_total=0
+        inode_used=0
+        for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+            inode_total= inode_total+volume["files"]["maximum"]
+            inode_used= inode_used+volume["files"]["used"]
+
+        add=pandas.DataFrame.from_records([{
+            'cluster name': cluster["cluster"]["name"],
+            'Total Inodes': inode_total,
+            'Used Inodes': inode_used, 
+            'Free Inodes': inode_total - inode_used,
+            'Inode Use%': round(inode_used / inode_total * 100,2)
+        }])
+        datatable=datatable._append(add,ignore_index = True)
         
 def main():
     if args.request == "clusters_indoe_info":
         storage_inode_report_by_cluster(data)
     elif args.request == "volume_indoe_info":
         storage_inode_report_by_volume(data)
+    elif args.request == "clusters_space_info":
+        storage_space_report_by_cluster(data)
     else:
         logger.info(args.request+" request is not matched")
 
