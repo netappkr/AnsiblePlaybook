@@ -28,8 +28,6 @@ logger.addHandler(file_handler) ## 핸들러 등록
 json_file = args.file
 with open(json_file, 'r') as file:
     data = json.load(file)
-with open("df_style.css", 'r') as file:
-    css = file.read()
 
 # Pandas DataFrame을 생성합니다.
 datatable = pandas.DataFrame()
@@ -119,6 +117,29 @@ def main():
             logger.error(args.request+" request is not matched")
         datatable.style.set_caption(args.request)
         # HTML 테이블로 변환합니다.
+        css = """
+        .mystyle {
+            font-size: 11pt; 
+            font-family: Arial;
+            border-collapse: collapse; 
+            border: 1px solid silver;
+
+        }
+
+        .mystyle td, th {
+            padding: 5px;
+            text-align: center;
+        }
+
+        .mystyle tr:nth-child(even) {
+            background: #E0E0E0;
+        }
+
+        .mystyle tr:hover {
+            background: silver;
+            cursor: pointer;
+        }
+        """
         html = f"""\
         <html>
         <head></head>
