@@ -26,26 +26,25 @@
         https: true
         validate_certs: false
         gather_subset:
-          - volume_info
+          - aggregate_info
         fields:
-          - 'files'
-          - 'name'
-      register: ontap_volumes
+          - 'space'
+      register: ontap_aggrs
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
     #- name: debug show
     #  ansible.builtin.debug:
-    #    msg: "{{ ontap_volumes.results }}"
+    #    msg: "{{ ontap_aggrs.results }}"
 
     - name: Write inode information to a JSON file
       copy:
-        dest: "/tmp/{{ cluster_volumes.cluster.name }}_inode_info.json"
-        content: "{{ cluster_volumes | to_nice_json }}"
+        dest: "/tmp/{{ cluster_aggrs.cluster.name }}_inode_info.json"
+        content: "{{ cluster_aggrs | to_nice_json }}"
       register: datafiles
-      loop: "{{ ontap_volumes.results }}"
+      loop: "{{ ontap_aggrs.results }}"
       loop_control:
-        loop_var: cluster_volumes
+        loop_var: cluster_aggrs
 
     #- name: debug show
     #  ansible.builtin.debug:
@@ -64,7 +63,7 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} -r volume_indoe_info -f {{ datafile.dest }}"
+      command: "python3 {{ files_matched.files[0].path }} -r aggrs_space_info -f {{ datafile.dest }}"
       register: html_tables
       loop: "{{ datafiles.results  }}"
       loop_control:

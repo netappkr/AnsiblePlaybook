@@ -32,20 +32,6 @@ with open(json_file, 'r') as file:
 # Pandas DataFrame을 생성합니다.
 datatable = pandas.DataFrame()
 
-
-def storage_inode_report_by_volume(data):
-    global datatable
-    for volume in data["ontap_info"]["storage/volumes"]["records"]:
-        add=pandas.DataFrame.from_records([{
-            'Volume Name': volume["name"],
-            'Total Inodes': volume["files"]["maximum"],
-            'Used Inodes': volume["files"]["used"], 
-            'Free Inodes': volume["files"]["maximum"] - volume["files"]["used"],
-            'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100,2)
-        }])
-        
-        datatable=datatable._append(add,ignore_index = True)
-
 def storage_inode_report_by_cluster(data):
     global datatable
     for cluster in data:
@@ -64,20 +50,51 @@ def storage_inode_report_by_cluster(data):
         }])
         datatable=datatable._append(add,ignore_index = True)
 
+def storage_inode_report_by_volume(data):
+    global datatable
+    for volume in data["ontap_info"]["storage/volumes"]["records"]:
+        add=pandas.DataFrame.from_records([{
+            'cluster Name': data["cluster"]["name"],
+            'Volume Name': volume["name"],
+            'Total Inodes': volume["files"]["maximum"],
+            'Used Inodes': volume["files"]["used"], 
+            'Free Inodes': volume["files"]["maximum"] - volume["files"]["used"],
+            'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100,2)
+        }])
+        
+        datatable=datatable._append(add,ignore_index = True)
+
+
 def storage_space_report_by_cluster(data):
     global datatable
     for cluster in data:
         total_size=0
         used_size=0
-        for volume in cluster["ontap_info"]["storage/aggregates"]["records"]:
-            total_size= total_size+volume["space"]["block_storage"]["size"]
-            used_size= used_size+volume["space"]["block_storage"]["used"]
+        for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+            total_size= total_size+aggr["space"]["block_storage"]["size"]
+            used_size= used_size+aggr["space"]["block_storage"]["used"]
             
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
             'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
             'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
+            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
+            'Used Rate(%)': round(used_size / total_size * 100,2)
+        }])
+        datatable=datatable._append(add,ignore_index = True)
+
+def storage_space_report_by_aggr(data):
+    global datatable
+    for aggr in data["ontap_info"]["storage/aggregates"]["records"]:
+        total_size=aggr["space"]["block_storage"]["size"]
+        used_size=aggr["space"]["block_storage"]["used"]
+        
+        add=pandas.DataFrame.from_records([{
+            'cluster name': data["cluster"]["name"],
+            'aggr name': data["cluster"]["name"],
+            'Total Size(TiB)': round(total_size,2),
+            'Used Size(TiB)': round(used_size,2), 
             'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
             'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
@@ -91,6 +108,8 @@ def main():
             storage_inode_report_by_volume(data)
         elif args.request == "clusters_space_info":
             storage_space_report_by_cluster(data)
+        elif args.request == "aggrs_space_info":
+            storage_space_report_by_aggr(data)
         else:
             logger.error(args.request+" request is not matched")
 
