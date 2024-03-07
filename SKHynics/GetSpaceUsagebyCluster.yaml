@@ -39,7 +39,7 @@
 
     - name: Write result data to a JSON file
       copy:
-        dest: "/tmp/clusters_storage_used_info.json"
+        dest: "/tmp/clusters_space_usage_info.json"
         content: "{{ ontap_aggrs.results | to_nice_json }}"
       register: datafiles
 
