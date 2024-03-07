@@ -66,18 +66,19 @@ def storage_inode_report_by_cluster(data):
 def storage_space_report_by_cluster(data):
     global datatable
     for cluster in data:
-        inode_total=0
-        inode_used=0
-        for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-            inode_total= inode_total+volume["files"]["maximum"]
-            inode_used= inode_used+volume["files"]["used"]
+        total_size=0
+        used_size=0
+        for volume in cluster["ontap_info"]["storage/aggregates"]["records"]:
+            total_size= total_size+volume["block_storage"]["size"]
+            used_size= used_size+volume["block_storage"]["used"]
+            
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
-            'Total Inodes': inode_total,
-            'Used Inodes': inode_used, 
-            'Free Inodes': inode_total - inode_used,
-            'Inode Use%': round(inode_used / inode_total * 100,2)
+            'Total Size(TB)': total_size,
+            'Used Size(TB)': used_size, 
+            'Free Size(TB)': total_size - used_size,
+            'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
         
@@ -96,10 +97,11 @@ def main():
     <html>
     <head></head>
     <body>
+    <p>{1}</p>
       {0}
     </body>
     </html>
-    """.format(datatable.to_html(index=False))
+    """.format(datatable.to_html(index=False),args.request)
 
     # 표준 출력으로 HTML 테이블을 출력합니다.
     print(html)
