@@ -113,7 +113,6 @@ def main():
         else:
             logger.error(args.request+" request is not matched")
         datatable.style.set_caption(args.request)
-        pd.set_option('colheader_justify', 'center')
         # HTML 테이블로 변환합니다.
         html = """\
         <html>
