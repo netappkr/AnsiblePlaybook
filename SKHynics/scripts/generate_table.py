@@ -6,7 +6,7 @@ import pandas
 import json
 import logging
 import traceback
-parser = argparse.ArgumentParser(description="Please refenace Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
+parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, help="read filename",required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
 args= parser.parse_args()

@@ -36,7 +36,7 @@ options:
 1. ansible playbook ```GetInodebyVolume.yaml``` 연계
 예제파일에서 ```testinpu.json``` 에 담겨있는 Cluster 내 볼륨별 inode 정보를 Html Table 형식으로 변환하여 출력합니다, 
 ```ps
-python .\SKHynics\scripts\generate_table.py -r volume_indoe_info -f .\SKHynics\scripts\testinput.json
+python .\SKHynics\scripts\generate_table.py -r volume_indoe_info -f .\SKHynics\scripts\testdata\get_inode_info_by_volume.json
 ```
 출력
 ```html
@@ -89,7 +89,7 @@ python .\SKHynics\scripts\generate_table.py -r volume_indoe_info -f .\SKHynics\s
 ```
 2. ansible playbook ```GetInodebyCluster.yaml``` 연계
 ```ps
-python .\SKHynics\scripts\generate_table.py -r clusters_inode_info -f .\SKHynics\scripts\testinput2.json
+python .\SKHynics\scripts\generate_table.py -r clusters_inode_info -f ..\SKHynics\scripts\testdata\get_inode_info_by_cluster.json
 ```
 
 출력
