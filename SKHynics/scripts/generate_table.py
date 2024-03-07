@@ -5,6 +5,7 @@ import argparse
 import pandas
 import json
 import logging
+import traceback
 parser = argparse.ArgumentParser(description="Please refenace Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, help="read filename",required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
@@ -83,28 +84,32 @@ def storage_space_report_by_cluster(data):
         datatable=datatable._append(add,ignore_index = True)
         
 def main():
-    if args.request == "clusters_indoe_info":
-        storage_inode_report_by_cluster(data)
-    elif args.request == "volume_indoe_info":
-        storage_inode_report_by_volume(data)
-    elif args.request == "clusters_space_info":
-        storage_space_report_by_cluster(data)
-    else:
-        logger.info(args.request+" request is not matched")
+    try:
+        if args.request == "clusters_indoe_info":
+            storage_inode_report_by_cluster(data)
+        elif args.request == "volume_indoe_info":
+            storage_inode_report_by_volume(data)
+        elif args.request == "clusters_space_info":
+            storage_space_report_by_cluster(data)
+        else:
+            logger.error(args.request+" request is not matched")
 
-    # HTML 테이블로 변환합니다.
-    html = """\
-    <html>
-    <head></head>
-    <body>
-    <p>{1}</p>
-      {0}
-    </body>
-    </html>
-    """.format(datatable.to_html(index=False),args.request)
+        # HTML 테이블로 변환합니다.
+        html = """\
+        <html>
+        <head></head>
+        <body>
+        <p>{1}</p>
+        {0}
+        </body>
+        </html>
+        """.format(datatable.to_html(index=False),args.request)
 
-    # 표준 출력으로 HTML 테이블을 출력합니다.
-    print(html)
+        # 표준 출력으로 HTML 테이블을 출력합니다.
+        print(html)
+    except Exception as e:
+        print("Error:" ,traceback.format_exc())
+        logger.error(traceback.format_exc())
 
 if __name__ == '__main__':
     main()
