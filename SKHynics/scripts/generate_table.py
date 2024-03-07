@@ -76,9 +76,9 @@ def storage_space_report_by_cluster(data):
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
-            'Total Size(TiB)': round(total_size/1024/1024/1024),
-            'Used Size(TiB)': round(used_size/1024/1024/1024), 
-            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024),
+            'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
+            'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
+            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
             'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
