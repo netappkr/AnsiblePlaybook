@@ -69,8 +69,8 @@ def storage_space_report_by_cluster(data):
         total_size=0
         used_size=0
         for volume in cluster["ontap_info"]["storage/aggregates"]["records"]:
-            total_size= total_size+volume["block_storage"]["size"]
-            used_size= used_size+volume["block_storage"]["used"]
+            total_size= total_size+volume["space"]["block_storage"]["size"]
+            used_size= used_size+volume["space"]["block_storage"]["used"]
             
 
         add=pandas.DataFrame.from_records([{
