@@ -32,15 +32,17 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 <details>
 <summary>Task table</summary>
 
-|분류|Task|담당자|상태|주석|
-|---|---|---|---|---|
-| AWX 구성 | AWX 설치 가이드 작성 | 안우영 | done | [가이드 문서](../AWX/install/Readme.md) |
-| AWX 구성 | AWX 설치를 위한 환경 구성 | 유한민 | Active | --- |
-| AWX 구성 | AWX 설치 진행 | 안우영 | New | --- |
-| Inode report by Cluster Playbook | Sample Playbook 작성           | 안우영 | done | [Inode report by Cluster Playbook](./GetInodebyCluster.yaml) |
-| Inode report by Cluster Playbook | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
-| Inode report by Volume Playbook  | Sample Playbook 작성           | 안우영 | done | [Inode report by Volume Playbook](./GetInodebyVolume.yaml) |
-| Inode report by Volume Playbook  | Sample SMTP loader Script 작성 | 안우영 | done | [generate_table.py](./script/generate_table.py) |
+|분류|Task|시작일자|종료일자|담당자|상태|산출물|주석|
+|----|--- |  ---  |  ---  | ---  |---| ---- |---|
+| AWX 구성                          | AWX 설치 가이드 작성           |2024-02-26|2024-02-29| 안우영 | done | [가이드 문서](../AWX/install/Readme.md) |
+| AWX 구성                          | AWX 설치 환경 구성             |2024-03-05|22024-03-08| 유한민 | Active | --- |
+| Inode report by Cluster Playbook | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Cluster Playbook](./GetInodebyCluster.yaml) |
+| Inode report by Cluster Playbook | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
+| Inode report by Volume Playbook  | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Volume Playbook](./GetInodebyVolume.yaml) |
+| Inode report by Volume Playbook  | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
+| Capacity Report by cluster Playbook | Sample Playbook 작성         |2024-03-04|2024-03-08| 안우영 | done | [Capacity Report by cluster Playbook](./GetStorageUsedbyCluster.yaml) |
+| Capacity Report by cluster Playbook  | Sample python script 작성   |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
+
 
 
 </details>
@@ -54,24 +56,25 @@ gantt
 
     section AWX 구성
     AWX install Guide 작성  : done, awx1, 2024-02-26, 4d
-    AWX 구성에 필요한 환경 구성  : active, awx2, 2024-03-05, 5d
+    AWX 설치 환경 구성  : active, awx2, 2024-03-05, 4d
     AWX 설치 진행 : awx3, after awx2 , 5d
     AWX 세부설정 추가 : awx4, after awx3, 5d
 
     section Inode report by Cluster Playbook
-    Sample Playbook 작성 : p1-1, 2024-03-04, 5d
-    Python Script 작성 : p1-2, 2024-03-04, 5d
+    Sample Playbook 작성 : done,p1-1, 2024-03-04, 5d
+    Sample Python Script 작성 : done,p1-2, 2024-03-04, 5d
     Playbokk 적용 Test: p1-3, after p1-2,  5d
     Playbook 수정 : p1-4, after p1-2 , 5d
 
     section Inode report by Volume Playbook
-    Sample Playbook 작성 : p2-1, 2024-03-04, 5d
-    Python Script 작성 : p2-2, 2024-03-04, 5d
+    Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
+    Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
     Playbokk 적용 Test: p2-3, after p2-2,  5d
     Playbook 수정 : p2-4, after p2-2 , 5d
 
     section Capacity Report by cluster Playbook
-    Sample Playbook 작성 : p3-1, 2024-03-18, 5d
+    Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
+    Sample Python Script 작성 : done, p3-1, 2024-03-18, 5d
     Playbokk 적용 Test: p3-2, after p3-1,  5d
     Playbook 수정 : p3-3, after p3-1 , 5d
 
