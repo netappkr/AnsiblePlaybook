@@ -28,6 +28,7 @@
           - aggregate_info
         fields:
           - 'space'
+          - 'home_node'
       register: ontap_aggrs
       loop: "{{ clusters }}"
       loop_control:
