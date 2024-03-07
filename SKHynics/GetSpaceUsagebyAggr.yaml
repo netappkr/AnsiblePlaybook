@@ -80,7 +80,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} Inode Usage Report"
+        subject: "ONTAP {{ html_table.datafile.cluster_aggrs.cluster.name }} Inode Usage Report"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
