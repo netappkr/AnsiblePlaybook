@@ -31,6 +31,9 @@ with open(json_file, 'r') as file:
 
 # Pandas DataFrame을 생성합니다.
 datatable = pandas.DataFrame()
+datatable.style.set_caption(args.request)
+datatable.style.set_table_attributes('class="mystyle"')
+
 def storage_inode_report_by_cluster(data):
     global datatable
     for cluster in data:
@@ -119,25 +122,25 @@ def main():
         <head></head>
         <style>
         .mystyle {
-            font-size: 11pt; 
-            font-family: Arial;
-            border-collapse: collapse; 
-            border: 1px solid silver;
+            "font-size": "11pt"; 
+            "font-family": "Arial";
+            "border-collapse": "collapse"; 
+            "border": "1px solid silver";
 
         }
 
         .mystyle td, th {
-            padding: 5px;
-            text-align: center;
+            "padding": "5px";
+            "text-align": "center";
         }
 
         .mystyle tr:nth-child(even) {
-            background: #E0E0E0;
+            "background": "#E0E0E0";
         }
 
         .mystyle tr:hover {
-            background: silver;
-            cursor: pointer;
+            "background": "silver";
+            "cursor": "pointer";
         }
         </style>
         <body>
@@ -145,7 +148,7 @@ def main():
         {0}
         </body>
         </html>
-        """.format(datatable.to_html(index=False,classes='mystyle'),args.request)
+        """.format(datatable.to_html(index=False),args.request)
 
         # 표준 출력으로 HTML 테이블을 출력합니다.
         print(html)
