@@ -1,3 +1,4 @@
+---
 - name: Collect inode usage from each ONTAP cluster
   hosts: task_server_1
   gather_facts: no
@@ -37,14 +38,11 @@
     #  ansible.builtin.debug:
     #    msg: "{{ ontap_volumes.results }}"
 
-    - name: Write inode information to a JSON file
+    - name: Write result data to a JSON file
       copy:
         dest: "/tmp/clusters_inode_info.json"
-        content: "{{ cluster_volumes | to_nice_json }}"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafiles
-      loop: "{{ ontap_volumes.results }}"
-      loop_control:
-        loop_var: cluster_volumes
 
     #- name: debug show
     #  ansible.builtin.debug:
@@ -63,15 +61,12 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "{{ files_matched.files[0].path }} -r volume_indoe_info -f {{ datafiles.dest }}"
-      register: html_table
-      loop: "{{ datafiles.results  }}"
-      loop_control:
-        loop_var: datafile
+      command: "{{ files_matched.files[0].path }} -r clusters_indoe_info -f {{ datafiles.dest }}"
+      register: html_tables
 
     #- name: debug show
     #  ansible.builtin.debug:
-    #    msg: "{{ datafiles.results }}"
+    #    msg: "{{ html_tables.results }}"
 
     - name: Send inode usage report via email
       mail:
@@ -81,11 +76,10 @@
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "ONTAP Cluster Inode Usage Report"
-        body: "{{ html_table.stdout }}"
+        body: "{{ html_tables.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
-      loop: "{{ html_table.results }}"
-      when: html_table.stdout is defined
+      when: html_tables.stdout is defined
