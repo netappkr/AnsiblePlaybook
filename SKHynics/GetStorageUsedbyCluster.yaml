@@ -33,14 +33,14 @@
       loop_control:
         loop_var: cluster
   
-    - name: debug show
-      ansible.builtin.debug:
-        msg: "{{ ontap_aggrs.results }}"
+    # - name: debug show
+    #   ansible.builtin.debug:
+    #     msg: "{{ ontap_aggrs.results }}"
 
     - name: Write result data to a JSON file
       copy:
         dest: "/tmp/clusters_storage_used_info.json"
-        content: "{{ cluster_aggrs | to_nice_json }}"
+        content: "{{ ontap_aggrs.results | to_nice_json }}"
       register: datafiles
 
     #- name: debug show
