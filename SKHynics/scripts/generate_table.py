@@ -31,7 +31,6 @@ with open(json_file, 'r') as file:
 
 # Pandas DataFrame을 생성합니다.
 datatable = pandas.DataFrame()
-
 def storage_inode_report_by_cluster(data):
     global datatable
     for cluster in data:
@@ -113,17 +112,19 @@ def main():
             storage_space_report_by_aggr(data)
         else:
             logger.error(args.request+" request is not matched")
-
+        datatable.style.set_caption(args.request)
+        pd.set_option('colheader_justify', 'center')
         # HTML 테이블로 변환합니다.
         html = """\
         <html>
         <head></head>
+        <link rel="stylesheet" type="text/css" href="df_style.css"/>
         <body>
         <p>{1}</p>
         {0}
         </body>
         </html>
-        """.format(datatable.to_html(index=False),args.request)
+        """.format(datatable.to_html(index=False,classes='mystyle'),args.request)
 
         # 표준 출력으로 HTML 테이블을 출력합니다.
         print(html)
