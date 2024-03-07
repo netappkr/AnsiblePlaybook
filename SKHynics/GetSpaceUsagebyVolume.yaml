@@ -1,0 +1,94 @@
+---
+- name: Collect inode usage from each ONTAP cluster
+  hosts: task_server_1
+  gather_facts: no
+  collections:
+    - netapp.ontap
+  tasks:
+    - name: install the package, force upgrade
+      pip:
+        name: pip
+        executable: pip3
+        state: latest
+
+    - name: Install Docker SDK for Python
+      ansible.builtin.pip:
+        name:
+        - "pip>=24.0"
+        - "pandas>2.0"
+        executable: pip3
+
+    - name: Get volume inode information
+      na_ontap_rest_info:
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+        https: true
+        validate_certs: false
+        gather_subset:
+          - volume_info
+        fields:
+          - 'files'
+          - 'name'
+      register: ontap_volumes
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ ontap_volumes.results }}"
+
+    - name: Write inode information to a JSON file
+      copy:
+        dest: "/tmp/{{ cluster_volumes.cluster.name }}_inode_info.json"
+        content: "{{ cluster_volumes | to_nice_json }}"
+      register: datafiles
+      loop: "{{ ontap_volumes.results }}"
+      loop_control:
+        loop_var: cluster_volumes
+
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ datafiles.results }}"
+
+    - name: Search for 'script' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "generate_table.py"
+        recurse: yes
+        file_type: file
+      register: files_matched
+
+    - name: Print the matched files
+      debug:
+        msg: "{{ files_matched.files[0].path }}"
+
+    - name: Generate HTML table from inode information using a Python script
+      command: "python3 {{ files_matched.files[0].path }} -r volume_indoe_info -f {{ datafile.dest }}"
+      register: html_tables
+      loop: "{{ datafiles.results  }}"
+      loop_control:
+        loop_var: datafile
+
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ html_tables.results }}"
+
+    - name: Send inode usage report via email
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} Inode Usage Report"
+        body: "{{ html_table.stdout }}"
+        from: "{{ email_from }}"
+        secure: starttls
+        subtype: html
+        headers: 
+        - Content-Type="text/html"
+      loop: "{{ html_tables.results }}"
+      loop_control:
+        loop_var: html_table
+      when: html_table.stdout is defined
