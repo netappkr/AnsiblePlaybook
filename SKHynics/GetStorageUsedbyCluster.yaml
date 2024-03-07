@@ -25,24 +25,24 @@
         https: true
         validate_certs: false
         gather_subset:
-          - volume_info
+          - aggregate_info
         fields:
-          - 'files'
-          - 'name'
-      register: ontap_volumes
+          - 'space'
+      register: ontap_aggrs
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
-    #- name: debug show
-    #  ansible.builtin.debug:
-    #    msg: "{{ ontap_volumes.results }}"
+  
+    - name: debug show
+      ansible.builtin.debug:
+        msg: "{{ ontap_aggrs.results }}"
 
-    - name: Write inode information to a JSON file
+    - name: Write result data to a JSON file
       copy:
         dest: "/tmp/clusters_storage_used_info.json"
-        content: "{{ cluster_volumes | to_nice_json }}"
+        content: "{{ cluster_aggrs | to_nice_json }}"
       register: datafiles
-      loop: "{{ ontap_volumes.results }}"
+      loop: "{{ ontap_aggrs.results }}"
       loop_control:
         loop_var: cluster_volumes
 
@@ -50,42 +50,42 @@
     #  ansible.builtin.debug:
     #    msg: "{{ datafiles.results }}"
 
-    - name: Search for 'script' in all directories
-      find:
-        paths: "{{ scripts_dir }}"
-        patterns: "generate_table.py"
-        recurse: yes
-        file_type: file
-      register: files_matched
+    # - name: Search for 'script' in all directories
+    #   find:
+    #     paths: "{{ scripts_dir }}"
+    #     patterns: "generate_table.py"
+    #     recurse: yes
+    #     file_type: file
+    #   register: files_matched
 
-    - name: Print the matched files
-      debug:
-        msg: "{{ files_matched.files[0].path }}"
+    # - name: Print the matched files
+    #   debug:
+    #     msg: "{{ files_matched.files[0].path }}"
 
-    - name: Generate HTML table from inode information using a Python script
-      command: "{{ files_matched.files[0].path }} -r Cluster_storage_used_info -f {{ datafiles.dest }}"
-      register: html_table
-      loop: "{{ datafiles.results  }}"
-      loop_control:
-        loop_var: datafile
+    # - name: Generate HTML table from inode information using a Python script
+    #   command: "{{ files_matched.files[0].path }} -r Cluster_storage_used_info -f {{ datafiles.dest }}"
+    #   register: html_table
+    #   loop: "{{ datafiles.results  }}"
+    #   loop_control:
+    #     loop_var: datafile
 
-    #- name: debug show
-    #  ansible.builtin.debug:
-    #    msg: "{{ datafiles.results }}"
+    # #- name: debug show
+    # #  ansible.builtin.debug:
+    # #    msg: "{{ datafiles.results }}"
 
-    - name: Send inode usage report via email
-      mail:
-        host: "{{ smtp_server }}"
-        port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
-        to: "{{ email_to }}"
-        subject: "ONTAP Cluster Inode Usage Report"
-        body: "{{ html_table.stdout }}"
-        from: "{{ email_from }}"
-        secure: starttls
-        subtype: html
-        headers: 
-        - Content-Type="text/html"
-      loop: "{{ html_table.results }}"
-      when: html_table.stdout is defined
+    # - name: Send inode usage report via email
+    #   mail:
+    #     host: "{{ smtp_server }}"
+    #     port: "{{ smtp_port }}"
+    #     username: "{{ smtp_username }}"
+    #     password: "{{ smtp_password }}"
+    #     to: "{{ email_to }}"
+    #     subject: "ONTAP Cluster Inode Usage Report"
+    #     body: "{{ html_table.stdout }}"
+    #     from: "{{ email_from }}"
+    #     secure: starttls
+    #     subtype: html
+    #     headers: 
+    #     - Content-Type="text/html"
+    #   loop: "{{ html_table.results }}"
+    #   when: html_table.stdout is defined

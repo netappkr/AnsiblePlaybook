@@ -3,8 +3,8 @@
     "changed": false,
     "cluster": {
         "ID": "fsxadmin",
-        "PW": "Netapp1!",
-        "ip": "172.30.1.86",
+        "PW": "<<password>>",
+        "ip": "<<cluster IP>>",
         "name": "fsxn"
     },
     "failed": false,
