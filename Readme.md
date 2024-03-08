@@ -16,6 +16,7 @@ AWX 또한 커뮤니티 버전과 레드헷의 Ansible Tower 로 나뉩니다.
 ## Netapp.ontap Ansible 모듈
 Netapp의 엔지니어분들 또한 Ansible에 모듈제작 및 배포에 공헌하고 있으며 이분들 덕분에 Netapp을 사용하시는 모든 Client 들이 Ansible을 통해 자동화된 스토리지 운영을 하고 있습니다.
 이를 통해 반복되는 작업을 자동화 및 관리하고 스토리지 자원들을 엔서블이 지원하는 여려 모듈들과 함께 통합 관리 할 수 있습니다.
+- NetApp Ansible Team: ng-ansibleteam@netapp.com
 
 # Ansible support
 모든 IaC 툴들이 그렇듯 이것을 이용하는 사용자는 몇몇 개념에 대한 숙지가 필요합니다.
