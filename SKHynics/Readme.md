@@ -42,7 +42,8 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | Inode report by Volume Playbook  | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
 | Capacity Report by cluster Playbook | Sample Playbook 작성         |2024-03-04|2024-03-08| 안우영 | done | [Capacity Report by cluster Playbook](./GetSpaceUsagebyCluster.yaml) |
 | Capacity Report by cluster Playbook  | Sample python script 작성   |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
-
+| Capacity Report by Volume Playbook | Sample Playbook 작성         |2024-03-04|2024-03-08| 안우영 | done | [Capacity Report by cluster Playbook](./GetSpaceUsagebyCluster.yaml) |
+| Capacity Report by Volume Playbook  | Sample python script 작성   |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
 
 
 </details>
@@ -79,7 +80,8 @@ gantt
     Playbook 수정 : p3-3, after p3-1 , 5d
 
     section Capacity Report by Volume Playbook
-    Sample Playbook 작성 : p4-1, 2024-03-18, 5d
+    Sample Playbook 작성 : done p4-1, 2024-03-18, 5d
+    Sample Python Script 작성 : done p4-1, 2024-03-18, 5d
     Playbokk 적용 Test: p4-2, after p4-1,  5d
     Playbook 수정 : p4-3, after p4-1 , 5d
 
