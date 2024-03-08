@@ -1,4 +1,7 @@
 # Ansible 이란?
+<p align="center">
+  <img src="./Images/ansble.png">
+</p>
 Ansible은 파이썬 기반으로 작성되었으며, module과 명령어를 사용하여 여러 서버에 동시에 명령을 실행할 수 있는 자동화 엔진입니다. </br>
 또한 ```ansible playbook``` 이라는 스크립트를 통해 IT 어플리케이션 인프라스트럭쳐를 정확하게 묘사할 수 있는 언어입니다. </br>
 원래 무료 오픈소스 프로젝트였으나 레드햇이 인수하여 오픈소스쪽과 별개로 Redhat에서 Ansible 자동화 솔루션을 판매하고 있습니다. </br>
