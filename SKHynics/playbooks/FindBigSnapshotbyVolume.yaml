@@ -57,12 +57,12 @@
 
     - name: Write result data to a JSON file
       copy:
-        dest: "/tmp/{{ cluster_volumes.cluster.name }}_big_snapshot_info.json"
-        content: "{{ cluster_volumes | to_nice_json }}"
+        dest: "/tmp/{{ filtered_volumes.cluster.name }}_big_snapshot_info.json"
+        content: "{{ filtered_volumes | to_nice_json }}"
       register: datafiles
       loop: "{{ filtered_volumes.results }}"
       loop_control:
-        loop_var: cluster_volumes
+        loop_var: filtered_volumes
 
     #- name: debug show
     #  ansible.builtin.debug:
