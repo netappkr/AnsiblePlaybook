@@ -102,6 +102,29 @@ def storage_space_report_by_aggr(data):
             'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
+
+def storage_Big_snapshot_report_by_volume(data):
+    global datatable
+    for cluster in data:
+        total_size=0
+        used_size=0
+        snapshot_used=0
+        for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+            total_size= volume["space"]["size"]
+            used_size= volume["space"]["used"]
+            snapshot_used=volume["space"]["snapshot"]["used"]
+            if round(used_size / total_size * 100,2) > 50:
+                if snapshot_used > 1099511627776:
+                    add=pandas.DataFrame.from_records([{
+                        'cluster name': cluster["cluster"]["name"],
+                        'volume name' : volume["name"],
+                        'Total Size(GiB)': round(total_size/1024/1024/1024,2),
+                        'Used Size(GiB)': round(used_size/1024/1024/1024,2), 
+                        'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
+                        'Used Rate(%)': round(used_size / total_size * 100,2),
+                        'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
+                    }])
+                    datatable=datatable._append(add,ignore_index = True)
         
 def main():
     try:
@@ -113,8 +136,11 @@ def main():
             storage_space_report_by_cluster(data)
         elif args.request == "aggrs_space_info":
             storage_space_report_by_aggr(data)
+        elif args.request == "big_Snapshot_info":
+            storage_Big_snapshot_report_by_volume(data)
         else:
             logger.error(args.request+" request is not matched")
+            
         datatable.style.set_caption(args.request)
         # HTML 테이블로 변환합니다.
         css = """
