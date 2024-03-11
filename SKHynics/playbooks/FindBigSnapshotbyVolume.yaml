@@ -37,7 +37,7 @@
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
-        loop_var: clusters
+        loop_var: cluster
     
     # - name: debug show
     #   ansible.builtin.debug:
