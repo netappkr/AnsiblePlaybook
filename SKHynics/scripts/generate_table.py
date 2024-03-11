@@ -118,6 +118,7 @@ def storage_Big_snapshot_report_by_volume(data):
                     add=pandas.DataFrame.from_records([{
                         'cluster name': cluster["cluster"]["name"],
                         'volume name' : volume["name"],
+                        'volume path' : volume["nas"]["path"],
                         'Total Size(GiB)': round(total_size/1024/1024/1024,2),
                         'Used Size(GiB)': round(used_size/1024/1024/1024,2), 
                         'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
@@ -125,6 +126,7 @@ def storage_Big_snapshot_report_by_volume(data):
                         'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
                     }])
                     datatable=datatable._append(add,ignore_index = True)
+    
         
 def main():
     try:
@@ -136,7 +138,7 @@ def main():
             storage_space_report_by_cluster(data)
         elif args.request == "aggrs_space_info":
             storage_space_report_by_aggr(data)
-        elif args.request == "big_Snapshot_info":
+        elif args.request == "big_snapshot_info":
             storage_Big_snapshot_report_by_volume(data)
         else:
             logger.error(args.request+" request is not matched")
