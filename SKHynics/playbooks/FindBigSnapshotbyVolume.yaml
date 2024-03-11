@@ -33,23 +33,25 @@
           - 'space.size'
           - 'space.available'
           - 'space.used'
-          - 'space.percent_used'
           - 'space.snapshot.used'
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
     
-    - name: debug show
-      ansible.builtin.debug:
-        msg: "{{ ontap_volumes.results }}"
+    # - name: debug show
+    #   ansible.builtin.debug:
+    #     msg: "{{ ontap_volumes.results }}"
 
     - name: Filter volumes
       set_fact:
-        filtered_volumes: "{{ cluster_volumes.volumes | selectattr('usage_percent', '>=', 50) | selectattr('snapshot_size', '>=', 1000000000000) | list }}"
-      loop: "{{ ontap_volumes.results }}"
+        filtered_volumes: "{{ volume_info | selectattr('space.size', '>=', 50) | selectattr('space.snapshot.used', '>=', 10) | list }}"
+      with_nested: 
+        - "{{ ontap_volumes.results }}"
+        - "{{ cluster_volumes.ontap_info.storage/volumes.records }}"
       loop_control:
-        loop_var: cluster_volumes
+        - loop_var: cluster_volumes
+        - loop_var: volume_info
 
     - name: Write result data to a JSON file
       copy:
