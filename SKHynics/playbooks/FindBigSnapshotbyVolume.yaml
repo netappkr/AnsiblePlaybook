@@ -56,7 +56,7 @@
         dest: "/tmp/{{ cluster_volumes.cluster.name }}_big_snapshot_info.json"
         content: "{{ cluster_volumes | to_nice_json }}"
       register: datafiles
-      loop: "{{ filtered_volumes.results }}"s
+      loop: "{{ filtered_volumes.results }}"
       loop_control:
         loop_var: cluster_volumes
 
