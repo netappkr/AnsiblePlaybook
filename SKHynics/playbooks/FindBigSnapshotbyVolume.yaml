@@ -45,13 +45,10 @@
 
     - name: Filter volumes
       set_fact:
-        filtered_volumes: "{{ volume_info | selectattr('space.size', '>=', 50) | selectattr('space.snapshot.used', '>=', 10) | list }}"
-      with_nested: 
-        - "{{ ontap_volumes.results }}"
-        - "{{ cluster_volumes.ontap_info.storage/volumes.records }}"
+        filtered_volumes: "{{ item.ontap_info['storage/volumes'].records | selectattr('space.size', '>=', 50) | selectattr('space.snapshot.used', '>=', 10) | list }}"
+      loop: "{{ ontap_volumes.results }}"
       loop_control:
         - loop_var: cluster_volumes
-        - loop_var: volume_info
 
     - name: Write result data to a JSON file
       copy:
