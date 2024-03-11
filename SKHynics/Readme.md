@@ -36,16 +36,16 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 |----|--- |  ---  |  ---  | ---  |---| ---- |---|
 | AWX 구성                          | AWX 설치 가이드 작성           |2024-02-26|2024-02-29| 안우영 | done | [가이드 문서](../AWX/install/Readme.md) |
 | AWX 구성                          | AWX 설치 환경 구성             |2024-03-05|22024-03-08| 유한민 | Active | --- |
-| Inode report by Cluster Playbook | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Cluster Playbook](./GetInodebyCluster.yaml) |
+| Inode report by Cluster Playbook | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Cluster Playbook](./playbooks/GetInodebyCluster.yaml) |
 | Inode report by Cluster Playbook | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
 | Inode report by Cluster Playbook | Playbokk 적용 Test             |2024-03---|2024-03---| 안우영,유한민 | New | --- |
-| Inode report by Volume Playbook  | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Volume Playbook](./GetInodebyVolume.yaml) |
+| Inode report by Volume Playbook  | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Volume Playbook](./playbooks/GetInodebyVolume.yaml) |
 | Inode report by Volume Playbook  | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) |
 | Inode report by Volume Playbook  | Playbokk 적용 Test             |2024-03---|2024-03---| 안우영,유한민 | New | --- |
-| Capacity Report by cluster Playbook | Sample Playbook 작성        |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./GetSpaceUsagebyCluster.yaml) |
+| Capacity Report by cluster Playbook | Sample Playbook 작성        |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) |
 | Capacity Report by cluster Playbook  | Sample python script 작성  |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) |
 | Capacity Report by cluster Playbook  | Playbokk 적용 Test         |2024-03---|2024-03---| 안우영,유한민 | New | --- |
-| Capacity Report by Volume Playbook | Sample Playbook 작성         |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./GetSpaceUsagebyCluster.yaml) |
+| Capacity Report by Volume Playbook | Sample Playbook 작성         |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) |
 | Capacity Report by Volume Playbook  | Sample python script 작성   |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) |
 | Capacity Report by Volume Playbook  | Playbokk 적용 Test          |2024-03---|2024-03---| 안우영,유한민 | New | --- |
 
