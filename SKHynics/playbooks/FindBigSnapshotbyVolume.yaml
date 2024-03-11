@@ -51,9 +51,9 @@
       loop_control:
         loop_var: cluster_volumes
 
-     - name: debug show
-       ansible.builtin.debug:
-         msg: "{{ filtered_volumes.results }}"
+    - name: debug show
+      ansible.builtin.debug:
+        msg: "{{ filtered_volumes.results }}"
 
     - name: Write result data to a JSON file
       copy:
