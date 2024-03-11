@@ -45,7 +45,7 @@
 
     - name: Filter volumes
       set_fact:
-        filtered_volumes: "{{ item.ontap_info['storage/volumes'].records | selectattr('space.size', '>=', 50) | selectattr('space.snapshot.used', '>=', 10) | list }}"
+        filtered_volumes: "{{ cluster_volumes.ontap_info['storage/volumes'].records | selectattr('space.size', '>=', 50) | selectattr('space.snapshot.used', '>=', 10) | list }}"
       loop: "{{ ontap_volumes.results }}"
       loop_control:
         - loop_var: cluster_volumes
