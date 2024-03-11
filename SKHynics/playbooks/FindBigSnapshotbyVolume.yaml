@@ -49,7 +49,7 @@
       register: filtered_volumes
       loop: "{{ ontap_volumes.results }}"
       loop_control:
-        - loop_var: cluster_volumes
+        loop_var: cluster_volumes
 
     - name: Write result data to a JSON file
       copy:
