@@ -37,7 +37,7 @@
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
-        loop_var: cluster
+        loop_var: clustersss
     
     # - name: debug show
     #   ansible.builtin.debug:
@@ -46,6 +46,7 @@
     - name: Filter volumes
       set_fact:
         filtered_volumes: "{{ cluster_volumes.ontap_info['storage/volumes'].records | selectattr('space.size', '>=', 50) | selectattr('space.snapshot.used', '>=', 10) | list }}"
+      register: filtered_volumes
       loop: "{{ ontap_volumes.results }}"
       loop_control:
         - loop_var: cluster_volumes
@@ -55,7 +56,7 @@
         dest: "/tmp/{{ cluster_volumes.cluster.name }}_big_snapshot_info.json"
         content: "{{ cluster_volumes | to_nice_json }}"
       register: datafiles
-      loop: "{{ ontap_volumes.results }}"
+      loop: "{{ filtered_volumes.results }}"s
       loop_control:
         loop_var: cluster_volumes
 
