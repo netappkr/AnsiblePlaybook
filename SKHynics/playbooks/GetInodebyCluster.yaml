@@ -18,7 +18,7 @@
         - "pandas>2.0"
         executable: pip3
 
-    - name: Get volume inode information
+    - name: Get rest data information
       na_ontap_rest_info:
         hostname: "{{ cluster.ip }}"
         username: "{{ cluster.ID }}"

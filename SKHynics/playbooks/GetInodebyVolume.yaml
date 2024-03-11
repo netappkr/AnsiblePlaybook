@@ -18,7 +18,7 @@
         - "pandas>2.0"
         executable: pip3
 
-    - name: Get volume inode information
+    - name: Get rest data information
       na_ontap_rest_info:
         hostname: "{{ cluster.ip }}"
         username: "{{ cluster.ID }}"
@@ -38,7 +38,7 @@
     #  ansible.builtin.debug:
     #    msg: "{{ ontap_volumes.results }}"
 
-    - name: Write inode information to a JSON file
+    - name: Write result data to a JSON file
       copy:
         dest: "/tmp/{{ cluster_volumes.cluster.name }}_inode_info.json"
         content: "{{ cluster_volumes | to_nice_json }}"

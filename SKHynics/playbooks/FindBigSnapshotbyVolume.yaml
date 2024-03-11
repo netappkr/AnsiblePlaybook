@@ -18,7 +18,7 @@
         - "pandas>2.0"
         executable: pip3
 
-    - name: Get volume inode information
+    - name: Get rest data information
       na_ontap_rest_info:
         hostname: "{{ cluster.ip }}"
         username: "{{ cluster.ID }}"
@@ -28,19 +28,32 @@
         gather_subset:
           - volume_info
         fields:
-          - 'space'
           - 'name'
+          - 'nas.path'
+          - 'space.size'
+          - 'space.available'
+          - 'space.used'
+          - 'space.percent_used'
+          - 'space.snapshot.used'
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
-    #- name: debug show
-    #  ansible.builtin.debug:
-    #    msg: "{{ ontap_volumes.results }}"
+    
+    - name: debug show
+      ansible.builtin.debug:
+        msg: "{{ ontap_volumes.results }}"
 
-    - name: Write inode information to a JSON file
+    - name: Filter volumes
+      set_fact:
+        filtered_volumes: "{{ cluster_volumes.volumes | selectattr('usage_percent', '>=', 50) | selectattr('snapshot_size', '>=', 1000000000000) | list }}"
+      loop: "{{ ontap_volumes.results }}"
+      loop_control:
+        loop_var: cluster_volumes
+
+    - name: Write result data to a JSON file
       copy:
-        dest: "/tmp/{{ cluster_volumes.cluster.name }}_inode_info.json"
+        dest: "/tmp/{{ cluster_volumes.cluster.name }}_big_snapshot_info.json"
         content: "{{ cluster_volumes | to_nice_json }}"
       register: datafiles
       loop: "{{ ontap_volumes.results }}"
@@ -63,32 +76,55 @@
       debug:
         msg: "{{ files_matched.files[0].path }}"
 
-    - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} -r volume_indoe_info -f {{ datafile.dest }}"
-      register: html_tables
-      loop: "{{ datafiles.results  }}"
-      loop_control:
-        loop_var: datafile
+#     - name: Generate HTML table from inode information using a Python script
+#       command: "python3 {{ files_matched.files[0].path }} -r volume_indoe_info -f {{ datafile.dest }}"
+#       register: html_tables
+#       loop: "{{ datafiles.results }}"
+#       loop_control:
+#         loop_var: datafile
 
-    #- name: debug show
-    #  ansible.builtin.debug:
-    #    msg: "{{ html_tables.results }}"
+#     #- name: debug show
+#     #  ansible.builtin.debug:
+#     #    msg: "{{ html_tables.results }}"
 
-    - name: Send inode usage report via email
-      mail:
-        host: "{{ smtp_server }}"
-        port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
-        to: "{{ email_to }}"
-        subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} Inode Usage Report"
-        body: "{{ html_table.stdout }}"
-        from: "{{ email_from }}"
-        secure: starttls
-        subtype: html
-        headers: 
-        - Content-Type="text/html"
-      loop: "{{ html_tables.results }}"
-      loop_control:
-        loop_var: html_table
-      when: html_table.stdout is defined
+#     - name: Send inode usage report via email
+#       mail:
+#         host: "{{ smtp_server }}"
+#         port: "{{ smtp_port }}"
+#         username: "{{ smtp_username }}"
+#         password: "{{ smtp_password }}"
+#         to: "{{ email_to }}"
+#         subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} big Snapshot Report"
+#         body: "{{ html_table.stdout }}"
+#         from: "{{ email_from }}"
+#         secure: starttls
+#         subtype: html
+#         headers: 
+#         - Content-Type="text/html"
+#       loop: "{{ html_tables.results }}"
+#       loop_control:
+#         loop_var: html_table
+#       when: html_table.stdout is defined
+
+
+
+# ---
+# - name: Get volume information
+#   hosts: localhost
+#   gather_facts: no
+#   tasks:
+#     - name: Gather volume facts
+#       na_ontap_rest_info:
+#         hostname: your_ontap_cluster
+#         username: your_username
+#         password: your_password
+#       register: volume_info
+
+#     - name: Filter volumes
+#       set_fact:
+#         filtered_volumes: "{{ volume_info.volumes | selectattr('usage_percent', '>=', 50) | selectattr('snapshot_size', '>=', 1000000000000) | list }}"
+
+#     - name: Print volume details
+#       debug:
+#         msg: "Volume Name: {{ item.name }}, Usage: {{ item.usage_percent }}%, Snapshot Size: {{ item.snapshot_size }}, Snapshot Usage: {{ item.snapshot_usage }}"
+#       loop: "{{ filtered_volumes }}"
