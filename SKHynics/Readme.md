@@ -85,8 +85,8 @@ gantt
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done p4-1, 2024-03-18, 5d
-    Sample Python Script 작성 : done p4-1, 2024-03-18, 5d
-    Playbokk 적용 Test: p4-2, after p4-1,  5d
+    Sample Python Script 작성 : done p4-2, 2024-03-18, 5d
+    Playbokk 적용 Test: p4-3, after p4-1,  5d
     Playbook 수정 : p4-3, after p4-1 , 5d
 
     section Big snapshot Alert by Volume Playbook
