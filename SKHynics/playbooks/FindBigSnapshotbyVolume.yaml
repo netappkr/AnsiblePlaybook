@@ -47,11 +47,11 @@
       copy:
         dest: "/tmp/clusters_snapshot_usage_info.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
-      register: datafiles
+      register: datafile
 
     # - name: debug show
     #   ansible.builtin.debug:
-    #     msg: "{{ datafiles.dest }}"
+    #     msg: "{{ datafile.dest }}"
 
     - name: Search for 'script' in all directories
       find:
@@ -80,14 +80,11 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} big Snapshot Report"
+        subject: "ONTAP big Snapshot Report"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
-      loop: "{{ html_tables.results }}"
-      loop_control:
-        loop_var: html_table
       when: html_table.stdout is defined
