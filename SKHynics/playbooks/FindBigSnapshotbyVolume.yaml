@@ -49,9 +49,9 @@
         content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafiles
 
-    - name: debug show
-      ansible.builtin.debug:
-        msg: "{{ datafiles }}"
+    # - name: debug show
+    #   ansible.builtin.debug:
+    #     msg: "{{ datafiles.dest }}"
 
     - name: Search for 'script' in all directories
       find:
@@ -68,9 +68,6 @@
     - name: Generate HTML table from inode information using a Python script
       command: "python3 {{ files_matched.files[0].path }} -r big_snapshot_info -f {{ datafile.dest }}"
       register: html_tables
-      loop: "{{ datafiles.results }}"
-      loop_control:
-        loop_var: datafile
 
     #- name: debug show
     #  ansible.builtin.debug:
