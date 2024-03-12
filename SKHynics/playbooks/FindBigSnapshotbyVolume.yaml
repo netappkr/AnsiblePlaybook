@@ -50,8 +50,8 @@
       register: datafiles
 
     - name: debug show
-     ansible.builtin.debug:
-       msg: "{{ datafiles.results }}"
+      ansible.builtin.debug:
+      msg: "{{ datafiles.results }}"
 
     - name: Search for 'script' in all directories
       find:
