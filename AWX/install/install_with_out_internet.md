@@ -45,6 +45,7 @@ docker run --rm --name kind_deploy -v /var/run/docker.sock:/var/run/docker.sock 
 ```
 kind create cluster --image kindest/node:v1.19.11 --config kind.yml
 ```
+
 ```
 Creating cluster "kind" ...
  ✓ Ensuring node image (kindest/node:v1.19.11) 🖼
@@ -57,10 +58,12 @@ Set kubectl context to "kind-kind"
 You can now use your cluster with:
 kubectl cluster-info --context kind-kindHave a nice day! 👋
 ```
+
 ```
 sed -i "s/^    server:.*/    server: https:\/\/172.17.0.2:6443/" /root/.kube/config
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 ```
+
 ```
 namespace/ingress-nginx created
 serviceaccount/ingress-nginx created
@@ -81,15 +84,19 @@ rolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
 job.batch/ingress-nginx-admission-create created
 job.batch/ingress-nginx-admission-patch created
 ```
+
 ```
 kubectl apply -f password.yml
 ```
+
 ```
 secret/awx-admin-password created
 ```
+
 ```
 kubectl apply -f https://raw.githubusercontent.com/ansible/awx-operator/0.12.0/deploy/awx-operator.yaml
 ```
+
 ```
 customresourcedefinition.apiextensions.k8s.io/awxs.awx.ansible.com created
 customresourcedefinition.apiextensions.k8s.io/awxbackups.awx.ansible.com created
@@ -100,12 +107,15 @@ serviceaccount/awx-operator created
 deployment.apps/awx-operator created
 FQDN: awx.example.com
 ```
+
 ```
 kubectl apply -f awx.yml
 ```
+
 ```
 awx.awx.ansible.com/awx created
 ```
+
 3. AWX에 사용할 FQDN을 묻는 메시지가 표시됩니다. 이는 DNS에 있어야 하지만 해당 도메인이 이 호스트를 가리키도록 ```/etc/hosts``` 파일을 편집할 수도 있습니다.
 위의 예에서는 FQDN에 ```awx.example.com```을 사용했고 이 줄은 내 DNS에 없기 때문에 ```/etc/hosts```에 추가했습니다.
 ```
