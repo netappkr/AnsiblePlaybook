@@ -57,6 +57,7 @@ Set kubectl context to "kind-kind"
 You can now use your cluster with:
 kubectl cluster-info --context kind-kindHave a nice day! 👋
 ```
+```
 sed -i "s/^    server:.*/    server: https:\/\/172.17.0.2:6443/" /root/.kube/config
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 ```
