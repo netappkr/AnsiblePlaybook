@@ -1,4 +1,4 @@
-# AWX install_with_out_insternet
+# AWX install_with_out_internat
 외부 인터넷이 차단된 환경에서 AWX 설치를 진행해야 합니다.</br>
 기존 AWX는 기본 이미지에 로컬 빌드를 통해 개발이나 커스텀 설정을 지원하는 형식으로 되어있습니다.</br>
 하지만 그럴 필요가 없다면?</br>
