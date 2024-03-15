@@ -1,158 +1,156 @@
-# AWX install_with_out_internat
-외부 인터넷이 차단된 환경에서 AWX 설치를 진행해야 합니다.</br>
-기존 AWX는 기본 이미지에 로컬 빌드를 통해 개발이나 커스텀 설정을 지원하는 형식으로 되어있습니다.</br>
-하지만 그럴 필요가 없다면?</br>
-도커의 강점인 이미지쨰로 다운로드 받아서 띄워버리면 됩니다.
+# AWX 24.0.0 install Guide
 
-## 설치 가이드 라인
-Controller의 OpenSource 업스트림 버전인 AWX(공식적으로 Ansible Tower라고 함)는 최근 많은 변화를 겪었습니다. </br>
-이러한 변경으로 인해 설치 및 설정 프로세스가 훨씬 더 어려워졌습니다. </br>
-새로운 설치 방법에는 Kubernetes도 필요합니다. </br>
-모든 사람이 그런 식으로 AWX를 실행하거나 실행하고 싶어하는 것은 아닙니다. </br>
-AWX의 단일 노드 설치에 대해 최종 사용자로부터 많은 요청을 받았습니다. </br>
-따라서 단일 노드에서 적절한 설정을 보장하기 위해 새로운 프로세스를 만들었습니다.
+- 최신버전 설치는 K8S 환경에서 오퍼레이터를 이용하여 설치해야 합니다.
+- RPM 설치는 [AWX-RPM](https://awx.wiki/installation)에서 찾아볼 수 있습니다만 AWX 정식 배포에 포함된 내용이 아닙니다.
+## Architecture
+![alt text](./Images/image-1.png)
 
-## 요구 사항
-- Minimum 4 cpu cores
-- Minimum 6 gigs RAM
-- Docker - https://docs.docker.com/get-docker/
-- No other containers running on host. AWX must be the only Dockerized function.
-- 실행 권한: Docker 권한이 있는 표준 사용자 또는 root
+## Pre-requirment
+설치 환경 및 필수 항목들을 정의합니다.
+- OS : 페도라 계열 8.x
+- CPU : 2 core
+- Mem : 4 Mem ( 권장 8)
+- Storage: 20GB of space ()
+- Running Docker, Openshift, or Kubernetes
+If you choose to use an external PostgreSQL database, please note that the minimum version is 10+.
 
-유일한 소프트웨어 요구 사항은 Docker입니다. </br>
-내가 만든 방법은 사용자 지정 Docker 이미지를 사용하여 Docker가 있는 호스트의 'kind'라고 하는 Docker에 Kubernetes를 설치하는 것입니다. </br>
-현재 AWX를 올바르게 사용하는 데 필요한 FQDN을 통해 AWX에 연결할 수 있도록 적절한 수신이 설정됩니다. </br>
-이미지를 사용하여 AWX 구성을 백업하거나 종류를 완전히 제거하는 방법도 있습니다.</br>
+### Pre-Install
+1. python install
+wget https://www.python.org/ftp/python/3.11.8/Python-3.11.8.tgz
 
-> ### ```Kind```에 대한 참고사항
-> [Kind](https://github.com/kubernetes-sigs/kind)는  Docker 컨테이너 "노드"를 사용하여 로컬 Kubernetes 클러스터를 실행하기 위한 도구입니다.</br>
-> ```kind```는 주로 ```Kubernetes``` 자체를 테스트하기 위해 설계되었지만 로컬 개발이나 CI에 사용될 수도 있습니다.
+```
+dnf install git gcc gcc-c++ nodejs gettext device-mapper-persistent-data lvm2 bzip2 python3-pip ansible
+```
+Install Docker Engine, containerd, and Docker Compose:
+```
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+Start Docker.
+```
+sudo systemctl start docker
+pip3 install pyyaml==5.3.1
+pip3 install docker-compose
+dnf -y installl docker-compose-plugin
+```
 
-## 설치 Step by Step
+## Ansible AWX 17.1.0 설치
+다음 명령을 사용하여 v17 릴리스를 복제합니다.
+```
+git clone -b "17.1.0" https://github.com/ansible/awx.git
+```
+다음 명령을 사용하여 비밀 암호화 키를 생성합니다.
+```
+openssl rand -base64 30
+iR0MXri042xWjgqztRXFK1eLERtU+9g2OhYRVWld
+```
+디렉터리 로 이동하여 인벤토리awx/installer 파일을 찾습니다.
+```
+cd awx/installer/
+vim inventory
+```
+아래 항목을 찾아 수정합니다.
+```ini
+[all:vars]
+local_docker=true
+# your credentials >> Use the key you created with `openssl rand -base64 30`
+secret_key=iR0MXri042xWjgqztRXFK1eLERtU+9g2OhYRVWld
 
-1. 먼저 Kubernetes 구성 파일을 저장할 수 있는 디렉터리를 만들겠습니다.
+admin_user=admin
+admin_password=password
+```
+인벤토리 파일 에서 PostgresSQL 데이터를 보관할 폴더를 ```​/opt/awx```로 변경합니다​.
+```ini
+postgres_data_dir="/opt/awx/pgdocker"
+host_port=80
+host_port_ssl=443
+#ssl_certificate=
+# Optional key file
+#ssl_certificate_key=
+docker_compose_dir="/opt/awx/awxcompose"
+```
+여기서 무엇을 선택하든 디렉터리가 존재하고 Docker 사용자가 쓸 수 있는지 확인하세요.
+```
+sudo mkdir /opt/awx
+```
+git clone 한 경로에서 설치 파일을 몇개 수정해야 합니다.
+```
+vim installer/roles/local_docker/tasks/main.yml
+```
+맨윗줄에 추가
+```yaml
+- name: Install Docker SDK for Python
+  ansible.builtin.pip:
+    name:
+      - "docker==6.1.3"
+      - "docker-compose"
+``
+
+```
+vim installer/roles/local_docker/tasks/compose.yml
+```
+아래 명령중  ```​docker-compose​```  부분을  ```​docker compose```​로 변경합니다.
+- ​docker-compose ==> version 1​ 
+- ​docker compose ==> version 2​ 
+```yaml
+    - name: Run migrations in task container
+      shell: docker compose run --rm --service-ports task awx-manage migrate --no-input
+      args:
+        chdir: "{{ docker_compose_dir }}"
+```
+이제 ```​awx/installer/``` 내부에서 Ansible 명령을 따라 Ansible AWX를 설치할 수 있습니다.
 ```bash
-mkdir /home/user/kind_awx
-cd /home/user/kind_awx
+sudo ansible-playbook -i inventory install.yml
 ```
-2. ```/home/user/kind_awx```를 이 파일을 보관할 위치로 바꾸세요. 모든 추가 명령은 항상 해당 디렉터리에 있는 동안 실행되어야 합니다.
+완료되면 아래와 같이 보입니다.
 ```bash
-docker run --rm --name kind_deploy -v /var/run/docker.sock:/var/run/docker.sock -v 
-(pwd):/root/.kube/ -it schmots1/kind_awx
+[root@ip-172-30-3-86 awx]# docker ps
+CONTAINER ID   IMAGE                COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+51493254cbdc   ansible/awx:17.1.0   "/usr/bin/tini -- /u…"   40 minutes ago   Up 40 minutes   8052/tcp                                awx_task
+ae968ef14f09   ansible/awx:17.1.0   "/usr/bin/tini -- /b…"   40 minutes ago   Up 40 minutes   0.0.0.0:80->8052/tcp, :::80->8052/tcp   awx_web
+29bca59e37cc   redis                "docker-entrypoint.s…"   40 minutes ago   Up 40 minutes   6379/tcp                                awx_redis
+0c9df9357c63   postgres:12          "docker-entrypoint.s…"   40 minutes ago   Up 40 minutes   5432/tcp                                awx_postgres
+[root@ip-172-30-3-86 awx]# 
 ```
-이 명령은 Docker 이미지를 다운로드하고 호스트 Docker 소켓에 액세스할 수 있는 임시 컨테이너를 생성할 뿐만 아니라 현재 있는 디렉터리를 Kubernetes 구성 파일 및 awx에 대한 임시 컨테이너의 /root/.kube 디렉터리에 매핑합니다. </br>
-```yml``` 연산자 파일.
-그런 일이 발생하면 컨테이너는 kind-control-plane이라는 컨테이너에 종류를 배포하고 해당 Kubernetes 환경에 AWX를 설치합니다.
+## Ansible Image Builder
+기본 이미지에는 Netapp 플러그인설치가 되어있지 않습니다. 이미지를 수동을 빌드해서 컨테이너를 올려야합니다.
+1. ```inventory```파일에서 ```dockerhub_base=ansible```을 찾아 주석처리해야합니다. ​
+2. 아래 파일을 편집합니다.
 ```
-kind create cluster --image kindest/node:v1.19.11 --config kind.yml
+/opt/awx/installer/roles/image_build/templates/Dockerfile.j2​ 
+```
+3. ```Install build dependencies``` 항목을 찾아 그 아래 추가 패키지를 설치를 명령합니다.
+
+### 필요 추가 패키지를 설치
+필요한 추가 패키지를 설치 하도록 install Playbook에 등록된 도커파일을 수정합니다.
+```dockerfile
+RUN dnf -y install libxslt-devel \
+    libxml2-devel
+RUN dnf -y groupinstall 'Development Tools'
+
+RUN python3 -m ensurepip && pip3 install "virtualenv < 20"
+RUN pip3 install netapp.ontap
+```
+## Playbook local 저장소 활용하기
+일반적으로 로드하면 로컬레포를 지정할 수 없는 상태로 표기됩니다.
+
+1. 인벤토리 파일 수정
+```ini
+# AWX project data folder. If you need access to the location where AWX stores the projects
+# it manages from the docker host, you can set this to turn it into a volume for the container.
+#project_data_dir=/var/lib/awx/projects
+project_data_dir=/opt/awx/projects
 ```
 
+2. 인스톨 재실행
 ```
-Creating cluster "kind" ...
- ✓ Ensuring node image (kindest/node:v1.19.11) 🖼
- ✓ Preparing nodes 📦
- ✓ Writing configuration 📜
- ✓ Starting control-plane 🕹️
- ✓ Installing CNI 🔌
- ✓ Installing StorageClass 💾
-Set kubectl context to "kind-kind"
-You can now use your cluster with:
-kubectl cluster-info --context kind-kindHave a nice day! 👋
-```
-
-```
-sed -i "s/^    server:.*/    server: https:\/\/172.17.0.2:6443/" /root/.kube/config
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-```
-
-```
-namespace/ingress-nginx created
-serviceaccount/ingress-nginx created
-configmap/ingress-nginx-controller created
-clusterrole.rbac.authorization.k8s.io/ingress-nginx created
-clusterrolebinding.rbac.authorization.k8s.io/ingress-nginx created
-role.rbac.authorization.k8s.io/ingress-nginx created
-rolebinding.rbac.authorization.k8s.io/ingress-nginx created
-service/ingress-nginx-controller-admission created
-service/ingress-nginx-controller created
-deployment.apps/ingress-nginx-controller created
-validatingwebhookconfiguration.admissionregistration.k8s.io/ingress-nginx-admission created
-serviceaccount/ingress-nginx-admission created
-clusterrole.rbac.authorization.k8s.io/ingress-nginx-admission created
-clusterrolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
-role.rbac.authorization.k8s.io/ingress-nginx-admission created
-rolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
-job.batch/ingress-nginx-admission-create created
-job.batch/ingress-nginx-admission-patch created
-```
-
-```
-kubectl apply -f password.yml
-```
-
-```
-secret/awx-admin-password created
-```
-
-```
-kubectl apply -f https://raw.githubusercontent.com/ansible/awx-operator/0.12.0/deploy/awx-operator.yaml
-```
-
-```
-customresourcedefinition.apiextensions.k8s.io/awxs.awx.ansible.com created
-customresourcedefinition.apiextensions.k8s.io/awxbackups.awx.ansible.com created
-customresourcedefinition.apiextensions.k8s.io/awxrestores.awx.ansible.com created
-clusterrole.rbac.authorization.k8s.io/awx-operator created
-clusterrolebinding.rbac.authorization.k8s.io/awx-operator created
-serviceaccount/awx-operator created
-deployment.apps/awx-operator created
-FQDN: awx.example.com
-```
-
-```
-kubectl apply -f awx.yml
-```
-
-```
-awx.awx.ansible.com/awx created
-```
-
-3. AWX에 사용할 FQDN을 묻는 메시지가 표시됩니다. 이는 DNS에 있어야 하지만 해당 도메인이 이 호스트를 가리키도록 ```/etc/hosts``` 파일을 편집할 수도 있습니다.
-위의 예에서는 FQDN에 ```awx.example.com```을 사용했고 이 줄은 내 DNS에 없기 때문에 ```/etc/hosts```에 추가했습니다.
-```
-172.31.199.143           awx.example.com
-```
-이렇게 하면 ```https://awx.example.com``` 으로 이동하여 172.31.199.143에서 종류를 실행하는 호스트로 라우팅될 수 있습니다. 호스트 IP 주소를 사용해야 합니다.
-
-AWX의 초기 설정에는 5~10분이 소요됩니다. ```https://awx.example.com```에 로그인 화면이 표시되면 완료되었음을 알 수 있습니다 .
-
-기본 로그인은 다음과 같습니다:
-- U: admin
-- P: 비밀번호
-
-이제 AWX는 실행 환경(EE)이라는 새로운 개념을 사용합니다. 
-즉, AWX를 업데이트하지 않고도 Ansible 엔진을 업데이트하거나 여러 버전의 엔진 또는 컬렉션을 실행할 수도 있습니다. 
-단점은 AWX가 사용하는 기본 시스템 EE가 NetApp 컬렉션에서 작동하지 않는다는 것입니다. 다행히도 이를 수행하는 EE가 있습니다.
-
-AWX에 로그인하고 실행 환경 섹션으로 이동합니다.
-
-여기서는 다음 설정으로 새 EE를 추가합니다.
-![alt text](./Images/Edit_details.png)
-이 EE에 대해 실행하게 될 NetApp 모듈이 포함된 플레이북을 실행하기 위해 생성하는 모든 작업 템플릿입니다.
-
-그러나 이 설정에는 문제가 없는 것은 아닙니다. 무엇보다도 Tower에서 일어나는 일에 대한 지속적인 데이터가 있습니다. 데이터는 /var/lib/docker/volumes에 로컬로 저장됩니다. 전체 경로를 얻으려면 `docker Volume ls`를 실행한 다음 `docker Volume Inspection <uuid of Volume>`을 실행할 수 있습니다.
-
-다음 문제는 이 Kubernetes가 Docker 내부에 있기 때문에 호스트를 재부팅하면 제어 플레인이 중지되고 내부 Docker 네트워크가 약간 변경되어 수신이 중단된다는 것입니다. 하지만 설치 컨테이너에는 수정 사항이 포함되어 있습니다. AWX 호스트가 재부팅되는 경우 이전에 생성한 디렉터리 내에서 다음을 실행합니다.
-```
-docker run --rm --name kind_deploy -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/root/.kube/ -it schmots1/kind_awx fix
-```
-제어 영역이 다시 시작되고 수신 라우팅 업데이트가 완료되는 데 1분 정도 걸릴 수 있습니다.
-
-문제가 발생하여 처음부터 다시 시작하려는 경우 이 명령을 실행하여 종류를 제거할 수 있습니다.
-```
-docker run --rm --name kind_deploy -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/root/.kube/ -it schmots1/kind_awx clean
+sudo ansible-playbook -i inventory install.yml
 ```
 
 # 참조
-- [Netapp.io how-to-guide-setting-up-awx-on-a-single-host](https://netapp.io/2021/08/19/how-to-guide-setting-up-awx-on-a-single-host/)
-- [github kind](https://github.com/kubernetes-sigs/kind)
+- [AWX 17.1.0 install guide](https://github.com/ansible/awx/blob/17.0.1/INSTALL.md)
+- [RHEL8에 Ansible Tower(Docker의 AWX) 설치](https://mpolinowski.github.io/docs/DevOps/Ansible/2021-04-28-ansible-tower-rhel/2021-04-28/)
+- [구성 오류 - kwargs_from_env()에 성공하지 못했습니다. 'ssl_version이 있습니다.](https://github.com/geerlingguy/internet-pi/issues/567)
+- [[버그] "pip install docker-compose"가 debian 12에서 실패합니다.](https://github.com/docker/compose/issues/11168)
+- [Ansible tower 요구사항](https://docs.ansible.com/ansible-tower/latest/html/installandreference/requirements_refguide.html#ansible-software-requirements)
