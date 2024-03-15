@@ -76,9 +76,16 @@ role.rbac.authorization.k8s.io/ingress-nginx-admission created
 rolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
 job.batch/ingress-nginx-admission-create created
 job.batch/ingress-nginx-admission-patch created
+```
 kubectl apply -f password.yml
+```
+```
 secret/awx-admin-password created
+```
+```
 kubectl apply -f https://raw.githubusercontent.com/ansible/awx-operator/0.12.0/deploy/awx-operator.yaml
+```
+```
 customresourcedefinition.apiextensions.k8s.io/awxs.awx.ansible.com created
 customresourcedefinition.apiextensions.k8s.io/awxbackups.awx.ansible.com created
 customresourcedefinition.apiextensions.k8s.io/awxrestores.awx.ansible.com created
@@ -87,7 +94,11 @@ clusterrolebinding.rbac.authorization.k8s.io/awx-operator created
 serviceaccount/awx-operator created
 deployment.apps/awx-operator created
 FQDN: awx.example.com
+```
+```
 kubectl apply -f awx.yml
+```
+```
 awx.awx.ansible.com/awx created
 ```
 3. AWX에 사용할 FQDN을 묻는 메시지가 표시됩니다. 이는 DNS에 있어야 하지만 해당 도메인이 이 호스트를 가리키도록 ```/etc/hosts``` 파일을 편집할 수도 있습니다.
