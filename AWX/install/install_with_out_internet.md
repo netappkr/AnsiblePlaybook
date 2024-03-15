@@ -37,7 +37,8 @@ cd /home/user/kind_awx
 ```
 2. ```/home/user/kind_awx```를 이 파일을 보관할 위치로 바꾸세요. 모든 추가 명령은 항상 해당 디렉터리에 있는 동안 실행되어야 합니다.
 ```bash
-docker run --rm --name kind_deploy -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/root/.kube/ -it schmots1/kind_awx
+docker run --rm --name kind_deploy -v /var/run/docker.sock:/var/run/docker.sock -v 
+(pwd):/root/.kube/ -it schmots1/kind_awx
 ```
 이 명령은 Docker 이미지를 다운로드하고 호스트 Docker 소켓에 액세스할 수 있는 임시 컨테이너를 생성할 뿐만 아니라 현재 있는 디렉터리를 Kubernetes 구성 파일 및 awx에 대한 임시 컨테이너의 /root/.kube 디렉터리에 매핑합니다. </br>
 ```yml``` 연산자 파일.
