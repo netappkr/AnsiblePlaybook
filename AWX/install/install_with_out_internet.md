@@ -56,8 +56,11 @@ Creating cluster "kind" ...
 Set kubectl context to "kind-kind"
 You can now use your cluster with:
 kubectl cluster-info --context kind-kindHave a nice day! 👋
+```
 sed -i "s/^    server:.*/    server: https:\/\/172.17.0.2:6443/" /root/.kube/config
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+```
+```
 namespace/ingress-nginx created
 serviceaccount/ingress-nginx created
 configmap/ingress-nginx-controller created
@@ -76,6 +79,7 @@ role.rbac.authorization.k8s.io/ingress-nginx-admission created
 rolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
 job.batch/ingress-nginx-admission-create created
 job.batch/ingress-nginx-admission-patch created
+```
 ```
 kubectl apply -f password.yml
 ```
