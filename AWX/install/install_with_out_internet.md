@@ -136,7 +136,7 @@ AWX의 초기 설정에는 5~10분이 소요됩니다. ```https://awx.example.co
 AWX에 로그인하고 실행 환경 섹션으로 이동합니다.
 
 여기서는 다음 설정으로 새 EE를 추가합니다.
-
+![alt text](./Images/Edit_details.png)
 이 EE에 대해 실행하게 될 NetApp 모듈이 포함된 플레이북을 실행하기 위해 생성하는 모든 작업 템플릿입니다.
 
 그러나 이 설정에는 문제가 없는 것은 아닙니다. 무엇보다도 Tower에서 일어나는 일에 대한 지속적인 데이터가 있습니다. 데이터는 /var/lib/docker/volumes에 로컬로 저장됩니다. 전체 경로를 얻으려면 `docker Volume ls`를 실행한 다음 `docker Volume Inspection <uuid of Volume>`을 실행할 수 있습니다.
