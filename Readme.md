@@ -18,6 +18,10 @@ Netapp의 엔지니어분들 또한 Ansible에 모듈제작 및 배포에 공헌
 이를 통해 반복되는 작업을 자동화 및 관리하고 스토리지 자원들을 엔서블이 지원하는 여려 모듈들과 함께 통합 관리 할 수 있습니다.
 - NetApp Ansible Team: ng-ansibleteam@netapp.com
 
+## Migration from WFA to Ansible/AWX
+Netapp Work Folow Automation을 AWX로 마이그레이션하여 이용하는 사례들이 있습니다.
+- https://netapp.io/2020/01/29/working-with-awx-tower/
+
 # Ansible support
 모든 IaC 툴들이 그렇듯 이것을 이용하는 사용자는 몇몇 개념에 대한 숙지가 필요합니다.
 Netapp Korea PSE 분들은 Netapp의 파트너분들이나 고객분들이 Ansible을 업무에 쉽게 적용하실 수 있도록 도움을 드리고 있습니다.
@@ -28,3 +32,4 @@ Netapp Korea PSE 분들은 Netapp의 파트너분들이나 고객분들이 Ansib
 # 참고
 - [Ansible Netapp.ontap](https://docs.ansible.com/ansible/latest/collections/netapp/ontap/index.html)
 - [Netapp blog Learn how to Ansible](https://www.netapp.com/ko/devops-solutions/ansible/)
+- [Netapp PS 참고자료](https://github.com/schmots1/AWX_Tower_Project)
