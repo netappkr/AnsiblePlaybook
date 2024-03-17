@@ -168,3 +168,44 @@ ls -al /var/piprepo/
 -rw-r--r--. 1 root root    67216 Mar 17 06:30 websocket_client-0.59.0-py2.py3-none-any.whl
 -rw-r--r--. 1 root root    58462 Mar 17 06:25 websocket_client-1.7.0-py3-none-any.whl
 ```
+
+```bash
+pip3 list
+```
+```bash
+Package            Version
+------------------ --------
+ansible            8.3.0
+ansible-core       2.15.3
+attrs              23.2.0
+bcrypt             4.1.2
+certifi            2024.2.2
+cffi               1.15.1
+charset-normalizer 3.3.2
+cryptography       37.0.2
+distro             1.9.0
+docker             6.1.3
+docker-compose     1.29.2
+dockerpty          0.4.1
+docopt             0.6.2
+idna               3.6
+jsonschema         3.2.0
+marshmallow        3.21.1
+netapp-ontap       9.14.1.0
+packaging          24.0
+paramiko           3.4.0
+pip                22.3.1
+ply                3.11
+pycparser          2.20
+PyNaCl             1.5.0
+pyrsistent         0.20.0
+python-dotenv      0.21.1
+PyYAML             5.3.1
+requests           2.31.0
+requests-toolbelt  1.0.0
+setuptools         65.5.1
+six                1.16.0
+texttable          1.7.0
+urllib3            2.2.1
+websocket-client   0.59.0
+```
