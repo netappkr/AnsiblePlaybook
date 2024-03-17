@@ -4,7 +4,7 @@
 # cd /var/localrepo/
 # ls -al
 ```
-```
+```bash
 -rw-r--r--. 1 root     root     42703372 Mar 17 04:44 ansible-8.3.0-1.el8.noarch.rpm
 -rw-r--r--. 1 root     root      3814892 Mar 17 04:44 ansible-core-2.15.3-1.el8.x86_64.rpm
 -rw-r--r--. 1 root     root      6094684 Mar 17 04:42 binutils-2.30-123.el8.x86_64.rpm
@@ -122,4 +122,49 @@ drwxr-xr-x. 2 root     root         4096 Mar 17 04:58 repodata
 -rw-r--r--. 1 root     root      1429496 Mar 17 05:02 vim-enhanced-8.0.1763-19.el8_6.4.x86_64.rpm
 -rw-r--r--. 1 root     root        51660 Mar 17 05:02 vim-filesystem-8.0.1763-19.el8_6.4.noarch.rpm
 -rw-r--r--. 1 root     root        77420 Mar 17 04:42 yum-utils-4.0.21-23.el8.noarch.rpm
+```
+
+# piplist
+```python3.11-pip``` 기준 사용된 파이선 패키지 목록입니다.
+```bash
+ls -al /var/piprepo/
+```
+```bash
+-rw-r--r--. 1 root root    60752 Mar 17 06:30 attrs-23.2.0-py3-none-any.whl
+-rw-r--r--. 1 root root   698875 Mar 17 06:30 bcrypt-4.1.2-cp39-abi3-manylinux_2_28_x86_64.whl
+-rw-r--r--. 1 root root   163774 Mar 17 05:34 certifi-2024.2.2-py3-none-any.whl
+-rw-r--r--. 1 root root   464825 Mar 17 06:30 cffi-1.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-rw-r--r--. 1 root root   140273 Mar 17 05:34 charset_normalizer-3.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-rw-r--r--. 1 root root  4578653 Mar 17 06:30 cryptography-42.0.5-cp39-abi3-manylinux_2_28_x86_64.whl
+-rw-r--r--. 1 root root    20277 Mar 17 06:30 distro-1.9.0-py3-none-any.whl
+-rw-r--r--. 1 root root   148096 Mar 17 06:25 docker-6.1.3-py3-none-any.whl
+-rw-r--r--. 1 root root   147565 Mar 17 06:30 docker-7.0.0-py3-none-any.whl
+-rw-r--r--. 1 root root   114764 Mar 17 06:30 docker_compose-1.29.2-py2.py3-none-any.whl
+-rw-r--r--. 1 root root    13924 Mar 17 06:30 dockerpty-0.4.1.tar.gz
+-rw-r--r--. 1 root root    25901 Mar 17 06:30 docopt-0.6.2.tar.gz
+-rw-r--r--. 1 root root    61567 Mar 17 05:34 idna-3.6-py3-none-any.whl
+-rw-r--r--. 1 root root    56305 Mar 17 06:30 jsonschema-3.2.0-py2.py3-none-any.whl
+-rw-r--r--. 1 root root    49362 Mar 17 05:35 marshmallow-3.21.1-py3-none-any.whl
+-rw-r--r--. 1 root root 26459166 Mar 17 05:35 netapp_ontap-9.14.1.0-py3-none-any.whl
+-rw-------. 1 root root        0 Mar 17 06:06 nohup.out
+-rw-r--r--. 1 root root 18252005 Mar 17 05:36 numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-rw-r--r--. 1 root root    53488 Mar 17 05:35 packaging-24.0-py3-none-any.whl
+-rw-r--r--. 1 root root 13034628 Mar 17 05:36 pandas-2.2.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-rw-r--r--. 1 root root   225900 Mar 17 06:30 paramiko-3.4.0-py3-none-any.whl
+-rw-r--r--. 1 root root   118697 Mar 17 06:30 pycparser-2.21-py2.py3-none-any.whl
+-rw-r--r--. 1 root root   856678 Mar 17 06:30 PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl
+-rw-r--r--. 1 root root   120002 Mar 17 06:30 pyrsistent-0.20.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-rw-r--r--. 1 root root   229892 Mar 17 05:36 python_dateutil-2.9.0.post0-py2.py3-none-any.whl
+-rw-r--r--. 1 root root    19284 Mar 17 06:30 python_dotenv-0.21.1-py3-none-any.whl
+-rw-r--r--. 1 root root   505474 Mar 17 05:36 pytz-2024.1-py2.py3-none-any.whl
+-rw-r--r--. 1 root root   269377 Mar 17 06:30 PyYAML-5.3.1.tar.gz
+-rw-r--r--. 1 root root    62574 Mar 17 05:34 requests-2.31.0-py3-none-any.whl
+-rw-r--r--. 1 root root    54481 Mar 17 05:35 requests_toolbelt-1.0.0-py2.py3-none-any.whl
+-rw-r--r--. 1 root root   821485 Mar 17 06:30 setuptools-69.2.0-py3-none-any.whl
+-rw-r--r--. 1 root root    11053 Mar 17 05:36 six-1.16.0-py2.py3-none-any.whl
+-rw-r--r--. 1 root root    10768 Mar 17 06:30 texttable-1.7.0-py2.py3-none-any.whl
+-rw-r--r--. 1 root root   345370 Mar 17 05:36 tzdata-2024.1-py2.py3-none-any.whl
+-rw-r--r--. 1 root root   121067 Mar 17 05:34 urllib3-2.2.1-py3-none-any.whl
+-rw-r--r--. 1 root root    67216 Mar 17 06:30 websocket_client-0.59.0-py2.py3-none-any.whl
+-rw-r--r--. 1 root root    58462 Mar 17 06:25 websocket_client-1.7.0-py3-none-any.whl
 ```

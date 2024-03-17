@@ -86,7 +86,7 @@ yum install --downloadonly --downloaddir=/var/localrepo --resolve docker-ce dock
 ```bash
 scp -i ./ssh/mykey.pem -r /var/localrepo root@awxserver:/var/localrepo
 ```
-> ```Red Hat Enterprise Linux release 8.9 (Ootpa)``` 기준 사용된 [rpm 목록](./DockerImages/rpmlist.md) 입니다.
+> ```Red Hat Enterprise Linux release 8.9 (Ootpa)``` 기준 사용된 [rpm 목록](./DockerImages/local_repo_list.md) 입니다.
 #### AWX 서버
 4. AWX 서버에 ```createrepo```를 설치합니다.
 ```bash
@@ -159,6 +159,8 @@ pip3 download netapp.ontap --dest /var/piprepo
 ```bash
 scp -i ./ssh/mykey.pem -r /var/piprepo root@awxserver:/var/piprepo
 ```
+> ```python3.11-pip``` 기준 사용된 [파이썬 패키지 목록](./DockerImages/local_repo_list.md) 입니다.
+
 4. 필요한 패키지를 설치합니다.
 ```
 pip3 install --no-index --find-links=/var/piprepo requests
