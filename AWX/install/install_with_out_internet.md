@@ -285,6 +285,12 @@ ae968ef14f09   ansible/awx:17.1.0   "/usr/bin/tini -- /b…"   40 minutes ago   
 
 ## Ansible Image Builder
 기본 이미지에는 Netapp 플러그인설치가 되어있지 않습니다. 이미지를 수동을 빌드해서 컨테이너를 올려야합니다.
+> ### Tips
+> Netapp의 엔지니어중 한분이 Netapp-ansible 환경을 실행 할 수 있는 Docker image를 업로드했습니다. 이를 다운로드 받아 사용할 수 있습니다.
+> [task_execute_ansible_playbook_using_docker](https://docs.netapp.com/us-en/active-iq/task_execute_ansible_playbook_using_docker.html#before-you-begin)
+> 하지만 netapp 모듈 외에 여러 모듈을 사용할 수 있는 ansible 특성상 로컬 서버또는 외부서버에 실행환경을 구성하고 ssh를 통해 연결하는 방법도 있습니다.
+> (필요할때 마다 빌드해서 이미지관리하기 너무 귀찮아요..)
+
 1. ```inventory```파일에서 ```dockerhub_base=ansible```을 찾아 주석처리해야합니다. ​
 2. 아래 파일을 편집합니다.
 ```
@@ -324,3 +330,4 @@ sudo ansible-playbook -i inventory install.yml
 - [구성 오류 - kwargs_from_env()에 성공하지 못했습니다. 'ssl_version이 있습니다.](https://github.com/geerlingguy/internet-pi/issues/567)
 - [[버그] "pip install docker-compose"가 debian 12에서 실패합니다.](https://github.com/docker/compose/issues/11168)
 - [Ansible tower 요구사항](https://docs.ansible.com/ansible-tower/latest/html/installandreference/requirements_refguide.html#ansible-software-requirements)
+- [task_execute_ansible_playbook_using_docker](https://docs.netapp.com/us-en/active-iq/task_execute_ansible_playbook_using_docker.html#before-you-begin)
