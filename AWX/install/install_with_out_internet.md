@@ -75,7 +75,7 @@ rhui-client-config-server-8                   RHUI Client Configuration Server 8
 ```
 2. ```yumdownloader```를 이용해 필요한 패키지를 다운로드 받습니다.</br>
 이렇게 하면 시스템에 맞는 종속성 패키지들까지 한번에 다운로드 받을 수 있습니다.
-```
+```bash
 mkdir /var/localrepo
 yum install --downloadonly --downloaddir=/var/localrepo --resolve git gcc gcc-c++ nodejs gettext device-mapper-persistent-data lvm2 bzip2 python3.11 python3.11-pip ansible createrepo
 yum install --downloadonly --downloaddir=/var/localrepo --resolve docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -134,10 +134,10 @@ rhel-8-appstream-rhui-rpms                    Red Hat Enterprise Linux 8 for x86
 rhel-8-baseos-rhui-rpms                       Red Hat Enterprise Linux 8 for x86_64 - BaseOS from RHUI (RPMs)
 rhui-client-config-server-8                   RHUI Client Configuration Server 8
 ```
-8. docker compose 명령 구성
-curl -SL https://github.com/docker/compose/releases/download/v2.24.7/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
+8. docker-compose 명령 구성
+```bash
+ln -f -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+```
 ### PIP repo 구성
 필요한 패키지 설치를 위해 PIP repo를 구성합니다.
 
