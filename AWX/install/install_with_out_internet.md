@@ -282,13 +282,109 @@ ae968ef14f09   ansible/awx:17.1.0   "/usr/bin/tini -- /b…"   40 minutes ago   
 29bca59e37cc   redis                "docker-entrypoint.s…"   40 minutes ago   Up 40 minutes   6379/tcp                                awx_redis
 0c9df9357c63   postgres:12          "docker-entrypoint.s…"   40 minutes ago   Up 40 minutes   5432/tcp                                awx_postgres
 ```
+10. 빌드된 도커 이미지를 확인합니다.
+```bash
+docker image ls
+```
+```bash
+REPOSITORY                         TAG       IMAGE ID       CREATED        SIZE
+registry                           2         9363667f8aec   29 hours ago   25.4MB
+ghcr.io/ansible/awx_devel          devel     77add6095501   3 days ago     1.83GB
+<none>                             <none>    26cd5ca9f2a8   3 days ago     1.83GB
+quay.io/sclorg/postgresql-15-c9s   latest    048f3997dc65   4 days ago     388MB
+ghcr.io/ansible/awx_devel          HEAD      b3737b709c5c   3 weeks ago    1.83GB
+postgres                           12        da186a3a7462   4 weeks ago    419MB
+redis                              latest    d1397258b209   2 months ago   138MB
+centos                             8         5d0da3dc9764   2 years ago    231MB
+ansible/awx                        17.1.0    599918776cf2   3 years ago    1.41GB
+```
+11. 도커이미지를 다운로드합니다.
+```bash
+mkdir /var/DockerImage
+```
+12. 도커이미지를 다운로드합니다.
+```bash
+docker save centos:8 -o /var/DockerImages/centos8.tar
+docker save postgres:12 -o /var/DockerImages/postgres12.tar
+docker save redis:latest -o /var/DockerImages/redis.tar
+docker save ansible/awx:17.1.0 -o /var/DockerImages/awx17.tar
+```
+13. 도커 이미지를 AWX 서버로 전송합니다.</br>
+**이때 AWX가 설치되는 서버 디렉토리 유무 및 권한이 충분한지 확인 후 실행하세요.**
+```bash
+scp -i ./ssh/mykey.pem -r /var/DockerImages root@awxserver:/var/DockerImages
+```
 
-## Ansible Image Builder
-기본 이미지에는 Netapp 플러그인설치가 되어있지 않습니다. 이미지를 수동을 빌드해서 컨테이너를 올려야합니다.
+14. AWX 서버로 ```awx``` 폴더를 전송합니다.</br>
+**이때 AWX가 설치되는 서버 디렉토리 유무 및 권한이 충분한지 확인 후 실행하세요.**
+```bash
+scp -i ./ssh/mykey.pem -r awx root@awxserver:/opt/
+```
+
+#### AWX 서버
+14. 받아온 awx 폴더이름을 변경합니다.
+```bash
+mv /opt/awx /opt/awxgit
+mkidr /opt/awx
+```
+15. 받아온 도커 이미지를 등록합니다.
+```bash
+docker load -i /opt/awxgit/DockerImages/centos8.tar 
+docker load -i /opt/awxgit/DockerImages/awx17.tar 
+docker load -i /opt/awxgit/DockerImages/postgres12.tar 
+docker load -i /opt/awxgit/DockerImages/redis.tar 
+```
 > ### Tips
-> Netapp의 엔지니어중 한분이 Netapp-ansible 환경을 실행 할 수 있는 Docker image를 업로드했습니다. 이를 다운로드 받아 사용할 수 있습니다.
-> [task_execute_ansible_playbook_using_docker](https://docs.netapp.com/us-en/active-iq/task_execute_ansible_playbook_using_docker.html#before-you-begin)
-> 하지만 netapp 모듈 외에 여러 모듈을 사용할 수 있는 ansible 특성상 로컬 서버또는 외부서버에 실행환경을 구성하고 ssh를 통해 연결하는 방법도 있습니다.
+> docker image 빌드 또는 ```docker hub```에 접근이 어려운경우 [DokcerImages](./DockerImages/) 항목을 다운로드 받습니다.
+> 별도의 image repo를 운영하시는 경우 repo에 이미지를 등록하고 ```inventory``` 파일에서 ```dockerhub_base=ansible``` 의 값을 repo 이름으로 변경합니다.
+
+16. ```​awx/installer/``` 내부에서 Ansible 명령을 실행합니다.
+```bash
+sudo ansible-playbook -i inventory install.yml
+```
+## 실행 및 관리
+1. 실행 확인
+```basj
+cd /opt/awx/awxcompose
+docker-compose ps
+```
+```bash
+    Name                  Command               State                  Ports                
+--------------------------------------------------------------------------------------------
+awx_postgres   docker-entrypoint.sh postgres    Up      5432/tcp                            
+awx_redis      docker-entrypoint.sh /usr/ ...   Up      6379/tcp                            
+awx_task       /usr/bin/tini -- /usr/bin/ ...   Up      8052/tcp                            
+awx_web        /usr/bin/tini -- /bin/sh - ...   Up      0.0.0.0:80->8052/tcp,:::80->8052/tcp
+```
+
+2. 중지
+```bash
+docker-compose stop
+```
+```bash
+Stopping awx_task     ... done
+Stopping awx_web      ... done
+Stopping awx_postgres ... done
+Stopping awx_redis    ... done
+```
+3. 시작
+```bash
+docker-compose start
+```
+```bash
+Starting redis    ... done
+Starting postgres ... done
+Starting web      ... done
+Starting task     ... done
+```
+## Ansible Image Builder
+기본 이미지에는 Netapp 플러그인설치가 되어있지 않습니다. 이미지를 수동을 빌드해서 컨테이너를 올려야합니다.</br>
+인터넷이 되지 않는 환경인 경우 인터넷이 가능한 곳에서 빌드 후  해당 이미지를 옮기는 방법을 추천드립니다.
+
+> ### Tips
+> Netapp의 엔지니어분들이 Netapp-ansible 환경을 실행 할 수 있는 Docker image를 업로드했습니다. 이를 다운로드 받아 사용할 수 있습니다.</br>
+> [task_execute_ansible_playbook_using_docker](https://docs.netapp.com/us-en/active-iq/task_execute_ansible_playbook_using_docker.html#before-you-begin)</br>
+> 하지만 netapp 모듈 외에 여러 모듈을 사용할 수 있는 ansible 특성상 로컬 서버또는 외부서버에 실행환경을 구성하고 ssh를 통해 연결하는 방법도 있습니다.</br>
 > (필요할때 마다 빌드해서 이미지관리하기 너무 귀찮아요..)
 
 1. ```inventory```파일에서 ```dockerhub_base=ansible```을 찾아 주석처리해야합니다. ​
