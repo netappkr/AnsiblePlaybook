@@ -9,9 +9,9 @@
 ## 컴퓨팅 최소 조건
 설치 환경 및 필수 항목들을 정의합니다.
 - OS : centos or redhat 8.x
-- CPU : 2 core
-- Mem : 4 Mem ( 권장 8)
-- Storage: 20GB of space ()
+- CPU : 2 core ( 권장 4core )
+- Mem : 4G Mem ( 권장 8G )
+- Storage: 20GB of space ( 권장 100G )
 - Running Docker, Openshift, or Kubernetes
 If you choose to use an external PostgreSQL database, please note that the minimum version is 10+.
 
@@ -54,9 +54,8 @@ Red Hat Enterprise Linux release 8.9 (Ootpa)
 sudo yum install yum-utils
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-sudo 
 ```
-사용한 repo는 아래와 같습니다.
+
 ```bash
 # yum repolist
 Updating Subscription Management repositories.
@@ -87,7 +86,7 @@ yum install --downloadonly --downloaddir=/var/localrepo --resolve docker-ce dock
 ```bash
 scp -i ./ssh/mykey.pem -r /var/localrepo root@awxserver:/var/localrepo
 ```
-
+> ```Red Hat Enterprise Linux release 8.9 (Ootpa)``` 기준 사용된 [rpm 목록](./DockerImages/rpmlist.md) 입니다.
 #### AWX 서버
 4. AWX 서버에 ```createrepo```를 설치합니다.
 ```bash
