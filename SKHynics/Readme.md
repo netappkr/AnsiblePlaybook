@@ -71,7 +71,7 @@ gantt
     AWX 설치 환경 구성  : done, awx2, 2024-03-05, 4d
     AWX 설치 진행 : done, awx3, after awx2 , 5d
     AWX 설치 재진행 : active, awx3-1, after awx1-1 , 3d
-    AWX 세부설정 추가 : awx4, after awx3, 5d
+    AWX 세부설정 추가 : awx4, after awx3-1, 1d
 
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : done,p1-1, 2024-03-04, 5d
