@@ -39,7 +39,7 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 |----|--- |  ---  |  ---  | ---  |---| ---- |---|
 | AWX 구성                          | AWX 설치 가이드 작성           |2024-02-26|2024-02-29| 안우영 | done | [가이드 문서](../AWX/install/Readme.md) | --- |
 | AWX 구성                          | AWX 설치 환경 구성             |2024-03-05|22024-03-08| 유한민 | active | --- | --- |
-| AWX 구성                          | AWX 설치                      |2024-03-18|22024-03-20| 안우영,유한민 | done | ---  | 외부레포 이용 문제로 가이드 수정후 재시도 |
+| AWX 구성                          | AWX 설치                      |2024-03-11|22024-03-13| 안우영,유한민 | done | ---  | 외부레포 이용 문제로 가이드 수정후 재시도 |
 | AWX 구성                          | AWX 설치 가이드 추가 수정       |2024-03-13|22024-03-15| 안우영 | done | [가이드 문서](../AWX/install/install_with_out_internet.md) | --- |
 | AWX 구성                          | AWX 설치 재진행                |2024-03-18|22024-03-20| 안우영,유한민 | active | 설치 진행중  | --- |
 | Inode report by Cluster Playbook | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Cluster Playbook](./playbooks/GetInodebyCluster.yaml) | --- |
