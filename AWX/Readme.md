@@ -1,5 +1,6 @@
+<img src="https://raw.githubusercontent.com/ansible/awx-logos/master/awx/ui/client/assets/logo-login.svg?sanitize=true" width=200 alt="AWX" />
+
 # AWX
-![AWX](https://raw.githubusercontent.com/ansible/awx-logos/master/awx/ui/client/assets/logo-login.svg?sanitize=true)
 AWX는 Ansible 을 기반으로 구축된 웹 기반 사용자 인터페이스, REST API 및 작업 엔진을 제공합니다. </br>
 Red Hat Ansible Automation Platform 의 업스트림 프로젝트 중 하나입니다.
 
