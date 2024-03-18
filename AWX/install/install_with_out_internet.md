@@ -45,7 +45,9 @@ Red Hat Enterprise Linux release 8.9 (Ootpa)
 ```
 
 ### yum local repo 구성
-이미 사용중인 ```private repo```가 있다면 그쪽을 이용합니다.
+이 가이드에서 외부 레포서버가 없다는 가정하에서 필요한 패키지를 다운로드 받기 위하여 외부 VM을 이용합니다.
+이미 사용중인 ```private repo```가 있다면 [rpm 목록](./DockerImages/local_repo_list.md)을 참고하여 운영하시는 레포에 밀어넣습니다.
+ **```Red Hat Enterprise Linux release 8.9 (Ootpa)``` 기준**
 #### 외부망에 접근 가능한 VM
 1. 먼저 설치할 환경과 동일한 OS를 설치한 VM 구합니다. 이 VM은 인터넷에 접근가능해야 합니다.
 
@@ -140,7 +142,9 @@ ln -f -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-co
 ```
 ### PIP repo 구성
 필요한 패키지 설치를 위해 PIP repo를 구성합니다.
-
+이 가이드에서 외부 레포서버가 없다는 가정하에서 필요한 패키지를 다운로드 받기 위하여 외부 VM을 이용합니다.
+이미 사용중인 ```private repo```가 있다면 [pip 목록](./DockerImages/local_repo_list.md)을 참고하여 운영하시는 레포에 밀어넣습니다.
+ **```python3.11``` 기준**
 #### 외부망에 접근 가능한 VM
 1. ```python3.11```을 설치합니다.
 ```bash
