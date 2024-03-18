@@ -213,6 +213,10 @@ host_port_ssl=443
 # Optional key file
 #ssl_certificate_key=
 docker_compose_dir="/opt/awx/awxcompose"
+# AWX project data folder. If you need access to the location where AWX stores the projects
+# it manages from the docker host, you can set this to turn it into a volume for the container.
+#project_data_dir=/var/lib/awx/projects
+project_data_dir="/opt/awx/projects"
 ```
 6. 여기서 무엇을 선택하든 디렉터리가 존재하고 Docker 사용자가 쓸 수 있는지 확인하세요.
 ```
@@ -262,7 +266,7 @@ redis                              latest    d1397258b209   2 months ago   138MB
 centos                             8         5d0da3dc9764   2 years ago    231MB
 ansible/awx                        17.1.0    599918776cf2   3 years ago    1.41GB
 ```
-11. 도커이미지를 다운로드합니다.
+11. 도커이미지를 다운로드할 폴더를 생성합니다.
 ```bash
 mkdir /var/DockerImage
 ```
