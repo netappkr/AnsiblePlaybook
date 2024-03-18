@@ -66,7 +66,7 @@ gantt
 
     section AWX 구성
     AWX install Guide 작성  : done, awx1, 2024-02-26, 4d
-    AWX install Guide 추가 수정  : done, awx1-1, 2024-03-15, 5d
+    AWX install Guide 추가 수정  : done, awx1-1, 2024-03-15, 2d
     AWX 설치 환경 구성  : done, awx2, 2024-03-05, 4d
     AWX 설치 진행 : done, awx3, after awx2 , 5d
     AWX 설치 재진행 : active, awx3-1, after awx1-1 , 3d
