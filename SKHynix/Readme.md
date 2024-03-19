@@ -70,20 +70,20 @@ gantt
     AWX install Guide 추가 수정  : done, awx1-1, after awx3, 2d
     AWX 설치 환경 구성  : done, awx2, 2024-03-05, 4d
     AWX 설치 진행 : done, awx3, after awx2 , 3d
-    AWX 설치 재진행 : active, awx3-1, after awx1-1 , 3d
+    AWX 설치 재진행 : done, awx3-1, after awx1-1 , 3d
     AWX 세부설정 추가 : awx4, after awx3-1, 1d
 
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : done,p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
-    Playbook 적용 Test: p1-3, after awx4,  5d
-    Playbook 수정 : p1-4, after awx4 , 5d
+    Playbook 적용 Test: p1-3, 2024-03-21,  5d
+    Playbook 수정 : p1-4, 2024-03-21 , 5d
 
     section Inode report by Volume Playbook
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: p2-3, after awx4,  5d
-    Playbook 수정 : p2-4, after awx4 , 5d
+    Playbook 적용 Test: p2-3, 2024-03-21,  5d
+    Playbook 수정 : p2-4, 2024-03-21 , 5d
 
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
