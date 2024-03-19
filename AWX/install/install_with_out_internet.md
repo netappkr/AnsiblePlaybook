@@ -177,6 +177,12 @@ pip3 list
 ```
 
 ## Ansible AWX 17.1.0 설치
+시작하기전에 docker 가 켜지있는지 확인하세요.
+```bash
+systemctl status docker
+systemctl start docker
+systemctl enable docker
+```
 
 #### 외부망에 접근 가능한 VM
 1. 다음 명령을 사용하여 v17 릴리스를 복제합니다.
@@ -301,8 +307,8 @@ mkidr /opt/awx
 ```
 15. 받아온 도커 이미지를 등록합니다.
 ```bash
-docker load -i /opt/awxgit/DockerImages/centos8.tar 
-docker load -i /opt/awxgit/DockerImages/awx17.tar 
+docker load -i /var/DockerImages/centos8.tar 
+docker load -i /var/DockerImages/postgres12.tar 
 docker load -i /opt/awxgit/DockerImages/postgres12.tar 
 docker load -i /opt/awxgit/DockerImages/redis.tar 
 ```
