@@ -73,32 +73,33 @@ gantt
     AWX 설치 환경 구성  : done, awx2, 2024-03-05, 4d
     AWX 설치 진행 : done, awx3, after awx2 , 3d
     AWX 설치 재진행 : done, awx3-1, after awx1-1 , 3d
-    AWX 세부설정 추가 : awx4, after awx3-2, 1d
     AWX task 컨테이너 커스텀 구성: active, awx3-2, after awx3-1, 5d
+    AWX 세부설정 추가 : awx4, after awx3-2, 1d
+    
 
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : done,p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
     Playbook 적용 Test: p1-3, after awx4,  5d
-    Playbook 수정 : p1-4, 2024-03-25 , 5d
+    Playbook 수정 : p1-4, after awx4 , 5d
 
     section Inode report by Volume Playbook
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: p2-3, 2024-03-25,  5d
-    Playbook 수정 : p2-4, 2024-03-25 , 5d
+    Playbook 적용 Test: p2-3, after awx4,  5d
+    Playbook 수정 : p2-4, after awx4 , 5d
 
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
-    Playbook 적용 Test: p3-3, after p3-1,  5d
-    Playbook 수정 : p3-4, after p3-1 , 5d
+    Playbook 적용 Test: p3-3, after awx4,  5d
+    Playbook 수정 : p3-4, after awx4 , 5d
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
-    Playbook 적용 Test: p4-3, after p4-1,  5d
-    Playbook 수정 : p4-3, after p4-1 , 5d
+    Playbook 적용 Test: p4-3, after awx4,  5d
+    Playbook 수정 : p4-3, after awx4 , 5d
 
     section Big snapshot Alert by Volume Playbook
     Sample Playbook 작성 : p5-1, 2024-04-01, 5d
@@ -139,7 +140,7 @@ gantt
 - New : 새로운 Task 등록
 - Active : Task 진행중
 - Pending : 외부또는 내부 이슈로 인해 대기 상태
-- close : 완료
+- done : 완료
 
 ### Agile 간략설명
 ![Img](./Images/애자일-방법론-정의-장점-단점-프로세스.webp)
