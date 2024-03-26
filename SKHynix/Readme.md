@@ -101,11 +101,6 @@ gantt
     Playbook 적용 Test: p4-3, after awx4,  5d
     Playbook 수정 : p4-3, after awx4 , 5d
 
-    section Big snapshot Alert by Volume Playbook
-    Sample Playbook 작성 : p5-1, 2024-04-01, 5d
-    Playbook 적용 Test: p5-2, after p5-1,  5d
-    Playbook 수정 : p5-3, after p5-1 , 5d
-
     section Snapmirror/vault Check Playbook
     Sample Playbook 작성 : p6-1, 2024-04-01, 5d
     Playbook 적용 Test: p6-2, after p6-1,  5d
@@ -120,11 +115,6 @@ gantt
     Sample Playbook 작성 : p8-1, 2024-04-15, 5d
     Playbook 적용 Test: p8-2, after p8-1,  5d
     Playbook 수정 : p8-3, after p8-1 , 5d
-
-    section Inode Increase Playbook
-    Sample Playbook 작성 : p9-1, 2024-04-29, 5d
-    Playbook 적용 Test: p9-2, after p9-1,  5d
-    Playbook 수정 : p9-3, after p9-1 , 5d
 
     section check the Data Life Cycle Playbook
     Sample Playbook 작성 : p10-1, 2024-04-29, 5d
