@@ -102,7 +102,7 @@ gantt
     Playbook 수정 : p4-3, after awx4 , 5d
 
     section Snapmirror/vault Check Playbook
-    Sample Playbook 작성 : p6-1, 2024-04-01, 5d
+    Sample Playbook 작성 : p6-1, 2024-04-08, 5d
     Playbook 적용 Test: p6-2, after p6-1,  5d
     Playbook 수정 : p6-3, after p6-1 , 5d
 
