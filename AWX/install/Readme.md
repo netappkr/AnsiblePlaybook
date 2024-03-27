@@ -13,28 +13,33 @@ AWX 17.1.0 버전을 설치합니다.
 설치 환경 및 필수 항목들을 정의합니다.
 - OS : 페도라 계열 8.x
 - CPU : 2 core
-- Mem : 4 Mem ( 권장 8)
+- Mem : 4 Mem ( 권장 8 )
 - Storage: 20GB of space ()
 - Running Docker, Openshift, or Kubernetes
 If you choose to use an external PostgreSQL database, please note that the minimum version is 10+.
 
 ### Pre-Install
 EPEL 리포지토리와 Docker가 모두 Red Hat 서버에 이미 설치되어 있는지 확인하세요. 설정 가이드를 참조하세요.
-```
+1. 필요한 패키지 설치
+```bash
 dnf install git gcc gcc-c++ nodejs gettext device-mapper-persistent-data lvm2 bzip2 python3-pip ansible
 ```
-Install Docker Engine, containerd, and Docker Compose:
-```
+2. Install Docker Engine, containerd, and Docker Compose:
+```bash
 sudo yum install -y yum-utils
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
-Start Docker.
-```
+3. Start Docker.
+```bash
 sudo systemctl start docker
 pip3 install pyyaml==5.3.1
 pip3 install docker-compose
 dnf -y installl docker-compose-plugin
+```
+4. docker-compose 명령 구성
+```bash
+ln -f -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
 ```
 
 ## Ansible AWX 17.1.0 설치
@@ -87,20 +92,8 @@ vim installer/roles/local_docker/tasks/main.yml
     name:
       - "docker==6.1.3"
       - "docker-compose"
-``
+```
 
-```
-vim installer/roles/local_docker/tasks/compose.yml
-```
-아래 명령중  ```​docker-compose​```  부분을  ```​docker compose```​로 변경합니다.
-- ​docker-compose ==> version 1​ 
-- ​docker compose ==> version 2​ 
-```yaml
-    - name: Run migrations in task container
-      shell: docker compose run --rm --service-ports task awx-manage migrate --no-input
-      args:
-        chdir: "{{ docker_compose_dir }}"
-```
 이제 ```​awx/installer/``` 내부에서 Ansible 명령을 따라 Ansible AWX를 설치할 수 있습니다.
 ```bash
 sudo ansible-playbook -i inventory install.yml
