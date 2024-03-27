@@ -7,7 +7,7 @@ AWX는 개발자분들을 위한 수동빌드 가이드를 제공합니다. </br
 > ### Tips
 > netapp ontap 과 연동하는 AWX 환경을 구축하고 계신가요?
 > ```netapp.ontap``` 모듈 설치가 되어 있는 커스텀 이미지를 찾고 계신가요?
-> 한국넷앱 PSE분들이 빌드한 [이미지](https://seanp.s3.ap-northeast-2.amazonaws.com/Public/DockerImages/awx17netappkr.tar)를 사용해보세요. 버전은 ```17.1.0``` 입니다.
+> 한국넷앱 PSE분들이 빌드한 [이미지](./DockerImages/Readme.md)를 사용해보세요. 버전은 ```17.1.0``` 입니다.
 
 ## Getting Start
 
