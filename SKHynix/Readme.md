@@ -46,16 +46,16 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | AWX 구성                          | AWX task 컨테이너 커스텀 구성   |2024-03-21|22024-03-27| 안우영 | done | [이슈](https://github.com/netappkr/AnsiblePlaybook/issues/3) 답변 완료   | --- |
 | Inode report by Cluster Playbook | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Cluster Playbook](./playbooks/GetInodebyCluster.yaml) | --- |
 | Inode report by Cluster Playbook | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
-| Inode report by Cluster Playbook | Playbook 적용 Test             |2024-03---|2024-03---| 안우영,유한민 | New | --- | --- |
+| Inode report by Cluster Playbook | Playbook 적용 Test             |2024-03---|2024-03---| 안우영,유한민 | active | --- | --- |
 | Inode report by Volume Playbook  | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Volume Playbook](./playbooks/GetInodebyVolume.yaml) | --- |
 | Inode report by Volume Playbook  | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
-| Inode report by Volume Playbook  | Playbook 적용 Test             |2024-03---|2024-03---| 안우영,유한민 | New | --- | --- |
+| Inode report by Volume Playbook  | Playbook 적용 Test             |2024-03---|2024-03---| 안우영,유한민 | active | --- | --- |
 | Capacity Report by cluster Playbook | Sample Playbook 작성        |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) | --- |
 | Capacity Report by cluster Playbook  | Sample python script 작성  |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
-| Capacity Report by cluster Playbook  | Playbook 적용 Test         |2024-03---|2024-03---| 안우영,유한민 | New | --- |
+| Capacity Report by cluster Playbook  | Playbook 적용 Test         |2024-03---|2024-03---| 안우영,유한민 | active | --- |
 | Capacity Report by Volume Playbook | Sample Playbook 작성         |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) | --- |
 | Capacity Report by Volume Playbook  | Sample python script 작성   |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
-| Capacity Report by Volume Playbook  | Playbook 적용 Test          |2024-03---|2024-03---| 안우영,유한민 | New | --- | --- |
+| Capacity Report by Volume Playbook  | Playbook 적용 Test          |2024-03---|2024-03---| 안우영,유한민 | active | --- | --- |
 
 
 </details>
@@ -73,33 +73,33 @@ gantt
     AWX 설치 환경 구성  : done, awx2, 2024-03-05, 4d
     AWX 설치 진행 : done, awx3, after awx2 , 3d
     AWX 설치 재진행 : done, awx3-1, after awx1-1 , 3d
-    AWX task 컨테이너 커스텀 구성: active, awx3-2, after awx3-1, 5d
-    AWX 세부설정 추가 : awx4, after awx3-2, 1d
+    AWX task 컨테이너 커스텀 구성: done, awx3-2, after awx3-1, 5d
+    AWX 세부설정 추가 : awx4, done awx3-2, 1d
     
 
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : done,p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
-    Playbook 적용 Test: p1-3, after awx4,  5d
-    Playbook 수정 : p1-4, after awx4 , 5d
+    Playbook 적용 Test: active, p1-3, after awx4,  5d
+    Playbook 수정 : active, p1-4, after awx4 , 5d
 
     section Inode report by Volume Playbook
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: p2-3, after awx4,  5d
-    Playbook 수정 : p2-4, after awx4 , 5d
+    Playbook 적용 Test: active, p2-3, after awx4,  5d
+    Playbook 수정 : active, p2-4, after awx4 , 5d
 
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
-    Playbook 적용 Test: p3-3, after awx4,  5d
-    Playbook 수정 : p3-4, after awx4 , 5d
+    Playbook 적용 Test: active, p3-3, after awx4,  5d
+    Playbook 수정 : active, p3-4, after awx4 , 5d
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
-    Playbook 적용 Test: p4-3, after awx4,  5d
-    Playbook 수정 : p4-3, after awx4 , 5d
+    Playbook 적용 Test: active, p4-3, after awx4,  5d
+    Playbook 수정 : active, p4-3, after awx4 , 5d
 
     section Snapmirror/vault Check Playbook
     Sample Playbook 작성 : p6-1, 2024-04-08, 5d

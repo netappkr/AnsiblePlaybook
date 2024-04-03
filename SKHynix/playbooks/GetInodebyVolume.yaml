@@ -64,7 +64,7 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} -r volume_indoe_info -f {{ datafile.dest }}"
+      command: "python3 {{ files_matched.files[0].path }} -r volume_inode_info -f {{ datafile.dest }}"
       register: html_tables
       loop: "{{ datafiles.results  }}"
       loop_control:

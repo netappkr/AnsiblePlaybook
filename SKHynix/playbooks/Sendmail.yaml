@@ -16,7 +16,7 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} -r clusters_indoe_info -f /tmp/clusters_inode_info.json"
+      command: "python3 {{ files_matched.files[0].path }} -r clusters_inode_info -f /tmp/clusters_inode_info.json"
       register: html_tables
 
     - name: Send inode usage report via email

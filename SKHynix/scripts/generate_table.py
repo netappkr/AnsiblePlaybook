@@ -130,9 +130,9 @@ def storage_Big_snapshot_report_by_volume(data):
         
 def main():
     try:
-        if args.request == "clusters_indoe_info":
+        if args.request == "clusters_inode_info":
             storage_inode_report_by_cluster(data)
-        elif args.request == "volume_indoe_info":
+        elif args.request == "volume_inode_info":
             storage_inode_report_by_volume(data)
         elif args.request == "clusters_space_info":
             storage_space_report_by_cluster(data)
