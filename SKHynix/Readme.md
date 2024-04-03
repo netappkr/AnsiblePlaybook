@@ -78,7 +78,7 @@ gantt
     
 
     section Inode report by Cluster Playbook
-    Sample Playbook 작성 : done,p1-1, 2024-03-04, 5d
+    Sample Playbook 작성 : done, p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
     Playbook 적용 Test: active, p1-3, after awx4,  5d
     Playbook 수정 : active, p1-4, after awx4 , 5d
