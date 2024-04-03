@@ -80,26 +80,26 @@ gantt
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : done, p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
-    Playbook 적용 Test: active, p1-3, after awx4,  5d
-    Playbook 수정 : active, p1-4, after awx4 , 5d
+    Playbook 적용 Test: active, p1-3, 2024-04-01,  5d
+    Playbook 수정 : active, p1-4, 2024-04-01 , 5d
 
     section Inode report by Volume Playbook
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: active, p2-3, after awx4,  5d
-    Playbook 수정 : active, p2-4, after awx4 , 5d
+    Playbook 적용 Test: active, p2-3, 2024-04-03,  5d
+    Playbook 수정 : active, p2-4, 2024-04-03 , 5d
 
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
-    Playbook 적용 Test: active, p3-3, after awx4,  5d
-    Playbook 수정 : active, p3-4, after awx4 , 5d
+    Playbook 적용 Test: active, p3-3, 2024-04-03,  5d
+    Playbook 수정 : active, p3-4, 2024-04-03 , 5d
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
-    Playbook 적용 Test: active, p4-3, after awx4,  5d
-    Playbook 수정 : active, p4-3, after awx4 , 5d
+    Playbook 적용 Test: active, p4-3, 2024-04-03,  5d
+    Playbook 수정 : active, p4-3, 2024-04-03 , 5d
 
     section Snapmirror/vault Check Playbook
     Sample Playbook 작성 : p6-1, 2024-04-08, 5d
