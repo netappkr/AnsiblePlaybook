@@ -74,7 +74,7 @@ gantt
     AWX 설치 진행 : done, awx3, after awx2 , 3d
     AWX 설치 재진행 : done, awx3-1, after awx1-1 , 3d
     AWX task 컨테이너 커스텀 구성: done, awx3-2, after awx3-1, 5d
-    AWX 세부설정 추가 : done, awx4, awx3-2, 1d
+    AWX 세부설정 추가 : done, awx4, after awx3-2, 1d
     
 
     section Inode report by Cluster Playbook
