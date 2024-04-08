@@ -30,9 +30,13 @@ with open(json_file, 'r') as file:
     data = json.load(file)
 
 # Pandas DataFrame을 생성합니다.
+pandas.options.display.float_format = '{:,}'.format
 datatable = pandas.DataFrame()
 datatable.style.set_caption(args.request)
 datatable.style.set_table_attributes('class="mystyle"')
+
+def format_with_commas(num):
+    return '{0:,}'.format(num)
 
 def storage_inode_report_by_cluster(data):
     global datatable
@@ -45,9 +49,9 @@ def storage_inode_report_by_cluster(data):
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
-            'Total Inodes': inode_total,
-            'Used Inodes': format(inode_used), 
-            'Free Inodes': format(inode_total - inode_used),
+            'Total Inodes': format_with_commas(inode_total),
+            'Used Inodes': format_with_commas(inode_used), 
+            'Free Inodes': format_with_commas(inode_total - inode_used),
             'Inode Use%': round(inode_used / inode_total * 100,0),
             'description': cluster["cluster"]["description"]
         }])
@@ -61,9 +65,9 @@ def storage_inode_report_by_volume(data):
         add=pandas.DataFrame.from_records([{
             'cluster Name': data["cluster"]["name"],
             'Volume Name': volume["name"],
-            'Total Inodes': format(volume["files"]["maximum"]),
-            'Used Inodes': format(volume["files"]["used"]), 
-            'Free Inodes': format(volume["files"]["maximum"] - volume["files"]["used"]),
+            'Total Inodes': format_with_commas(volume["files"]["maximum"]),
+            'Used Inodes': format_with_commas(volume["files"]["used"]), 
+            'Free Inodes': format_with_commas(volume["files"]["maximum"] - volume["files"]["used"]),
             'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100,0)
         }])
         
@@ -84,9 +88,9 @@ def storage_space_report_by_cluster(data):
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
-            'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
-            'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
-            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
+            'Total Size(TiB)': format_with_commas(round(total_size/1024/1024/1024/1024,2)),
+            'Used Size(TiB)': format_with_commas(round(used_size/1024/1024/1024/1024,2)), 
+            'Free Size(TiB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,2)),
             'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
@@ -103,10 +107,10 @@ def storage_space_report_by_aggr(data):
             'Cluster Name': data["cluster"]["name"],
             'Aggr Name': aggr["name"],
             'Node Name': aggr["home_node"]["name"],
-            'Total Size(TiB)': format(round(total_size/1024/1024/1024/1024,2)),
-            'Used Size(TiB)': format(round(used_size/1024/1024/1024/1024,2)), 
-            'Free Size(TiB)': format(round((total_size - used_size)/1024/1024/1024/1024,2)),
-            'Used Rate(%)': format(round(used_size / total_size * 100,2))
+            'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
+            'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
+            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
+            'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
     report_name = "------ Aggregates Capacity Report ------"
