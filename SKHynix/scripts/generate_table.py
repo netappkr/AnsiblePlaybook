@@ -53,7 +53,8 @@ def storage_inode_report_by_cluster(data):
             'Inode Use%': round(inode_used / inode_total * 100)
         }])
         datatable=datatable._append(add,ignore_index = True)
-    report_name = "CAD Storage Cluster INODE 사용량 Summary"
+    custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
+    report_name = "CAD Storage Cluster INODE 사용량 Summary" , custom_col_style_list
     return report_name
 
 def storage_inode_report_by_volume(data):
@@ -69,8 +70,9 @@ def storage_inode_report_by_volume(data):
         }])
         
         datatable=datatable._append(add,ignore_index = True)
+    custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
     report_name = data["cluster"]["name"] + " Storage Volumes INODE Report"
-    return report_name
+    return report_name , custom_col_style_list
 
 
 def storage_space_report_by_cluster(data):
@@ -138,36 +140,40 @@ def storage_Big_snapshot_report_by_volume(data):
                     }])
                     datatable=datatable._append(add,ignore_index = True)
     
-def format_html_style(datatable,report_name):
-    # HTML 테이블로 변환합니다.
-    ## 경고
-    # Html 양식의 이메일 제출 시 CSS 포함 전송기능을 지원하지 않는 경우가 있다고 합니다.
-    # 이런 경우 방법은 각 Html 항목에 직접 css를 한줄씩 넣어야 합니다.
-    datatable=datatable.style.set_caption(report_name)
-    datatable=datatable.hide()
-    datatable=datatable.set_table_attributes('class="mystyle"')
-    # datatable=datatable.style.set_properties(subset=['Total Inodes'], **{'text-align': 'right'})
-    html_table= datatable.to_html()
+def align_right(s):
+    return 'text-align: right;'
+
+def format_html_style(datatable, report_name, custom_col_style_list=[]):
+    datatable = datatable.style.set_caption(report_name).set_table_attributes('class="mystyle"').hide()
+    
+    # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
+    for col in custom_col_style_list:
+        datatable = datatable.applymap(align_right, subset=[col])
+    
+    html_table = datatable.to_html()
     return html_table
        
 def main():
     try:
         if args.request == "clusters_inode_info":
-            report_name=storage_inode_report_by_cluster(data)
+            report_name, custom_col_style_list = storage_inode_report_by_cluster(data)
+            html_table = format_html_style(datatable,report_name)
         elif args.request == "volume_inode_info":
-            report_name=storage_inode_report_by_volume(data)
+            report_name, custom_col_style_list = storage_inode_report_by_volume(data)
+            html_table = format_html_style(datatable,report_name)
         elif args.request == "clusters_space_info":
             report_name=storage_space_report_by_cluster(data)
+            html_table = format_html_style(datatable,report_name)
         elif args.request == "aggrs_space_info":
             report_name=storage_space_report_by_aggr(data)
+            html_table = format_html_style(datatable,report_name)
         elif args.request == "big_snapshot_info":
             report_name=storage_Big_snapshot_report_by_volume(data)
+            html_table = format_html_style(datatable,report_name)
         else:
             logger.error(args.request+" request is not matched")
             
-
-        # html_table= datatable.render()
-        html_table = format_html_style(datatable,report_name)
+        
 
         # HTML 테이블로 변환합니다.
         ## 경고
