@@ -46,11 +46,11 @@ def storage_inode_report_by_cluster(data):
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
+            'description': cluster["cluster"]["description"],
             'Total Inodes': format_with_commas(inode_total),
             'Used Inodes': format_with_commas(inode_used), 
             'Free Inodes': format_with_commas(inode_total - inode_used),
-            'Inode Use%': round(inode_used / inode_total * 100,0),
-            'description': cluster["cluster"]["description"]
+            'Inode Use%': round(inode_used / inode_total * 100,0)
         }])
         datatable=datatable._append(add,ignore_index = True)
     report_name = "CAD Storage Cluster INODE 사용량 Summary"
@@ -85,6 +85,7 @@ def storage_space_report_by_cluster(data):
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
+            'description': cluster["cluster"]["description"],
             'Total Size(TiB)': format_with_commas(round(total_size/1024/1024/1024/1024,0)),
             'Used Size(TiB)': format_with_commas(round(used_size/1024/1024/1024/1024,0)), 
             'Free Size(TiB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,0)),
