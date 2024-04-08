@@ -139,15 +139,15 @@ def storage_Big_snapshot_report_by_volume(data):
                     }])
                     datatable=datatable._append(add,ignore_index = True)
     
-def format_html_style(datatable):
+def format_html_style(datatable,report_name):
     # HTML 테이블로 변환합니다.
     ## 경고
     # Html 양식의 이메일 제출 시 CSS 포함 전송기능을 지원하지 않는 경우가 대부분이라고 합니다.
     # 따라서 방법은 각 Html 항목에 직접 css를 한줄씩 넣어야 합니다.
-    datatable=datatable.style.set_caption(args.request)
+    datatable=datatable.style.set_caption(report_name)
     datatable=datatable.set_table_attributes('class="mystyle"')
     # datatable=datatable.style.set_properties(subset=['Total Inodes'], **{'text-align': 'right'})
-    html_table= datatable.to_html()
+    html_table= datatable.to_html(index=False)
     return html_table       
 def main():
     try:
@@ -166,7 +166,7 @@ def main():
             
 
         # html_table= datatable.render()
-        html_table = format_html_style(datatable)
+        html_table = format_html_style(datatable,report_name)
 
         # HTML 테이블로 변환합니다.
         ## 경고
