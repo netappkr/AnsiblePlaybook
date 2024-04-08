@@ -46,9 +46,10 @@ def storage_inode_report_by_cluster(data):
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
             'Total Inodes': inode_total,
-            'Used Inodes': inode_used, 
-            'Free Inodes': inode_total - inode_used,
-            'Inode Use%': round(inode_used / inode_total * 100,2)
+            'Used Inodes': format(inode_used), 
+            'Free Inodes': format(inode_total - inode_used),
+            'Inode Use%': round(inode_used / inode_total * 100,0),
+            'description': cluster["cluster"]["description"]
         }])
         datatable=datatable._append(add,ignore_index = True)
 
@@ -58,10 +59,10 @@ def storage_inode_report_by_volume(data):
         add=pandas.DataFrame.from_records([{
             'cluster Name': data["cluster"]["name"],
             'Volume Name': volume["name"],
-            'Total Inodes': volume["files"]["maximum"],
-            'Used Inodes': volume["files"]["used"], 
-            'Free Inodes': volume["files"]["maximum"] - volume["files"]["used"],
-            'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100,2)
+            'Total Inodes': format(volume["files"]["maximum"]),
+            'Used Inodes': format(volume["files"]["used"]), 
+            'Free Inodes': format(volume["files"]["maximum"] - volume["files"]["used"]),
+            'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100,0)
         }])
         
         datatable=datatable._append(add,ignore_index = True)
@@ -96,10 +97,10 @@ def storage_space_report_by_aggr(data):
             'Cluster Name': data["cluster"]["name"],
             'Aggr Name': aggr["name"],
             'Node Name': aggr["home_node"]["name"],
-            'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
-            'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
-            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
-            'Used Rate(%)': round(used_size / total_size * 100,2)
+            'Total Size(TiB)': format(round(total_size/1024/1024/1024/1024,2)),
+            'Used Size(TiB)': format(round(used_size/1024/1024/1024/1024,2)), 
+            'Free Size(TiB)': format(round((total_size - used_size)/1024/1024/1024/1024,2)),
+            'Used Rate(%)': format(round(used_size / total_size * 100,2))
         }])
         datatable=datatable._append(add,ignore_index = True)
 
@@ -132,6 +133,7 @@ def main():
     try:
         if args.request == "clusters_inode_info":
             storage_inode_report_by_cluster(data)
+            report_name="CAD Storage Cluster INODE 사용량 Summary"
         elif args.request == "volume_inode_info":
             storage_inode_report_by_volume(data)
         elif args.request == "clusters_space_info":
@@ -170,12 +172,12 @@ def main():
         """
         html = f"""\
         <html>
-        <head></head>
+        <head>{args.request}</head>
         <style>
         {css}
         </style>
         <body>
-        <p>{args.request}</p>
+        <h2>{report_name}</h2>
         {datatable.to_html(index=False)}
         </body>
         </html>
