@@ -200,7 +200,7 @@ def main():
         """
         html = f"""\
 <html>
-<head>{args.request}</head>
+<head>{args.request} Playbook</head>
 <style>
 {css}
 </style>
