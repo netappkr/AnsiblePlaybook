@@ -31,8 +31,6 @@ with open(json_file, 'r') as file:
 
 # Pandas DataFrame을 생성합니다.
 datatable = pandas.DataFrame()
-datatable.style.set_caption(args.request)
-datatable.style.set_table_attributes('class="mystyle"')
 
 def format_with_commas(num):
     return '{0:,}'.format(num)
@@ -145,9 +143,10 @@ def format_html_style(datatable,report_name):
     # Html 양식의 이메일 제출 시 CSS 포함 전송기능을 지원하지 않는 경우가 대부분이라고 합니다.
     # 따라서 방법은 각 Html 항목에 직접 css를 한줄씩 넣어야 합니다.
     datatable=datatable.style.set_caption(report_name)
+    datatable=datatable.hide()
     datatable=datatable.set_table_attributes('class="mystyle"')
     # datatable=datatable.style.set_properties(subset=['Total Inodes'], **{'text-align': 'right'})
-    html_table= datatable.to_html().hide(axis="index")
+    html_table= datatable.to_html()
     return html_table
        
 def main():
