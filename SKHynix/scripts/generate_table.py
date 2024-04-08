@@ -52,6 +52,8 @@ def storage_inode_report_by_cluster(data):
             'description': cluster["cluster"]["description"]
         }])
         datatable=datatable._append(add,ignore_index = True)
+    report_name = "CAD Storage Cluster INODE 사용량 Summary"
+    return report_name
 
 def storage_inode_report_by_volume(data):
     global datatable
@@ -66,6 +68,8 @@ def storage_inode_report_by_volume(data):
         }])
         
         datatable=datatable._append(add,ignore_index = True)
+    report_name = data["cluster"]["name"] + " Storage Volumes INODE Report"
+    return report_name
 
 
 def storage_space_report_by_cluster(data):
@@ -86,6 +90,8 @@ def storage_space_report_by_cluster(data):
             'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
+    report_name = "CAD Storage Cluster 사용량 Summary"
+    return report_name
 
 def storage_space_report_by_aggr(data):
     global datatable
@@ -103,6 +109,8 @@ def storage_space_report_by_aggr(data):
             'Used Rate(%)': format(round(used_size / total_size * 100,2))
         }])
         datatable=datatable._append(add,ignore_index = True)
+    report_name = "------ Aggregates Capacity Report ------"
+    return report_name
 
 def storage_Big_snapshot_report_by_volume(data):
     global datatable
@@ -133,9 +141,11 @@ def main():
     try:
         if args.request == "clusters_inode_info":
             storage_inode_report_by_cluster(data)
-            report_name="CAD Storage Cluster INODE 사용량 Summary"
+            
+
         elif args.request == "volume_inode_info":
             storage_inode_report_by_volume(data)
+            report_name=" Storage Volumes INODE Report"
         elif args.request == "clusters_space_info":
             storage_space_report_by_cluster(data)
         elif args.request == "aggrs_space_info":
