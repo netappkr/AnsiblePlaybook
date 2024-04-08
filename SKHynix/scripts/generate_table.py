@@ -50,7 +50,7 @@ def storage_inode_report_by_cluster(data):
             'Total Inodes': format_with_commas(inode_total),
             'Used Inodes': format_with_commas(inode_used), 
             'Free Inodes': format_with_commas(inode_total - inode_used),
-            'Inode Use%': round(inode_used / inode_total * 100,0)
+            'Inode Use%': round(inode_used / inode_total * 100)
         }])
         datatable=datatable._append(add,ignore_index = True)
     report_name = "CAD Storage Cluster INODE 사용량 Summary"
@@ -65,7 +65,7 @@ def storage_inode_report_by_volume(data):
             'Total Inodes': format_with_commas(volume["files"]["maximum"]),
             'Used Inodes': format_with_commas(volume["files"]["used"]), 
             'Free Inodes': format_with_commas(volume["files"]["maximum"] - volume["files"]["used"]),
-            'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100,0)
+            'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"] * 100)
         }])
         
         datatable=datatable._append(add,ignore_index = True)
@@ -89,7 +89,7 @@ def storage_space_report_by_cluster(data):
             'Total Size(TiB)': format_with_commas(round(total_size/1024/1024/1024/1024,0)),
             'Used Size(TiB)': format_with_commas(round(used_size/1024/1024/1024/1024,0)), 
             'Free Size(TiB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,0)),
-            'Used Rate(%)': round(used_size / total_size * 100,2)
+            'Used Rate(%)': round(used_size / total_size * 100)
         }])
         datatable=datatable._append(add,ignore_index = True)
     report_name = "CAD Storage Cluster 사용량 Summary"
@@ -107,8 +107,8 @@ def storage_space_report_by_aggr(data):
             'Node Name': aggr["home_node"]["name"],
             'Total Size(TiB)': format_with_commas(round(total_size/1024/1024/1024/1024,0)),
             'Used Size(TiB)': format_with_commas(round(used_size/1024/1024/1024/1024,0)), 
-            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,0),
-            'Used Rate(%)': round(used_size / total_size * 100,0)
+            'Free Size(TiB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,0)),
+            'Used Rate(%)': round(used_size / total_size * 100)
         }])
         datatable=datatable._append(add,ignore_index = True)
     report_name = "------ Aggregates Capacity Report ------"
