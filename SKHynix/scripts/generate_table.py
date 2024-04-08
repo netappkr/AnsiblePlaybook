@@ -147,7 +147,7 @@ def format_html_style(datatable,report_name):
     datatable=datatable.style.set_caption(report_name)
     datatable=datatable.set_table_attributes('class="mystyle"')
     # datatable=datatable.style.set_properties(subset=['Total Inodes'], **{'text-align': 'right'})
-    html_table= datatable.to_html(index=False)
+    html_table= datatable.to_html().hide(axis="index")
     return html_table
        
 def main():
