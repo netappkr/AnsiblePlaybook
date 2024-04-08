@@ -140,18 +140,15 @@ def storage_Big_snapshot_report_by_volume(data):
 def main():
     try:
         if args.request == "clusters_inode_info":
-            storage_inode_report_by_cluster(data)
-            
-
+            report_name=storage_inode_report_by_cluster(data)
         elif args.request == "volume_inode_info":
-            storage_inode_report_by_volume(data)
-            report_name=" Storage Volumes INODE Report"
+            report_name=storage_inode_report_by_volume(data)
         elif args.request == "clusters_space_info":
-            storage_space_report_by_cluster(data)
+            report_name=storage_space_report_by_cluster(data)
         elif args.request == "aggrs_space_info":
-            storage_space_report_by_aggr(data)
+            report_name=storage_space_report_by_aggr(data)
         elif args.request == "big_snapshot_info":
-            storage_Big_snapshot_report_by_volume(data)
+            report_name=storage_Big_snapshot_report_by_volume(data)
         else:
             logger.error(args.request+" request is not matched")
             
