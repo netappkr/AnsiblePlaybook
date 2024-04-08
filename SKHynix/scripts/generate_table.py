@@ -148,7 +148,8 @@ def format_html_style(datatable,report_name):
     datatable=datatable.set_table_attributes('class="mystyle"')
     # datatable=datatable.style.set_properties(subset=['Total Inodes'], **{'text-align': 'right'})
     html_table= datatable.to_html(index=False)
-    return html_table       
+    return html_table
+       
 def main():
     try:
         if args.request == "clusters_inode_info":
@@ -185,6 +186,9 @@ def main():
             padding: 5px;
             text-align: center;
         }
+        .mystyle caption {
+            font-size: 16pt;
+        }
 
         .mystyle tr:nth-child(even) {
             background: #E0E0E0;
@@ -202,7 +206,6 @@ def main():
 {css}
 </style>
 <body>
-<h2>{report_name}</h2>
 {html_table}
 </body>
 </html>
