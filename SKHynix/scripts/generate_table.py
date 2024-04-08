@@ -30,7 +30,6 @@ with open(json_file, 'r') as file:
     data = json.load(file)
 
 # Pandas DataFrame을 생성합니다.
-pandas.options.display.float_format = '{:,}'.format
 datatable = pandas.DataFrame()
 datatable.style.set_caption(args.request)
 datatable.style.set_table_attributes('class="mystyle"')
@@ -88,9 +87,9 @@ def storage_space_report_by_cluster(data):
 
         add=pandas.DataFrame.from_records([{
             'cluster name': cluster["cluster"]["name"],
-            'Total Size(TiB)': format_with_commas(round(total_size/1024/1024/1024/1024,2)),
-            'Used Size(TiB)': format_with_commas(round(used_size/1024/1024/1024/1024,2)), 
-            'Free Size(TiB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,2)),
+            'Total Size(TiB)': format_with_commas(round(total_size/1024/1024/1024/1024,0)),
+            'Used Size(TiB)': format_with_commas(round(used_size/1024/1024/1024/1024,0)), 
+            'Free Size(TiB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,0)),
             'Used Rate(%)': round(used_size / total_size * 100,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
@@ -107,10 +106,10 @@ def storage_space_report_by_aggr(data):
             'Cluster Name': data["cluster"]["name"],
             'Aggr Name': aggr["name"],
             'Node Name': aggr["home_node"]["name"],
-            'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
-            'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
-            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
-            'Used Rate(%)': round(used_size / total_size * 100,2)
+            'Total Size(TiB)': format_with_commas(round(total_size/1024/1024/1024/1024,0)),
+            'Used Size(TiB)': format_with_commas(round(used_size/1024/1024/1024/1024,0)), 
+            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,0),
+            'Used Rate(%)': round(used_size / total_size * 100,0)
         }])
         datatable=datatable._append(add,ignore_index = True)
     report_name = "------ Aggregates Capacity Report ------"
@@ -132,15 +131,24 @@ def storage_Big_snapshot_report_by_volume(data):
                         'cluster name': cluster["cluster"]["name"],
                         'volume name' : volume["name"],
                         'volume path' : volume["nas"]["path"],
-                        'Total Size(GiB)': round(total_size/1024/1024/1024,2),
-                        'Used Size(GiB)': round(used_size/1024/1024/1024,2), 
-                        'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
-                        'Used Rate(%)': round(used_size / total_size * 100,2),
-                        'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
+                        'Total Size(GiB)': format_with_commas(round(total_size/1024/1024/1024,0)),
+                        'Used Size(GiB)': format_with_commas(round(used_size/1024/1024/1024,0)), 
+                        'Free Size(GiB)': format_with_commas(round((total_size - used_size)/1024/1024/1024,0)),
+                        'Used Rate(%)': format_with_commas(round(used_size / total_size * 100,0)),
+                        'snaphost Used(Tib)': format_with_commas(round(snapshot_used/1024/1024/1024/1024,0))
                     }])
                     datatable=datatable._append(add,ignore_index = True)
     
-        
+def format_html_style(datatable):
+    # HTML 테이블로 변환합니다.
+    ## 경고
+    # Html 양식의 이메일 제출 시 CSS 포함 전송기능을 지원하지 않는 경우가 대부분이라고 합니다.
+    # 따라서 방법은 각 Html 항목에 직접 css를 한줄씩 넣어야 합니다.
+    datatable=datatable.style.set_caption(args.request)
+    datatable=datatable.set_table_attributes('class="mystyle"')
+    # datatable=datatable.style.set_properties(subset=['Total Inodes'], **{'text-align': 'right'})
+    html_table= datatable.to_html()
+    return html_table       
 def main():
     try:
         if args.request == "clusters_inode_info":
@@ -156,8 +164,14 @@ def main():
         else:
             logger.error(args.request+" request is not matched")
             
-        datatable.style.set_caption(args.request)
+
+        # html_table= datatable.render()
+        html_table = format_html_style(datatable)
+
         # HTML 테이블로 변환합니다.
+        ## 경고
+        # Html 양식의 이메일 제출 시 CSS 포함 전송기능을 지원하지 않는 경우가 대부분이라고 합니다.
+        # 따라서 방법은 각 Html 항목에 직접 css를 한줄씩 넣어야 합니다.
         css = """
         .mystyle {
             font-size: 11pt; 
@@ -182,16 +196,16 @@ def main():
         }
         """
         html = f"""\
-        <html>
-        <head>{args.request}</head>
-        <style>
-        {css}
-        </style>
-        <body>
-        <h2>{report_name}</h2>
-        {datatable.to_html(index=False)}
-        </body>
-        </html>
+<html>
+<head>{args.request}</head>
+<style>
+{css}
+</style>
+<body>
+<h2>{report_name}</h2>
+{html_table}
+</body>
+</html>
         """
 
         # 표준 출력으로 HTML 테이블을 출력합니다.
