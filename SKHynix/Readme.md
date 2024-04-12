@@ -7,9 +7,11 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 2. 아래 기능을 플레이북으로 구현
     1. Inode Summary : 전체 Cluster 별 Inode 현황을 매일 메일로 담당자에게 전송
     2. Inode Report: 전체 Volume 별 Inode 현황을 매일 메일로 담당자에게 전송
+        1. 모든 클러스터의 Volume Inode 정보가 한 메일에 출력
     3. Capacity Summery: 전체 Cluster 별 용량 사용 현황을 매일 메일로 담당자에게 전송
     4. Capacity Report: 전체 Volume 별 용량 사용 현황을 매일 메일로 담당자에게 전송
         1. 추가 항목 : snapshot reserve 공간 표시
+        2. aggr 용량 정보와 volume 용량정보을 한 메일에 출력
     5. Capacity Report 전체 Cluster/Node 지정하여 용량 사용 현황을 매일 메일로 담당자에게 전송
         1. 추가 항목 : snapshot reserve 공간 표시
     6. ~~Big snapshot Alert: Volume 사용량이 50% 이상,Snapshot size가 1TB 이상~~
@@ -48,18 +50,18 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | AWX 구성                          | AWX task 컨테이너 커스텀 구성   |2024-03-21|2024-03-27| 안우영 | done | [이슈](https://github.com/netappkr/AnsiblePlaybook/issues/3) 답변 완료   | --- |
 | Inode report by Cluster Playbook | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Cluster Playbook](./playbooks/GetInodebyCluster.yaml) | --- |
 | Inode report by Cluster Playbook | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
-| Inode report by Cluster Playbook | Playbook 적용 Test             |2024-04-03|2024-04-05| 안우영,유한민 | active | --- | --- |
+| Inode report by Cluster Playbook | Playbook 적용 Test             |2024-04-03|2024-04-05| 안우영,유한민 | done | --- | --- |
 | Inode report by Volume Playbook  | Sample Playbook 작성           |2024-03-04|2024-03-08| 안우영 | done | [Inode report by Volume Playbook](./playbooks/GetInodebyVolume.yaml) | --- |
 | Inode report by Volume Playbook  | Sample python script 작성      |2024-03-04|2024-03-08| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
 | Inode report by Volume Playbook  | Playbook 적용 Test             |2024-04-03|2024-04-05| 안우영,유한민 | active | --- | --- |
 | Capacity Report by cluster Playbook | Sample Playbook 작성        |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) | --- |
 | Capacity Report by cluster Playbook  | Sample python script 작성  |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
-| Capacity Report by cluster Playbook  | Playbook 적용 Test         |2024-04-03|2024-04-05| 안우영,유한민 | active | --- |
-| Capacity Report by cluster Playbook  | Playbook 수정              |2024-04-08|2024-04-09| 안우영 | active | --- | SnapshotResorve 공간 표시 |
+| Capacity Report by cluster Playbook  | Playbook 적용 Test         |2024-04-03|2024-04-05| 안우영,유한민 | done | --- |
+| Capacity Report by cluster Playbook  | Playbook 수정              |2024-04-08|2024-04-09| 안우영 | done | --- | --- |
 | Capacity Report by Volume Playbook | Sample Playbook 작성         |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) | --- |
 | Capacity Report by Volume Playbook  | Sample python script 작성   |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
 | Capacity Report by Volume Playbook  | Playbook 적용 Test          |2024-04-03|2024-04-05| 안우영,유한민 | active | --- | --- |
-| Capacity Report by Volume Playbook  | Playbook 수정               |2024-04-08|2024-04-09| 안우영 | active | --- | SnapshotResorve 공간 표시 |
+| Capacity Report by Volume Playbook  | Playbook 수정               |2024-04-08|2024-04-09| 안우영 | active | --- | --- |
 
 
 </details>
