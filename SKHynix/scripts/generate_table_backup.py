@@ -31,10 +31,8 @@ with open(json_file, 'r') as file:
 
 # Pandas DataFrame을 생성합니다.
 datatable = pandas.DataFrame()
-datatable2 = pandas.DataFrame()
-
-def format_with_commas(num):
-    return '{0:,}'.format(num)
+datatable.style.set_caption(args.request)
+datatable.style.set_table_attributes('class="mystyle"')
 
 def storage_inode_report_by_cluster(data):
     global datatable
@@ -46,39 +44,28 @@ def storage_inode_report_by_cluster(data):
             inode_used= inode_used+volume["files"]["used"]
 
         add=pandas.DataFrame.from_records([{
-            'Cluster name': cluster["cluster"]["name"],
-            '업무 구분': cluster["cluster"]["description"],
-            'INODE Total': format_with_commas(inode_total),
-            'INODE Used': format_with_commas(inode_used),
-            'INODE Free': format_with_commas(inode_total - inode_used),
-            'INODE Used Rate(%)': round(inode_used / inode_total * 100)
+            'cluster name': cluster["cluster"]["name"],
+            'Total Inodes': inode_total,
+            'Used Inodes': inode_used, 
+            'Free Inodes': inode_total - inode_used,
+            'Inode Use%': round(inode_used / inode_total * 100)
         }])
         datatable=datatable._append(add,ignore_index = True)
-    custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
-    report_name = "CAD Storage Cluster INODE 사용량 Summary"
-    return report_name, custom_col_style_list
 
 def storage_inode_report_by_volume(data):
     global datatable
     for volume in data["ontap_info"]["storage/volumes"]["records"]:
-        Aggr_name = volume["aggregates"][0]['name']
-        if volume["style"] == "flexgroup":
-            Aggr_name = "-"
         add=pandas.DataFrame.from_records([{
             'cluster Name': data["cluster"]["name"],
-            'Aggregate': Aggr_name,
-            'type': volume["style"],
-            'Volume': volume["name"],
-            'INODE Total': format_with_commas(volume["files"]["maximum"]),
-            'INODE Used': format_with_commas(volume["files"]["used"]),
-            'INODE Free': format_with_commas(volume["files"]["maximum"] - volume["files"]["used"]),
-            'INode Used Rate(%)': round(volume["files"]["used"] / volume["files"]["maximum"] * 100)
+            'Volume Name': volume["name"],
+            'Total Inodes': volume["files"]["maximum"],
+            'Used Inodes': volume["files"]["used"], 
+            'Free Inodes': volume["files"]["maximum"] - volume["files"]["used"],
+            'Inode Use%': round(volume["files"]["used"] / volume["files"]["maximum"],2)
         }])
-
+        
         datatable=datatable._append(add,ignore_index = True)
-    custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
-    report_name = data["cluster"]["name"] + " Storage Volumes INODE Report"
-    return report_name, custom_col_style_list
+
 
 def storage_space_report_by_cluster(data):
     global datatable
@@ -88,59 +75,33 @@ def storage_space_report_by_cluster(data):
         for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
             total_size= total_size+aggr["space"]["block_storage"]["size"]
             used_size= used_size+aggr["space"]["block_storage"]["used"]
-
+            
 
         add=pandas.DataFrame.from_records([{
-            'Cluster name': cluster["cluster"]["name"],
-            '업무 구분': cluster["cluster"]["description"],
-            'Total Size(TB)': format_with_commas(round(total_size/1024/1024/1024/1024)),
-            'Used Size(TB)': format_with_commas(round(used_size/1024/1024/1024/1024)),
-            'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024)),
-            'Used Rate(%)': round(used_size / total_size * 100)
+            'cluster name': cluster["cluster"]["name"],
+            'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
+            'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
+            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
+            'Used Rate(%)': round(used_size / total_size,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
-    report_name = "CAD Storage Cluster 사용량 Summary"
-    return report_name
 
 def storage_space_report_by_aggr(data):
     global datatable
     for aggr in data["ontap_info"]["storage/aggregates"]["records"]:
         total_size=aggr["space"]["block_storage"]["size"]
         used_size=aggr["space"]["block_storage"]["used"]
-
+        
         add=pandas.DataFrame.from_records([{
             'Cluster Name': data["cluster"]["name"],
-            'Node Name': aggr["home_node"]["name"],
             'Aggr Name': aggr["name"],
-            'Total Size(TB)': format_with_commas(round(total_size/1024/1024/1024/1024,1)),
-            'Used Size(TB)': format_with_commas(round(used_size/1024/1024/1024/1024,1)),
-            'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,1)),
-            'Used Rate(%)': round(used_size / total_size * 100)
+            'Node Name': aggr["home_node"]["name"],
+            'Total Size(TiB)': round(total_size/1024/1024/1024/1024,2),
+            'Used Size(TiB)': round(used_size/1024/1024/1024/1024,2), 
+            'Free Size(TiB)': round((total_size - used_size)/1024/1024/1024/1024,2),
+            'Used Rate(%)': round(used_size / total_size,2)
         }])
         datatable=datatable._append(add,ignore_index = True)
-    report_name = "------ Aggregates Capacity Report ------"
-    return report_name
-
-def storage_space_report_by_volume(data):
-    global datatable2
-    for Volume in data["ontap_info"]["storage/volumes"]["records"]:
-        total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
-        used_size=Volume["space"]["used"]
-        
-        Aggr_name = Volume["aggregates"][0]['name']
-        if Volume["style"] == "flexgroup":
-            Aggr_name = "-"
-        add=pandas.DataFrame.from_records([{
-            'SVM Name': Volume["svm"]["name"],
-            'Aggregate': Aggr_name,
-            'Total Size(TB)': format_with_commas(round(total_size/1024/1024/1024)),
-            'Used Size(TB)': format_with_commas(round(used_size/1024/1024/1024)),
-            'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024)),
-            'Used Rate(%)': round(used_size / total_size * 100)
-        }])
-        datatable2=datatable2._append(add,ignore_index = True)
-    report_name = data["cluster"]["name"] + " Storage Volumes Capacity Report-"
-    return report_name
 
 def storage_Big_snapshot_report_by_volume(data):
     global datatable
@@ -159,68 +120,43 @@ def storage_Big_snapshot_report_by_volume(data):
                         'volume name' : volume["name"],
                         'volume path' : volume["nas"]["path"],
                         'Total Size(GiB)': round(total_size/1024/1024/1024,2),
-                        'Used Size(GiB)': round(used_size/1024/1024/1024,2),
+                        'Used Size(GiB)': round(used_size/1024/1024/1024,2), 
                         'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
                         'Used Rate(%)': round(used_size / total_size,2),
                         'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
                     }])
                     datatable=datatable._append(add,ignore_index = True)
-
-def align_right(s):
-    return 'text-align: right;'
-
-def format_html_style(datatable, report_name, custom_col_style_list=[]):
-    datatable = datatable.style.set_caption(report_name).set_table_attributes('class="mystyle"').hide()
     
-    # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
-    for col in custom_col_style_list:
-        datatable = datatable.applymap(align_right, subset=[col])
-    
-    html_table = datatable.to_html()
-    return html_table
-
+        
 def main():
     try:
         if args.request == "clusters_inode_info":
-            report_name, custom_col_style_list = storage_inode_report_by_cluster(data)
-            html_table = format_html_style(datatable,report_name)
+            storage_inode_report_by_cluster(data)
         elif args.request == "volume_inode_info":
-            report_name, custom_col_style_list = storage_inode_report_by_volume(data)
-            html_table = format_html_style(datatable,report_name)
+            storage_inode_report_by_volume(data)
         elif args.request == "clusters_space_info":
-            report_name=storage_space_report_by_cluster(data)
-            html_table = format_html_style(datatable,report_name)
+            storage_space_report_by_cluster(data)
         elif args.request == "aggrs_space_info":
-            report_name=storage_space_report_by_aggr(data)
-            html_table = format_html_style(datatable,report_name)
-        elif args.request == "volume_space_info":
-            report_name=storage_space_report_by_volume(data)
-            html_table = format_html_style(datatable2,report_name)
+            storage_space_report_by_aggr(data)
         elif args.request == "big_snapshot_info":
-            report_name=storage_Big_snapshot_report_by_volume(data)
-            html_table = format_html_style(datatable,report_name)
+            storage_Big_snapshot_report_by_volume(data)
         else:
             logger.error(args.request+" request is not matched")
-
+            
+        datatable.style.set_caption(args.request)
         # HTML 테이블로 변환합니다.
-        ## 경고
-        # Html 양식의 이메일 제출 시 CSS 포함 전송기능을 지원하지 않는 경우가 대부분이라고 합니다.
-        # 따라서 방법은 각 Html 항목에 직접 css를 한줄씩 넣어야 합니다.
         css = """
         .mystyle {
             font-size: 11pt; 
             font-family: Arial;
             border-collapse: collapse; 
-            border: 1px solid black;
+            border: 1px solid silver;
+
         }
 
         .mystyle td, th {
             padding: 5px;
             text-align: center;
-	    border: 1px solid black;
-        }
-        .mystyle caption {
-            font-size: 16pt;
         }
 
         .mystyle tr:nth-child(even) {
@@ -233,15 +169,16 @@ def main():
         }
         """
         html = f"""\
-<html>
-<head>{args.request} Playbook</head>
-<style>
-{css}
-</style>
-<body>
-{html_table}
-</body>
-</html>
+        <html>
+        <head></head>
+        <style>
+        {css}
+        </style>
+        <body>
+        <p>{args.request}</p>
+        {datatable.to_html(index=False)}
+        </body>
+        </html>
         """
 
         # 표준 출력으로 HTML 테이블을 출력합니다.

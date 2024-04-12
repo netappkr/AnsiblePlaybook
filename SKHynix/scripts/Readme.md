@@ -20,13 +20,6 @@ pip install -r requirements.txt
 
 ### help 명령
 ```--help``` 옵션을 통해 스크립트에 필요한 인수를 확인합니다.
-```yaml
-clusters_inode_info: "report_name=storage_inode_report_by_cluster"
-volume_inode_info: "report_name=storage_inode_report_by_volume"
-clusters_space_info : "report_name=storage_space_report_by_cluster"
-aggrs_space_info: "report_name=storage_space_report_by_aggr"
-big_snapshot_info: "report_name=storage_Big_snapshot_report_by_volume"
-```
 ```PS
 PS C:\Users\wooyeoun\OneDrive\자료\11. Netapp\NetappKR Github\AnsiblePlaybook> python .\SKHynics\scripts\generate_table.py --help
 usage: generate_table.py [-h] [-f FILE] [-r REQUEST]
@@ -43,12 +36,7 @@ options:
 1. ansible playbook ```GetInodebyVolume.yaml``` 연계
 예제파일에서 ```testinpu.json``` 에 담겨있는 Cluster 내 볼륨별 inode 정보를 Html Table 형식으로 변환하여 출력합니다, 
 ```ps
-Netapp\NetappKR Github\AnsiblePlaybook>pwd
-Path
-----
-C:\Users\wooyoung\NetappKR Github\AnsiblePlaybook
-
-python .\SKHynix\scripts\generate_table.py -r volume_indoe_info -f .\SKHynix\scripts\testdata\get_inode_info_by_volume.json
+python .\SKHynics\scripts\generate_table.py -r volume_indoe_info -f .\SKHynics\scripts\testdata\get_inode_info_by_volume.json
 ```
 출력
 ```html
@@ -101,7 +89,7 @@ python .\SKHynix\scripts\generate_table.py -r volume_indoe_info -f .\SKHynix\scr
 ```
 2. ansible playbook ```GetInodebyCluster.yaml``` 연계
 ```ps
-python .\SKHynix\scripts\generate_table.py -r clusters_inode_info -f .\SKHynix\scripts\testdata\get_inode_info_by_cluster.json
+python .\SKHynics\scripts\generate_table.py -r clusters_inode_info -f ..\SKHynics\scripts\testdata\get_inode_info_by_cluster.json
 ```
 
 출력

@@ -6,7 +6,6 @@
             "ID": "fsxadmin",
             "PW": "<<password>>",
             "ip": "0.0.0.0",
-            "description": "Netapp Sample 1",
             "name": "fsxn"
         },
         "failed": false,
@@ -111,7 +110,6 @@
         "cluster": {
             "ID": "admin",
             "PW": "<<password>>",
-            "description": "Netapp Sample 2",
             "ip": "0.0.0.0",
             "name": "FAS8040"
         },

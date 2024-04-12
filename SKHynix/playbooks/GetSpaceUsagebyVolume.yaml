@@ -4,7 +4,6 @@
   gather_facts: no
   collections:
     - netapp.ontap
-
   tasks:
     - name: install the package, force upgrade
       pip:
@@ -18,42 +17,46 @@
         - "pip>=24.0"
         - "pandas>2.0"
         executable: pip3
-      register: test
-
-    - name: debug show
-      ansible.builtin.debug:
-        msg: "{{ test }}"
 
     - name: Get rest data information
-      netapp.ontap.na_ontap_rest_info:
+      na_ontap_rest_info:
         hostname: "{{ cluster.ip }}"
         username: "{{ cluster.ID }}"
         password: "{{ cluster.PW }}"
         https: true
         validate_certs: false
         gather_subset:
-          - storage/volumes
+          - volume_info
         fields:
-          - 'files'
-          - 'name'
-      register: ontap_volumes
+          - 'svm.name'
+          - 'aggregates.name'
+          - 'size'
+          - 'space.snapshot.reserve_percent'
+          - 'space.size'
+          - 'space.used'
+          - 'style'
+#          - 'space.physical_used'
+#          - 'space.snapshot.reserve_size'
+      register: ontap_aggrs
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
- 
-   #- name: debug show
-   #   ansible.builtin.debug:
-   #     msg: "{{ ontap_volumes.results }}"
+    # - name: debug show
+    #   ansible.builtin.debug:
+    #     msg: "{{ ontap_aggrs.results }}"
 
-    - name: Write result data to a JSON file
+    - name: Write results data to a JSON file
       copy:
-        dest: "/tmp/clusters_inode_info.json"
-        content: "{{ ontap_volumes.results | to_nice_json }}"
+        dest: "/tmp/{{ cluster_aggrs.cluster.name }}_space_usage_volume.json"
+        content: "{{ cluster_aggrs | to_nice_json }}"
       register: datafiles
+      loop: "{{ ontap_aggrs.results }}"
+      loop_control:
+        loop_var: cluster_aggrs
 
-    #- name: debug show
-    #  ansible.builtin.debug:
-    #    msg: "{{ datafiles.results }}"
+    # #- name: debug show
+    # #  ansible.builtin.debug:
+    # #    msg: "{{ datafiles.results }}"
 
     - name: Search for 'script' in all directories
       find:
@@ -68,25 +71,32 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "python3.11 {{ files_matched.files[0].path }} -r clusters_inode_info -f {{ datafiles.dest }}"
+      command: "python3 {{ files_matched.files[0].path }} -r volume_space_info -f {{ datafile.dest }}"
       register: html_tables
+      loop: "{{ datafiles.results  }}"
+      loop_control:
+        loop_var: datafile
 
     #- name: debug show
     #  ansible.builtin.debug:
     #    msg: "{{ html_tables.results }}"
 
-    - name: Send inode usage report via email
+    - name: Send space usage report via email
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
 #        username: "{{ smtp_username }}"
 #        password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Cluster Inode Usage Report"
-        body: "{{ html_tables.stdout }}"
+        subject: "ONTAP {{ html_table.datafile.cluster_aggrs.cluster.name }} Space Usage Report"
+        body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: never
         subtype: html
-        headers: 
+        headers:
         - Content-Type="text/html"
-      when: html_tables.stdout is defined
+      loop: "{{ html_tables.results }}"
+      loop_control:
+        loop_var: html_table
+      when: html_table.stdout is defined
+

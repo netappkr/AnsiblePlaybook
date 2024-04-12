@@ -30,6 +30,8 @@
         fields:
           - 'files'
           - 'name'
+          - 'aggregates.name'
+          - 'style'
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
@@ -78,13 +80,13 @@
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
+#        username: "{{ smtp_username }}"
+#        password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} Inode Usage Report"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
-        secure: starttls
+        secure: never
         subtype: html
         headers: 
         - Content-Type="text/html"
