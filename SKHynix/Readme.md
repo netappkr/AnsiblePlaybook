@@ -92,22 +92,20 @@ gantt
     section Inode report by Volume Playbook
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: done, p2-3, 2024-04-03,  3d
-    Playbook 수정 : done, p2-4, 2024-04-03 , 3d
-    Playbook 추가 수정 : active, p2-5, after p2-4 , 5d
+    Playbook 적용 Test: done, p2-3, 2024-04-03,  9d
+    Playbook 수정 : done, p2-4, 2024-04-03 , 9d
 
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p3-3, 2024-04-03,  3d
-    Playbook 수정 : done, p3-4, 2024-04-08 , 2d
+    Playbook 적용 Test: done, p3-3, 2024-04-03,  9d
+    Playbook 수정 : done, p3-4, 2024-04-08 , 9d
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p4-3, 2024-04-03,  3d
-    Playbook 수정 : done, p4-3, 2024-04-08 , 2d
-    Playbook 추가 수정 : active, p4-4, after p4-3 , 5d
+    Playbook 적용 Test: done, p4-3, 2024-04-03,  9d
+    Playbook 수정 : done, p4-3, 2024-04-08 , 9d
 
     section Snapmirror/vault Check Playbook
     Sample Playbook 작성 : p6-1, 2024-04-08, 5d
