@@ -105,7 +105,7 @@ gantt
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
     Playbook 적용 Test: active, p4-3, 2024-04-08,  9d
-    Playbook 수정 : active, p4-3, 2024-04-08 , 9d
+    Playbook 수정 : active, p4-4, 2024-04-08 , 9d
 
     section Snapmirror/vault Check Playbook
     Sample Playbook 작성 : p6-1, 2024-04-08, 5d
