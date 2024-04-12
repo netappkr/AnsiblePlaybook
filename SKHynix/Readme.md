@@ -108,22 +108,22 @@ gantt
     Playbook 수정 : active, p4-4, 2024-04-08 , 9d
 
     section Snapmirror/vault Check Playbook
-    Sample Playbook 작성 : p6-1, 2024-04-08, 5d
+    Sample Playbook 작성 : p6-1, after p4-4, 5d
     Playbook 적용 Test: p6-2, after p6-1,  5d
     Playbook 수정 : p6-3, after p6-1 , 5d
 
     section Check usage by Directory Playbook
-    Sample Playbook 작성 : p7-1, 2024-04-15, 5d
+    Sample Playbook 작성 : p7-1, after p4-4, 5d
     Playbook 적용 Test: p7-2, after p7-1,  5d
     Playbook 수정 : p7-3, after p7-1 , 5d
 
     section check the File status Playbook
-    Sample Playbook 작성 : p8-1, 2024-04-15, 5d
+    Sample Playbook 작성 : p8-1, after p7-3, 5d
     Playbook 적용 Test: p8-2, after p8-1,  5d
     Playbook 수정 : p8-3, after p8-1 , 5d
 
     section check the Data Life Cycle Playbook
-    Sample Playbook 작성 : p10-1, 2024-04-29, 5d
+    Sample Playbook 작성 : p10-1, after p7-3, 5d
     Playbook 적용 Test: p10-2, after p10-1,  5d
     Playbook 수정 : p10-3, after p10-1 , 5d
 ```
