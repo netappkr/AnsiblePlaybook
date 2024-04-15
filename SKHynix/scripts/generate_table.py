@@ -78,7 +78,7 @@ def storage_inode_report_by_volume(data):
 
             datatable=datatable._append(add,ignore_index = True)
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
-    report_name = data["cluster"]["name"] + " Storage Volumes INODE Report"
+    report_name = "Storage Volumes INODE Report"
     return report_name, custom_col_style_list
 
 def storage_space_report_by_cluster(data):
