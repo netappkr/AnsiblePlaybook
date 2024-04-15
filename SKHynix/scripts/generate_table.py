@@ -217,7 +217,7 @@ def main():
         .mystyle td, th {
             padding: 5px;
             text-align: center;
-	    border: 1px solid black;
+	        border: 1px solid black;
         }
         .mystyle caption {
             font-size: 16pt;
