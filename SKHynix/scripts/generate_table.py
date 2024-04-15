@@ -66,7 +66,7 @@ def storage_inode_report_by_volume(data):
             if volume["style"] == "flexgroup":
                 Aggr_name = "-"
             add=pandas.DataFrame.from_records([{
-                'cluster Name': data["cluster"]["name"],
+                'cluster Name': cluster["cluster"]["name"],
                 'Aggregate': Aggr_name,
                 'type': volume["style"],
                 'Volume': volume["name"],
@@ -202,7 +202,8 @@ def main():
             html_table = format_html_style(datatable,report_name)
         else:
             logger.error(args.request+" request is not matched")
-
+            html_table = args.request+" request is not matched"
+             
         # HTML 테이블로 변환합니다.
         ## 경고
         # Html 양식의 이메일 제출 시 CSS 포함 전송기능을 지원하지 않는 경우가 대부분이라고 합니다.
