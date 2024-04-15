@@ -183,7 +183,7 @@ def storage_Big_snapshot_report_by_volume(data):
 def align_right():
     return 'text-align: right;'
 
-def format_html_style(datatable, report_names=[], custom_col_style_list=[]):
+def format_html_style(datatables, report_names=[], custom_col_style_list=[]):
     html_tables=[]
     i=0
     for datatable in datatables:
@@ -200,23 +200,23 @@ def format_html_style(datatable, report_names=[], custom_col_style_list=[]):
 def main():
     try:
         if args.request == "clusters_inode_info":
-            report_name, custom_col_style_list = storage_inode_report_by_cluster(data)
-            html_tables = format_html_style(datatable,report_name)
+            report_names, custom_col_style_list = storage_inode_report_by_cluster(data)
+            html_tables = format_html_style(datatables,report_names)
         elif args.request == "volume_inode_info":
-            report_name, custom_col_style_list = storage_inode_report_by_volume(data)
-            html_tables = format_html_style(datatable,report_name)
+            report_names, custom_col_style_list = storage_inode_report_by_volume(data)
+            html_tables = format_html_style(datatables,report_names)
         elif args.request == "clusters_space_info":
-            report_name=storage_space_report_by_cluster(data)
-            html_tables = format_html_style(datatable,report_name)
+            report_names=storage_space_report_by_cluster(data)
+            html_tables = format_html_style(datatables,report_names)
         elif args.request == "aggrs_space_info":
-            report_name=storage_space_report_by_aggr(data)
-            html_tables = format_html_style(datatable,report_name)
+            report_names=storage_space_report_by_aggr(data)
+            html_tables = format_html_style(datatables,report_names)
         elif args.request == "volume_space_info":
-            report_name=storage_space_report_by_volume(data)
-            html_tables = format_html_style(datatable2,report_name)
+            report_names=storage_space_report_by_volume(data)
+            html_tables = format_html_style(datatables,report_names)
         elif args.request == "big_snapshot_info":
-            report_name=storage_Big_snapshot_report_by_volume(data)
-            html_tables = format_html_style(datatable,report_name)
+            report_names=storage_Big_snapshot_report_by_volume(data)
+            html_tables = format_html_style(datatables,report_names)
         else:
             logger.error(args.request+" request is not matched")
             html_tables = [args.request+" request is not matched"]
