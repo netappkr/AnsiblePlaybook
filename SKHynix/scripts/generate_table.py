@@ -183,6 +183,7 @@ def storage_Big_snapshot_report_by_volume(data):
                         'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
                     }])
                    datatable=datatable._append(add,ignore_index = True)
+   
             
 
 def align_right():
