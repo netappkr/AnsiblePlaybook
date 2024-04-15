@@ -36,9 +36,9 @@ def format_with_commas(num):
     return '{0:,}'.format(num)
 
 def storage_inode_report_by_cluster(data):
-    i=0
     global datatables
-    datatables[i] = pandas.DataFrame()
+    report_names = []
+    datatable = pandas.DataFrame()
     for cluster in data:
         inode_total=0
         inode_used=0
@@ -54,17 +54,17 @@ def storage_inode_report_by_cluster(data):
             'INODE Free': format_with_commas(inode_total - inode_used),
             'INODE Used Rate(%)': round(inode_used / inode_total * 100)
         }])
-        datatables[i]=datatables[i]._append(add,ignore_index = True)
+        datatable=datatable._append(add,ignore_index = True)
+    datatables.append(datatable)
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
-    report_names = ["CAD Storage Cluster INODE 사용량 Summary"]
+    report_names.append("CAD Storage Cluster INODE 사용량 Summary")
     return report_names, custom_col_style_list
 
 def storage_inode_report_by_volume(data):
-    i=0
     global datatables
     report_names = []
     for Cluster in data:
-        datatables[i] = pandas.DataFrame()
+        datatable = pandas.DataFrame()
         for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
             Aggr_name = Volume["aggregates"][0]['name']
             if Volume["style"] == "flexgroup":
@@ -81,16 +81,17 @@ def storage_inode_report_by_volume(data):
                 'INode Used Rate(%)': round(Volume["files"]["used"] / Volume["files"]["maximum"] * 100)
             }])
 
-            datatables[i]=datatables[i]._append(add,ignore_index = True)
-        report_names[i] = Cluster["cluster"]["name"] + "Storage Volumes INODE Report"
+            datatable=datatable._append(add,ignore_index = True)
+        datatables.append(datatable)
+        report_names.append(Cluster["cluster"]["name"] + "Storage Volumes INODE Report")
         i=i+1
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
     return report_names, custom_col_style_list
 
 def storage_space_report_by_cluster(data):
-    i=0
     global datatables
-    datatables[i] = pandas.DataFrame()
+    report_names = []
+    datatable = pandas.DataFrame()
     for cluster in data:
         total_size=0
         used_size=0
@@ -106,14 +107,15 @@ def storage_space_report_by_cluster(data):
             'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024)),
             'Used Rate(%)': round(used_size / total_size * 100)
         }])
-        datatables[i]=datatables[i]._append(add,ignore_index = True)
-    report_names = ["CAD Storage Cluster 사용량 Summary"]
+        datatable=datatable._append(add,ignore_index = True)
+    datatables.append(datatable)
+    report_names.append("CAD Storage Cluster 사용량 Summary")
     return report_names
 
 def storage_space_report_by_aggr(data):
-    i=0
     global datatables
-    datatables[i] = pandas.DataFrame()
+    report_names = []
+    datatable = pandas.DataFrame()
     for aggr in data["ontap_info"]["storage/aggregates"]["records"]:
         total_size=aggr["space"]["block_storage"]["size"]
         used_size=aggr["space"]["block_storage"]["used"]
@@ -127,14 +129,15 @@ def storage_space_report_by_aggr(data):
             'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,1)),
             'Used Rate(%)': round(used_size / total_size * 100)
         }])
-        datatables[i]=datatables[i]._append(add,ignore_index = True)
-    report_names = ["------ Aggregates Capacity Report ------"]
+        datatable=datatable._append(add,ignore_index = True)
+    datatables.append(datatable)
+    report_names.append("------ Aggregates Capacity Report ------")
     return report_names
 
 def storage_space_report_by_volume(data):
-    i=0
     global datatables
-    datatables[i] = pandas.DataFrame()
+    report_names = []
+    datatable = pandas.DataFrame()
     for Volume in data["ontap_info"]["storage/volumes"]["records"]:
         total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
         used_size=Volume["space"]["used"]
@@ -150,14 +153,15 @@ def storage_space_report_by_volume(data):
             'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024)),
             'Used Rate(%)': round(used_size / total_size * 100)
         }])
-        datatables[i]=datatables[i]._append(add,ignore_index = True)
-    report_names = [data["cluster"]["name"] + " Storage Volumes Capacity Report-"]
+        datatable=datatable._append(add,ignore_index = True)
+    datatables.append(datatable)
+    report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
     return report_names
 
 def storage_Big_snapshot_report_by_volume(data):
-    i=0
     global datatables
-    datatables[i] = pandas.DataFrame()
+    report_names = []
+    datatable = pandas.DataFrame()
     for cluster in data:
         total_size=0
         used_size=0
@@ -178,7 +182,8 @@ def storage_Big_snapshot_report_by_volume(data):
                         'Used Rate(%)': round(used_size / total_size,2),
                         'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
                     }])
-                    datatables[i]=datatables[i]._append(add,ignore_index = True)
+                   datatable=datatable._append(add,ignore_index = True)
+            
 
 def align_right():
     return 'text-align: right;'
