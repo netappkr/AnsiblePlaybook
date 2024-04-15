@@ -63,7 +63,7 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} -r cluster_inode_info -f {{ datafile.dest }}"
+      command: "python3 {{ files_matched.files[0].path }} -r clusters_inode_info -f {{ datafile.dest }}"
       register: html_table
 
     #- name: debug show
