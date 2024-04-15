@@ -30,14 +30,15 @@ with open(json_file, 'r') as file:
     data = json.load(file)
 
 # Pandas DataFrame을 생성합니다.
-datatable = pandas.DataFrame()
-datatable2 = pandas.DataFrame()
+datatables = []
 
 def format_with_commas(num):
     return '{0:,}'.format(num)
 
 def storage_inode_report_by_cluster(data):
-    global datatable
+    i=0
+    global datatables
+    datatables[i] = pandas.DataFrame()
     for cluster in data:
         inode_total=0
         inode_used=0
@@ -53,43 +54,49 @@ def storage_inode_report_by_cluster(data):
             'INODE Free': format_with_commas(inode_total - inode_used),
             'INODE Used Rate(%)': round(inode_used / inode_total * 100)
         }])
-        datatable=datatable._append(add,ignore_index = True)
+        datatables[i]=datatables[i]._append(add,ignore_index = True)
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
-    report_name = "CAD Storage Cluster INODE 사용량 Summary"
-    return report_name, custom_col_style_list
+    report_names = ["CAD Storage Cluster INODE 사용량 Summary"]
+    return report_names, custom_col_style_list
 
 def storage_inode_report_by_volume(data):
-    global datatable
-    for cluster in data:
-        for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-            Aggr_name = volume["aggregates"][0]['name']
-            if volume["style"] == "flexgroup":
+    i=0
+    global datatables
+    report_names = []
+    for Cluster in data:
+        datatables[i] = pandas.DataFrame()
+        for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
+            Aggr_name = Volume["aggregates"][0]['name']
+            if Volume["style"] == "flexgroup":
                 Aggr_name = "-"
             add=pandas.DataFrame.from_records([{
-                'cluster Name': cluster["cluster"]["name"],
+                'cluster Name': Cluster["cluster"]["name"],
+                'SVM Name': Volume["svm"]["name"],
                 'Aggregate': Aggr_name,
-                'type': volume["style"],
-                'Volume': volume["name"],
-                'INODE Total': format_with_commas(volume["files"]["maximum"]),
-                'INODE Used': format_with_commas(volume["files"]["used"]),
-                'INODE Free': format_with_commas(volume["files"]["maximum"] - volume["files"]["used"]),
-                'INode Used Rate(%)': round(volume["files"]["used"] / volume["files"]["maximum"] * 100)
+                'type': Volume["style"],
+                'Volume': Volume["name"],
+                'INODE Total': format_with_commas(Volume["files"]["maximum"]),
+                'INODE Used': format_with_commas(Volume["files"]["used"]),
+                'INODE Free': format_with_commas(Volume["files"]["maximum"] - Volume["files"]["used"]),
+                'INode Used Rate(%)': round(Volume["files"]["used"] / Volume["files"]["maximum"] * 100)
             }])
 
-            datatable=datatable._append(add,ignore_index = True)
+            datatables[i]=datatables[i]._append(add,ignore_index = True)
+        report_names[i] = Cluster["cluster"]["name"] + "Storage Volumes INODE Report"
+        i=i+1
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
-    report_name = "Storage Volumes INODE Report"
-    return report_name, custom_col_style_list
+    return report_names, custom_col_style_list
 
 def storage_space_report_by_cluster(data):
-    global datatable
+    i=0
+    global datatables
+    datatables[i] = pandas.DataFrame()
     for cluster in data:
         total_size=0
         used_size=0
         for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
             total_size= total_size+aggr["space"]["block_storage"]["size"]
             used_size= used_size+aggr["space"]["block_storage"]["used"]
-
 
         add=pandas.DataFrame.from_records([{
             'Cluster name': cluster["cluster"]["name"],
@@ -99,12 +106,14 @@ def storage_space_report_by_cluster(data):
             'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024)),
             'Used Rate(%)': round(used_size / total_size * 100)
         }])
-        datatable=datatable._append(add,ignore_index = True)
-    report_name = "CAD Storage Cluster 사용량 Summary"
-    return report_name
+        datatables[i]=datatables[i]._append(add,ignore_index = True)
+    report_names = ["CAD Storage Cluster 사용량 Summary"]
+    return report_names
 
 def storage_space_report_by_aggr(data):
-    global datatable
+    i=0
+    global datatables
+    datatables[i] = pandas.DataFrame()
     for aggr in data["ontap_info"]["storage/aggregates"]["records"]:
         total_size=aggr["space"]["block_storage"]["size"]
         used_size=aggr["space"]["block_storage"]["used"]
@@ -118,12 +127,14 @@ def storage_space_report_by_aggr(data):
             'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,1)),
             'Used Rate(%)': round(used_size / total_size * 100)
         }])
-        datatable=datatable._append(add,ignore_index = True)
-    report_name = "------ Aggregates Capacity Report ------"
-    return report_name
+        datatables[i]=datatables[i]._append(add,ignore_index = True)
+    report_names = ["------ Aggregates Capacity Report ------"]
+    return report_names
 
 def storage_space_report_by_volume(data):
-    global datatable2
+    i=0
+    global datatables
+    datatables[i] = pandas.DataFrame()
     for Volume in data["ontap_info"]["storage/volumes"]["records"]:
         total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
         used_size=Volume["space"]["used"]
@@ -139,12 +150,14 @@ def storage_space_report_by_volume(data):
             'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024)),
             'Used Rate(%)': round(used_size / total_size * 100)
         }])
-        datatable2=datatable2._append(add,ignore_index = True)
-    report_name = data["cluster"]["name"] + " Storage Volumes Capacity Report-"
-    return report_name
+        datatables[i]=datatables[i]._append(add,ignore_index = True)
+    report_names = [data["cluster"]["name"] + " Storage Volumes Capacity Report-"]
+    return report_names
 
 def storage_Big_snapshot_report_by_volume(data):
-    global datatable
+    i=0
+    global datatables
+    datatables[i] = pandas.DataFrame()
     for cluster in data:
         total_size=0
         used_size=0
@@ -165,44 +178,48 @@ def storage_Big_snapshot_report_by_volume(data):
                         'Used Rate(%)': round(used_size / total_size,2),
                         'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
                     }])
-                    datatable=datatable._append(add,ignore_index = True)
+                    datatables[i]=datatables[i]._append(add,ignore_index = True)
 
-def align_right(s):
+def align_right():
     return 'text-align: right;'
 
-def format_html_style(datatable, report_name, custom_col_style_list=[]):
-    datatable = datatable.style.set_caption(report_name).set_table_attributes('class="mystyle"').hide()
+def format_html_style(datatable, report_names=[], custom_col_style_list=[]):
+    html_tables=[]
+    i=0
+    for datatable in datatables:
+        datatable = datatable.style.set_caption(report_names[i]).set_table_attributes('class="mystyle"').hide()
     
-    # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
-    for col in custom_col_style_list:
-        datatable = datatable.applymap(align_right, subset=[col])
-    
-    html_table = datatable.to_html()
-    return html_table
+        # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
+        for col in custom_col_style_list:
+            datatable = datatable.applymap(align_right, subset=[col])
+        
+        html_tables[i] = datatable.to_html()
+        i=i+1
+    return html_tables
 
 def main():
     try:
         if args.request == "clusters_inode_info":
             report_name, custom_col_style_list = storage_inode_report_by_cluster(data)
-            html_table = format_html_style(datatable,report_name)
+            html_tables = format_html_style(datatable,report_name)
         elif args.request == "volume_inode_info":
             report_name, custom_col_style_list = storage_inode_report_by_volume(data)
-            html_table = format_html_style(datatable,report_name)
+            html_tables = format_html_style(datatable,report_name)
         elif args.request == "clusters_space_info":
             report_name=storage_space_report_by_cluster(data)
-            html_table = format_html_style(datatable,report_name)
+            html_tables = format_html_style(datatable,report_name)
         elif args.request == "aggrs_space_info":
             report_name=storage_space_report_by_aggr(data)
-            html_table = format_html_style(datatable,report_name)
+            html_tables = format_html_style(datatable,report_name)
         elif args.request == "volume_space_info":
             report_name=storage_space_report_by_volume(data)
-            html_table = format_html_style(datatable2,report_name)
+            html_tables = format_html_style(datatable2,report_name)
         elif args.request == "big_snapshot_info":
             report_name=storage_Big_snapshot_report_by_volume(data)
-            html_table = format_html_style(datatable,report_name)
+            html_tables = format_html_style(datatable,report_name)
         else:
             logger.error(args.request+" request is not matched")
-            html_table = args.request+" request is not matched"
+            html_tables = [args.request+" request is not matched"]
              
         # HTML 테이블로 변환합니다.
         ## 경고
@@ -241,7 +258,7 @@ def main():
 {css}
 </style>
 <body>
-{html_table}
+{''.join(html_tables)}
 </body>
 </html>
         """

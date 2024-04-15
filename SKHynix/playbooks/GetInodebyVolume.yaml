@@ -28,6 +28,7 @@
         gather_subset:
           - volume_info
         fields:
+          - 'svm.name'
           - 'files'
           - 'name'
           - 'aggregates.name'
