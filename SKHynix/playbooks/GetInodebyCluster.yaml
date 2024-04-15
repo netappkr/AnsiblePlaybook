@@ -42,7 +42,7 @@
 
     - name: Write result data to a JSON file
       copy:
-        dest: "/tmp/volume_inode_info.json"
+        dest: "/tmp/cluster_inode_info.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
 
@@ -77,7 +77,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} Inode Usage Report"
+        subject: "ONTAP Cluster Inode Usage Report"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
