@@ -4,7 +4,6 @@
   gather_facts: no
   collections:
     - netapp.ontap
-
   tasks:
     - name: install the package, force upgrade
       pip:
@@ -18,38 +17,34 @@
         - "pip>=24.0"
         - "pandas>2.0"
         executable: pip3
-      register: test
-
-    - name: debug show
-      ansible.builtin.debug:
-        msg: "{{ test }}"
 
     - name: Get rest data information
-      netapp.ontap.na_ontap_rest_info:
+      na_ontap_rest_info:
         hostname: "{{ cluster.ip }}"
         username: "{{ cluster.ID }}"
         password: "{{ cluster.PW }}"
         https: true
         validate_certs: false
         gather_subset:
-          - storage/volumes
+          - volume_info
         fields:
           - 'files'
           - 'name'
+          - 'aggregates.name'
+          - 'style'
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
- 
-   #- name: debug show
-   #   ansible.builtin.debug:
-   #     msg: "{{ ontap_volumes.results }}"
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ ontap_volumes.results }}"
 
     - name: Write result data to a JSON file
       copy:
-        dest: "/tmp/clusters_inode_info.json"
+        dest: "/tmp/volume_inode_info.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
-      register: datafiles
+      register: datafile
 
     #- name: debug show
     #  ansible.builtin.debug:
@@ -68,8 +63,8 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "python3.11 {{ files_matched.files[0].path }} -r clusters_inode_info -f {{ datafiles.dest }}"
-      register: html_tables
+      command: "python3 {{ files_matched.files[0].path }} -r volume_inode_info -f {{ datafile.dest }}"
+      register: html_table
 
     #- name: debug show
     #  ansible.builtin.debug:
@@ -82,11 +77,11 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Cluster Inode Usage Report"
-        body: "{{ html_tables.stdout }}"
+        subject: "ONTAP {{ html_table.datafile.cluster_volumes.cluster.name }} Inode Usage Report"
+        body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
-      when: html_tables.stdout is defined
+      when: html_table.stdout is defined

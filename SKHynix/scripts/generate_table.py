@@ -60,22 +60,23 @@ def storage_inode_report_by_cluster(data):
 
 def storage_inode_report_by_volume(data):
     global datatable
-    for volume in data["ontap_info"]["storage/volumes"]["records"]:
-        Aggr_name = volume["aggregates"][0]['name']
-        if volume["style"] == "flexgroup":
-            Aggr_name = "-"
-        add=pandas.DataFrame.from_records([{
-            'cluster Name': data["cluster"]["name"],
-            'Aggregate': Aggr_name,
-            'type': volume["style"],
-            'Volume': volume["name"],
-            'INODE Total': format_with_commas(volume["files"]["maximum"]),
-            'INODE Used': format_with_commas(volume["files"]["used"]),
-            'INODE Free': format_with_commas(volume["files"]["maximum"] - volume["files"]["used"]),
-            'INode Used Rate(%)': round(volume["files"]["used"] / volume["files"]["maximum"] * 100)
-        }])
+    for cluster in data:
+        for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+            Aggr_name = volume["aggregates"][0]['name']
+            if volume["style"] == "flexgroup":
+                Aggr_name = "-"
+            add=pandas.DataFrame.from_records([{
+                'cluster Name': data["cluster"]["name"],
+                'Aggregate': Aggr_name,
+                'type': volume["style"],
+                'Volume': volume["name"],
+                'INODE Total': format_with_commas(volume["files"]["maximum"]),
+                'INODE Used': format_with_commas(volume["files"]["used"]),
+                'INODE Free': format_with_commas(volume["files"]["maximum"] - volume["files"]["used"]),
+                'INode Used Rate(%)': round(volume["files"]["used"] / volume["files"]["maximum"] * 100)
+            }])
 
-        datatable=datatable._append(add,ignore_index = True)
+            datatable=datatable._append(add,ignore_index = True)
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
     report_name = data["cluster"]["name"] + " Storage Volumes INODE Report"
     return report_name, custom_col_style_list
