@@ -85,7 +85,7 @@
         subject: "ONTAP Cluster Inode Usage Report"
         body: "{{ html_tables.stdout }}"
         from: "{{ email_from }}"
-        secure: never
+        secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"

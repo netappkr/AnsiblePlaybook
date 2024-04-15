@@ -84,7 +84,7 @@
         subject: "ONTAP {{ html_table.datafile.cluster_aggrs.cluster.name }} Space Usage Report"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
-        secure: never
+        secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
