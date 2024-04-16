@@ -191,16 +191,14 @@ def align_right():
 
 def format_html_style(datatables, report_names=[], custom_col_style_list=[]):
     html_tables=[]
-    i=0
-    for datatable in datatables:
-        datatable = datatable.style.set_caption(report_names[i]).set_table_attributes('class="mystyle"').hide()
+    for datatable, report_name in datatables, report_names:
+        datatable = datatable.style.set_caption(report_name).set_table_attributes('class="mystyle"').hide()
     
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         for col in custom_col_style_list:
             datatable = datatable.applymap(align_right, subset=[col])
         
-        html_tables[i] = datatable.to_html()
-        i=i+1
+        html_tables.append(datatable.to_html())
     return html_tables
 
 def main():
