@@ -41,7 +41,7 @@
     - name: Write results data to a JSON file
       copy:
         dest: "/tmp/aggrs_space_usage.json"
-        content: "{{ ontap_aggrs | to_nice_json }}"
+        content: "{{ ontap_aggrs.results | to_nice_json }}"
       register: aggr_datafile
 
 - name: query to usage by volume from each ONTAP cluster
@@ -93,7 +93,7 @@
     - name: Write results data to a JSON file
       copy:
         dest: "/tmp/volume_space_usage_info.json"
-        content: "{{ ontap_volume | to_nice_json }}"
+        content: "{{ ontap_volume.results | to_nice_json }}"
       register: volume_datafile
 
     #- name: debug show

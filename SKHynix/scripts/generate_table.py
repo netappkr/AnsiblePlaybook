@@ -156,7 +156,7 @@ def storage_space_report_by_volume(data):
             }])
             datatable=datatable._append(add,ignore_index = True)
         datatables.append(datatable)
-        report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
+        report_names.append(cluster["cluster"]["name"] + " Storage Volumes Capacity Report-")
     return report_names
 
 def storage_Big_snapshot_report_by_volume(data):
