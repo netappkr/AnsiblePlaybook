@@ -1,0 +1,224 @@
+[
+    {
+        "ansible_loop_var": "cluster",
+        "changed": false,
+        "cluster": {
+            "ID": "fsxadmin",
+            "PW": "<<password>>",
+            "description": "Netapp APAC AWS account",
+            "ip": "<<your ip>>",
+            "name": "fsxn"
+        },
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "cert_filepath": null,
+                "feature_flags": null,
+                "fields": [
+                    "space",
+                    "home_node"
+                ],
+                "force_ontap_version": null,
+                "gather_subset": [
+                    "aggregate_info"
+                ],
+                "hal_linking": true,
+                "hostname": "<<your ip>>",
+                "http_port": null,
+                "https": true,
+                "ignore_api_errors": null,
+                "key_filepath": null,
+                "max_records": 1024,
+                "ontapi": null,
+                "owning_resource": null,
+                "parameters": null,
+                "password": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
+                "state": null,
+                "use_python_keys": false,
+                "use_rest": "auto",
+                "username": "fsxadmin",
+                "validate_certs": false
+            }
+        },
+        "ontap_info": {
+            "storage/aggregates": {
+                "_links": {
+                    "self": {
+                        "href": "/api/storage/aggregates?max_records=1024&fields=space%2Chome_node"
+                    }
+                },
+                "num_records": 1,
+                "records": [
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/storage/aggregates/a92a2685-d5d9-11ee-93e9-67ab2b152bbe"
+                            }
+                        },
+                        "home_node": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/cluster/nodes/adb9d7b1-d5d8-11ee-93e9-67ab2b152bbe"
+                                }
+                            },
+                            "name": "FsxId0355838e2681c9d54-01",
+                            "uuid": "adb9d7b1-d5d8-11ee-93e9-67ab2b152bbe"
+                        },
+                        "name": "aggr1",
+                        "space": {
+                            "block_storage": {
+                                "aggregate_metadata": 408637440,
+                                "aggregate_metadata_percent": 0,
+                                "available": 918293053440,
+                                "data_compacted_count": 208896,
+                                "data_compaction_space_saved": 266240,
+                                "data_compaction_space_saved_percent": 0,
+                                "full_threshold_percent": 96,
+                                "inactive_user_data": 0,
+                                "inactive_user_data_percent": 0,
+                                "physical_used": 13300981760,
+                                "physical_used_percent": 1,
+                                "size": 925308932096,
+                                "used": 7015878656,
+                                "used_including_snapshot_reserve": 55716347904,
+                                "used_including_snapshot_reserve_percent": 6,
+                                "used_percent": 1,
+                                "volume_deduplication_shared_count": 208896,
+                                "volume_deduplication_space_saved": 266240,
+                                "volume_deduplication_space_saved_percent": 0
+                            },
+                            "cloud_storage": {
+                                "used": 0
+                            },
+                            "efficiency": {
+                                "auto_adaptive_compression_savings": true,
+                                "cross_volume_background_dedupe": false,
+                                "cross_volume_dedupe_savings": false,
+                                "cross_volume_inline_dedupe": false,
+                                "enable_workload_informed_tsse": true,
+                                "logical_used": 485613568,
+                                "ratio": 3.467723536810085,
+                                "savings": 345575424,
+                                "wise_tsse_min_used_capacity_pct": 0
+                            },
+                            "efficiency_without_snapshots": {
+                                "logical_used": 35356672,
+                                "ratio": 1,
+                                "savings": 0
+                            },
+                            "efficiency_without_snapshots_flexclones": {
+                                "logical_used": 34746368,
+                                "ratio": 1,
+                                "savings": 0
+                            },
+                            "footprint": 6607507456,
+                            "footprint_percent": 1,
+                            "snapshot": {
+                                "available": 48700448768,
+                                "reserve_percent": 5,
+                                "total": 48700469248,
+                                "used": 20480,
+                                "used_percent": 0
+                            }
+                        },
+                        "uuid": "a92a2685-d5d9-11ee-93e9-67ab2b152bbe"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "ansible_loop_var": "cluster",
+        "changed": false,
+        "cluster": {
+            "ID": "admin",
+            "PW": "<<your password>>",
+            "description": "NetappKR local",
+            "ip": "<<your ip>>",
+            "name": "FAS8040"
+        },
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "cert_filepath": null,
+                "feature_flags": null,
+                "fields": [
+                    "space",
+                    "home_node"
+                ],
+                "force_ontap_version": null,
+                "gather_subset": [
+                    "aggregate_info"
+                ],
+                "hal_linking": true,
+                "hostname": "<<your ip>>",
+                "http_port": null,
+                "https": true,
+                "ignore_api_errors": null,
+                "key_filepath": null,
+                "max_records": 1024,
+                "ontapi": null,
+                "owning_resource": null,
+                "parameters": null,
+                "password": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
+                "state": null,
+                "use_python_keys": false,
+                "use_rest": "auto",
+                "username": "admin",
+                "validate_certs": false
+            }
+        },
+        "ontap_info": {
+            "storage/aggregates": {
+                "_links": {
+                    "self": {
+                        "href": "/api/storage/aggregates?max_records=1024&fields=space%2Chome_node"
+                    }
+                },
+                "num_records": 1,
+                "records": [
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/storage/aggregates/0785b309-c575-4bc7-aa04-42846ca64b17"
+                            }
+                        },
+                        "home_node": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/cluster/nodes/e6fd339a-8464-11ea-bfc1-90e2baa80c8c"
+                                }
+                            },
+                            "name": "N1",
+                            "uuid": "e6fd339a-8464-11ea-bfc1-90e2baa80c8c"
+                        },
+                        "name": "node1_aggr1",
+                        "space": {
+                            "block_storage": {
+                                "available": 4827551035392,
+                                "full_threshold_percent": 98,
+                                "size": 11322462527488,
+                                "used": 6494911492096
+                            },
+                            "cloud_storage": {
+                                "used": 0
+                            },
+                            "efficiency": {
+                                "logical_used": 2348378783744,
+                                "ratio": 2.228895232240884,
+                                "savings": 1294772158464
+                            },
+                            "efficiency_without_snapshots": {
+                                "logical_used": 390145085440,
+                                "ratio": 1.025631476851487,
+                                "savings": 9750085632
+                            },
+                            "footprint": 6494596894720
+                        },
+                        "uuid": "0785b309-c575-4bc7-aa04-42846ca64b17"
+                    }
+                ]
+            }
+        }
+    }
+]

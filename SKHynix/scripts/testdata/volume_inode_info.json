@@ -4,9 +4,9 @@
         "changed": false,
         "cluster": {
             "ID": "fsxadmin",
-            "PW": "Netapp1!",
+            "PW": "<<your password>>",
             "description": "Netapp APAC AWS account",
-            "ip": "172.30.1.86",
+            "ip": "<<your ip>>",
             "name": "fsxn"
         },
         "failed": false,
@@ -26,7 +26,7 @@
                     "volume_info"
                 ],
                 "hal_linking": true,
-                "hostname": "172.30.1.86",
+                "hostname": "<<your ip>>",
                 "http_port": null,
                 "https": true,
                 "ignore_api_errors": null,
@@ -285,7 +285,7 @@
                         ],
                         "files": {
                             "maximum": 5033146,
-                            "used": 208
+                            "used": 210
                         },
                         "name": "vol1_cache",
                         "style": "flexgroup",
@@ -303,9 +303,9 @@
         "changed": false,
         "cluster": {
             "ID": "admin",
-            "PW": "NetApp123!@#",
+            "PW": "<<your password>>",
             "description": "NetappKR local",
-            "ip": "115.144.174.245",
+            "ip": "<<your ip>>",
             "name": "FAS8040"
         },
         "failed": false,
@@ -325,7 +325,7 @@
                     "volume_info"
                 ],
                 "hal_linking": true,
-                "hostname": "115.144.174.245",
+                "hostname": "<<your ip>>",
                 "http_port": null,
                 "https": true,
                 "ignore_api_errors": null,

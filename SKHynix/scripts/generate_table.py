@@ -192,6 +192,7 @@ def align_right():
 
 def format_html_style(datatables, report_names, custom_col_style_list=[]):
     html_tables=[]
+    print(report_names)
     for datatable in datatables:
         for report_name in report_names:
             report_name = report_name
