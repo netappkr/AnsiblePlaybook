@@ -7,10 +7,10 @@ import json
 import logging
 import traceback
 parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
-parser.add_argument("-f", "--file", type=str, help="read filename",required=False)
+parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
 args= parser.parse_args()
-
+report_names=[]
 # logger
 logger = logging.getLogger(name='generate_table_log')
 logger.setLevel(logging.INFO) ## 경고 수준 설정
@@ -25,10 +25,12 @@ file_handler.setFormatter(formatter) ## 텍스트 포맷 설정
 logger.addHandler(file_handler) ## 핸들러 등록
 
 # JSON 파일로부터 데이터를 읽어옵니다.
-json_file = args.file
-with open(json_file, 'r') as file:
-    data = json.load(file)
+data={}
+for json_file in args.file:
+    with open(json_file, 'r') as file:
+        data[json_file] = json.load(file)
 
+print(data)
 # Pandas DataFrame을 생성합니다.
 datatables = []
 
@@ -206,22 +208,32 @@ def format_html_style(datatables, report_names, custom_col_style_list=[]):
 def main():
     try:
         if args.request == "clusters_inode_info":
-            report_names, custom_col_style_list = storage_inode_report_by_cluster(data)
+            report_names, custom_col_style_list = storage_inode_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(datatables,report_names)
         elif args.request == "volume_inode_info":
-            report_names, custom_col_style_list = storage_inode_report_by_volume(data)
+            report_names, custom_col_style_list = storage_inode_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(datatables,report_names)
         elif args.request == "clusters_space_info":
-            report_names=storage_space_report_by_cluster(data)
+            report_names=storage_space_report_by_cluster(data[args.file[0]])
+            html_tables = format_html_style(datatables,report_names)
+        elif args.request == "aggr_volume_space_info":
+            report_names=[]
+            # datatable은 실행순서 대로 list에 추가됨 
+            # report name을 실행 순서대로 list에 추가함 
+            # datatable도 전역 변수 쓰지말고 돌릴까 고민중 
+            for report_name in storage_space_report_by_aggr(data[args.file[0]]):
+                report_names.append(report_name)
+            for report_name in storage_space_report_by_volume(data[args.file[1]]):
+                report_names.append(report_name)
             html_tables = format_html_style(datatables,report_names)
         elif args.request == "aggrs_space_info":
-            report_names=storage_space_report_by_aggr(data)
+            report_names=storage_space_report_by_aggr(data[args.file[0]])
             html_tables = format_html_style(datatables,report_names)
         elif args.request == "volume_space_info":
-            report_names=storage_space_report_by_volume(data)
+            report_names=storage_space_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(datatables,report_names)
         elif args.request == "big_snapshot_info":
-            report_names=storage_Big_snapshot_report_by_volume(data)
+            report_names=storage_Big_snapshot_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(datatables,report_names)
         else:
             logger.error(args.request+" request is not matched")
