@@ -264,7 +264,7 @@ def main():
 {css}
 </style>
 <body>
-{''.join(html_tables)}
+{'\n'.join(html_tables)}
 </body>
 </html>
         """
