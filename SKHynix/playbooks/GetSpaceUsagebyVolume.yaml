@@ -37,7 +37,7 @@
           - 'style'
 #          - 'space.physical_used'
 #          - 'space.snapshot.reserve_size'
-      register: ontap_aggrs
+      register: ontap_volume
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
@@ -48,7 +48,7 @@
     - name: Write results data to a JSON file
       copy:
         dest: "/tmp/volumes_space_usage_info.json"
-        content: "{{ cluster_aggrs | to_nice_json }}"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
 
     # #- name: debug show
