@@ -10,7 +10,6 @@ parser = argparse.ArgumentParser(description="Please refer to Netapp korea githu
 parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
 args= parser.parse_args()
-report_names=[]
 # logger
 logger = logging.getLogger(name='generate_table_log')
 logger.setLevel(logging.INFO) ## 경고 수준 설정
@@ -156,7 +155,7 @@ def storage_space_report_by_volume(data):
             }])
             datatable=datatable._append(add,ignore_index = True)
         datatables.append(datatable)
-        report_names.append(cluster["cluster"]["name"] + " Storage Volumes Capacity Report-")
+        report_names.append(cluster["cluster"]["name"] + " Storage Volumes Capacity Report")
     return report_names
 
 def storage_Big_snapshot_report_by_volume(data):
