@@ -29,8 +29,6 @@ data={}
 for json_file in args.file:
     with open(json_file, 'r') as file:
         data[json_file] = json.load(file)
-
-print(data)
 # Pandas DataFrame을 생성합니다.
 datatables = []
 
