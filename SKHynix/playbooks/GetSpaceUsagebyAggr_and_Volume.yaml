@@ -40,7 +40,7 @@
 
     - name: Write results data to a JSON file
       copy:
-        dest: "/tmp/ontap_aggrs_space_usage.json"
+        dest: "/tmp/aggrs_space_usage.json"
         content: "{{ ontap_aggrs | to_nice_json }}"
       register: aggr_datafile
 
@@ -92,7 +92,7 @@
 
     - name: Write results data to a JSON file
       copy:
-        dest: "/tmp/volume_space_usage_volume.json"
+        dest: "/tmp/volume_space_usage_info.json"
         content: "{{ ontap_volume | to_nice_json }}"
       register: volume_datafile
 

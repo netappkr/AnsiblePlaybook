@@ -42,7 +42,7 @@
 
     - name: Write result data to a JSON file
       copy:
-        dest: "/tmp/cluster_inode_info.json"
+        dest: "/tmp/clusters_inode_info.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
 
