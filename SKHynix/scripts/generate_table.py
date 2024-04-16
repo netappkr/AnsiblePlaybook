@@ -115,20 +115,21 @@ def storage_space_report_by_aggr(data):
     global datatables
     report_names = []
     datatable = pandas.DataFrame()
-    for aggr in data["ontap_info"]["storage/aggregates"]["records"]:
-        total_size=aggr["space"]["block_storage"]["size"]
-        used_size=aggr["space"]["block_storage"]["used"]
+    for cluster in data:
+        for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+            total_size=aggr["space"]["block_storage"]["size"]
+            used_size=aggr["space"]["block_storage"]["used"]
 
-        add=pandas.DataFrame.from_records([{
-            'Cluster Name': data["cluster"]["name"],
-            'Node Name': aggr["home_node"]["name"],
-            'Aggr Name': aggr["name"],
-            'Total Size(TB)': format_with_commas(round(total_size/1024/1024/1024/1024,1)),
-            'Used Size(TB)': format_with_commas(round(used_size/1024/1024/1024/1024,1)),
-            'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,1)),
-            'Used Rate(%)': round(used_size / total_size * 100)
-        }])
-        datatable=datatable._append(add,ignore_index = True)
+            add=pandas.DataFrame.from_records([{
+                'Cluster Name': cluster["cluster"]["name"],
+                'Node Name': aggr["home_node"]["name"],
+                'Aggr Name': aggr["name"],
+                'Total Size(TB)': format_with_commas(round(total_size/1024/1024/1024/1024,1)),
+                'Used Size(TB)': format_with_commas(round(used_size/1024/1024/1024/1024,1)),
+                'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024/1024,1)),
+                'Used Rate(%)': round(used_size / total_size * 100)
+            }])
+            datatable=datatable._append(add,ignore_index = True)
     datatables.append(datatable)
     report_names.append("------ Aggregates Capacity Report ------")
     return report_names
@@ -136,25 +137,26 @@ def storage_space_report_by_aggr(data):
 def storage_space_report_by_volume(data):
     global datatables
     report_names = []
-    datatable = pandas.DataFrame()
-    for Volume in data["ontap_info"]["storage/volumes"]["records"]:
-        total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
-        used_size=Volume["space"]["used"]
-        
-        Aggr_name = Volume["aggregates"][0]['name']
-        if Volume["style"] == "flexgroup":
-            Aggr_name = "-"
-        add=pandas.DataFrame.from_records([{
-            'SVM Name': Volume["svm"]["name"],
-            'Aggregate': Aggr_name,
-            'Total Size(TB)': format_with_commas(round(total_size/1024/1024/1024)),
-            'Used Size(TB)': format_with_commas(round(used_size/1024/1024/1024)),
-            'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024)),
-            'Used Rate(%)': round(used_size / total_size * 100)
-        }])
-        datatable=datatable._append(add,ignore_index = True)
-    datatables.append(datatable)
-    report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
+    for cluster in data:
+        datatable = pandas.DataFrame()
+        for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+            total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
+            used_size=Volume["space"]["used"]
+            
+            Aggr_name = Volume["aggregates"][0]['name']
+            if Volume["style"] == "flexgroup":
+                Aggr_name = "-"
+            add=pandas.DataFrame.from_records([{
+                'SVM Name': Volume["svm"]["name"],
+                'Aggregate': Aggr_name,
+                'Total Size(TB)': format_with_commas(round(total_size/1024/1024/1024)),
+                'Used Size(TB)': format_with_commas(round(used_size/1024/1024/1024)),
+                'Free Size(TB)': format_with_commas(round((total_size - used_size)/1024/1024/1024)),
+                'Used Rate(%)': round(used_size / total_size * 100)
+            }])
+            datatable=datatable._append(add,ignore_index = True)
+        datatables.append(datatable)
+        report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
     return report_names
 
 def storage_Big_snapshot_report_by_volume(data):

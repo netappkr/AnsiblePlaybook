@@ -40,16 +40,13 @@
 
     - name: Write results data to a JSON file
       copy:
-        dest: "/tmp/{{ cluster_aggrs.cluster.name }}_aggr_space_usage.json"
-        content: "{{ cluster_aggrs | to_nice_json }}"
-      register: datafiles
-      loop: "{{ ontap_aggrs.results }}"
-      loop_control:
-        loop_var: cluster_aggrs
+        dest: "/tmp/aggrs_space_usage_info.json"
+        content: "{{ ontap_aggrs | to_nice_json }}"
+      register: datafile
 
     #- name: debug show
     #  ansible.builtin.debug:
-    #    msg: "{{ datafiles.results }}"
+    #    msg: "{{ datafile.results }}"
 
     - name: Search for 'script' in all directories
       find:
@@ -65,10 +62,7 @@
 
     - name: Generate HTML table from inode information using a Python script
       command: "python3 {{ files_matched.files[0].path }} -r aggrs_space_info -f {{ datafile.dest }}"
-      register: html_tables
-      loop: "{{ datafiles.results  }}"
-      loop_control:
-        loop_var: datafile
+      register: html_table
 
     #- name: debug show
     #  ansible.builtin.debug:
@@ -88,7 +82,4 @@
         subtype: html
         headers: 
         - Content-Type="text/html"
-      loop: "{{ html_tables.results }}"
-      loop_control:
-        loop_var: html_table
       when: html_table.stdout is defined
