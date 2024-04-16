@@ -84,7 +84,6 @@ def storage_inode_report_by_volume(data):
             datatable=datatable._append(add,ignore_index = True)
         datatables.append(datatable)
         report_names.append(Cluster["cluster"]["name"] + "Storage Volumes INODE Report")
-        i=i+1
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
     return report_names, custom_col_style_list
 
@@ -182,9 +181,10 @@ def storage_Big_snapshot_report_by_volume(data):
                         'Used Rate(%)': round(used_size / total_size,2),
                         'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
                     }])
-                   datatable=datatable._append(add,ignore_index = True)
-   
-            
+                    datatable = datatable._append(add,ignore_index = True)
+        datatables.append(datatable)
+    report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
+    return report_names
 
 def align_right():
     return 'text-align: right;'
