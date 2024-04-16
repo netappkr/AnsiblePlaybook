@@ -189,10 +189,11 @@ def storage_Big_snapshot_report_by_volume(data):
 def align_right():
     return 'text-align: right;'
 
-def format_html_style(datatables, report_names=[], custom_col_style_list=[]):
+def format_html_style(datatables, report_names, custom_col_style_list=[]):
     html_tables=[]
-    for datatable, report_name in datatables, report_names:
-        print(report_name)
+    for datatable in datatables:
+        for report_name in report_names:
+            report_name = report_name
         datatable = datatable.style.set_caption(report_name).set_table_attributes('class="mystyle"').hide()
     
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
