@@ -3,7 +3,7 @@ Ansible 모듈이 제공하는 기능만으로는 디테일한 설정이 불가�
 이를 보조하기위한 파이썬 스크립트를 작성하여 활용합니다.
 
 ## requirement
-이 부분은 엔서블플레이북이 스크립트 실행에 필요한 패키지를 다운로드 받도록 설정하고있습니다.</br>
+이 부분은 엔서블 플레이북이 스크립트 실행에 필요한 패키지를 다운로드 받도록 설정하고 있습니다.</br>
 하지만 repo에 접근하지못하는 환경의 경우 패키지를 수동설치해야 합니다.
 
 pip를 이용한 요구사항 설치 명령
@@ -21,7 +21,7 @@ pip install -r requirements.txt
 ### help 명령
 ```--help``` 옵션을 통해 스크립트에 필요한 인수를 확인합니다.
 ```PS
-PS C:\Users\wooyeoun\OneDrive\자료\11. Netapp\NetappKR Github\AnsiblePlaybook> python .\SKHynics\scripts\generate_table.py --help
+PS \AnsiblePlaybook> python .\SKHynics\scripts\generate_table.py --help
 usage: generate_table.py [-h] [-f FILE] [-r REQUEST]
 
 Please refenace Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts
@@ -32,16 +32,45 @@ options:
   -r REQUEST, --request REQUEST
                         request type
 ```
+### request 항목
+- clusters_inode_info: 
+  - descrption : 클러스터별 Inode 정보 출력 
+  - playbook: [GetInodebyCluster.yaml](../playbooks/GetInodebyCluster.yaml)
+  - Test data: : [clusters_inode_info.json](./testdata/clusters_inode_info.json)
+- volume_inode_info:
+  - descrption : Volume별 Inode 정보 출력 
+  - playbook: [GetInodebyVolume.yaml](../playbooks/GetInodebyVolume.yaml)
+  - Test data: : [volume_inode_info.json](./testdata/volume_inode_info.json)
+- clusters_space_info:
+  - descrption : Cluster별 공간 사용 정보 출력 
+  - playbook: [GetSpaceUsagebyCluster.yaml](../playbooks/GetSpaceUsagebyCluster.yaml)
+  - Test data: : [cluster_space_usage_info.json](./testdata/cluster_space_usage_info.json)
+- aggr_volume_space_info:
+  - descrption : aggr 및 Volume 공간 사용 정보 출력 
+  - playbook: [GetSpaceUsagebyAggr_and_Volume.yaml](../playbooks/GetSpaceUsagebyAggr_and_Volume.yaml)
+  - Test data: : [aggr_space_info.json](./testdata/aggr_space_info.json),[volume_space_info.json](./testdata/volume_space_info.json)
+- aggrs_space_info:
+  - descrption : aggr별 공간 사용 정보 출력 
+  - Test data: : [aggr_space_info.json](./testdata/aggr_space_info.json)
+- volume_space_info:
+  - descrption : Volume별 공간 사용 정보 출력 
+  - Test data: : [volume_space_info.json](./testdata/volume_space_info.json)
+- big_snapshot_info:
+
 ### 실행 예제
-1. ansible playbook ```GetInodebyVolume.yaml``` 연계
-예제파일에서 ```testinpu.json``` 에 담겨있는 Cluster 내 볼륨별 inode 정보를 Html Table 형식으로 변환하여 출력합니다, 
 ```ps
-python .\SKHynics\scripts\generate_table.py -r volume_indoe_info -f .\SKHynics\scripts\testdata\get_inode_info_by_volume.json
+python generate_table.py -r <<request type>> -f <<file>>
+```
+
+1. ansible playbook ```GetInodebyVolume.yaml``` 연계
+예제파일에서 ```testinput.json``` 에 담겨있는 Cluster 내 볼륨별 inode 정보를 Html Table 형식으로 변환하여 출력합니다, 
+```ps
+python generate_table.py -r volume_indoe_info -f .\SKHynics\scripts\testdata\get_inode_info_by_volume.json
 ```
 출력
 ```html
-    <html>
-    <head></head>
+<html>
+<head></head>
     <body>
       <table border="1" class="dataframe">
   <thead>
@@ -89,24 +118,11 @@ python .\SKHynics\scripts\generate_table.py -r volume_indoe_info -f .\SKHynics\s
 ```
 2. ansible playbook ```GetInodebyCluster.yaml``` 연계
 ```ps
-python .\SKHynics\scripts\generate_table.py -r clusters_inode_info -f ..\SKHynics\scripts\testdata\get_inode_info_by_cluster.json
+python generate_table.py -r clusters_inode_info -f ./testdata/get_inode_info_by_cluster.json
 ```
-
-출력
-```html
-    <html>
-    <head></head>
-    <body>
-      <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-    </tr>
-  </thead>
-  <tbody>
-  </tbody>
-</table>
-    </body>
-    </html>
+3. ansible playbook ```GetSpaceUsagebyAggr_and_Volume.yaml``` 연계
+```ps
+python generate_table.py -r aggr_volume_space_info -f ./testdata/aggr_space_info.json ./testdata/volume_space_info.json
 ```
 ### 스크립트 동작로그
 ```generate_table.log``` 파일에 실행로그를 남기고 있습니다. 에러 발생 시 이 로그파일을 참조합니다.
