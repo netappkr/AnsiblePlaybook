@@ -7,6 +7,8 @@ ontap에서 file_analytics 를 활성화 하면 rest api를 활용하여 데이�
 ## xcp Guide
 Xcp 설치 및 가이드는 Netapp Docs를 참조하세요.
 
+## Play book에서 활용한 XCP 명령
+ 
 ## 참조
 - [xcp-bp-file-analytics](https://docs.netapp.com/us-en/netapp-solutions/xcp/xcp-bp-file-analytics.html)
 - [data-move-or-migration](https://docs.netapp.com/us-en/netapp-solutions/xcp/xcp-bp-netapp-xcp-overview.html#data-move-or-migration)
