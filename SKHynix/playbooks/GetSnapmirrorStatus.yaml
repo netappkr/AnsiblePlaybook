@@ -1,0 +1,84 @@
+- name: Collect Storage usage from each ONTAP cluster
+  hosts: task_server_1
+  gather_facts: no
+  collections:
+    - netapp.ontap
+  tasks:
+    - name: install the package, force upgrade
+      pip:
+        name: pip
+        executable: pip3
+        state: latest
+
+    - name: Install Docker SDK for Python
+      ansible.builtin.pip:
+        name:
+        - "pip>=24.0"
+        - "pandas>2.0"
+        executable: pip3
+
+    - name: Get rest data information
+      na_ontap_rest_info:
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+        https: true
+        validate_certs: false
+        gather_subset:
+          - snapmirror_info
+        fields:
+          - '*'
+      register: ontap_snapmirror
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+  
+    # - name: debug show
+    #   ansible.builtin.debug:
+    #     msg: "{{ ontap_aggrs.results }}"
+
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/clusters_snapmirror_info.json"
+        content: "{{ ontap_snapmirror.results | to_nice_json }}"
+      register: datafiles
+
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ datafiles.results }}"
+
+    - name: Search for 'script' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "generate_table.py"
+        recurse: yes
+        file_type: file
+      register: files_matched
+
+    - name: Print the matched files
+      debug:
+        msg: "{{ files_matched.files[0].path }}"
+
+    # - name: Generate HTML table from inode information using a Python script
+    #   command: "python3 {{ files_matched.files[0].path }} -r clusters_smapmirror_info -f {{ datafiles.dest }}"
+    #   register: html_tables
+
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ html_tables.results }}"
+
+    # - name: Send storage usage report via email
+    #   mail:
+    #     host: "{{ smtp_server }}"
+    #     port: "{{ smtp_port }}"
+    #     username: "{{ smtp_username }}"
+    #     password: "{{ smtp_password }}"
+    #     to: "{{ email_to }}"
+    #     subject: "ONTAP Clusters Snapmirror status Report"
+    #     body: "{{ html_tables.stdout }}"
+    #     from: "{{ email_from }}"
+    #     secure: starttls
+    #     subtype: html
+    #     headers: 
+    #     - Content-Type="text/html"
+    #   when: html_tables.stdout is defined
