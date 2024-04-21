@@ -60,8 +60,9 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | Capacity Report by cluster Playbook  | Playbook 수정              |2024-04-08|2024-04-09| 안우영 | done | --- | --- |
 | Capacity Report by Volume Playbook | Sample Playbook 작성         |2024-03-18|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) | --- |
 | Capacity Report by Volume Playbook  | Sample python script 작성   |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
-| Capacity Report by Volume Playbook  | Playbook 적용 Test          |2024-04-03|2024-04-05| 안우영,유한민 | active | --- | --- |
-| Capacity Report by Volume Playbook  | Playbook 수정               |2024-04-08|2024-04-09| 안우영 | active | --- | --- |
+| Capacity Report by Volume Playbook  | Playbook 적용 Test          |2024-04-03|2024-04-05| 안우영,유한민 | done | --- | --- |
+| Capacity Report by Volume Playbook  | Playbook 수정               |2024-04-08|2024-04-09| 안우영 | done | --- | --- |
+| Snapmirror/vault Check status Playbook     | Playbook 수정               |2024-04-22|2024-04-27| 안우영 | active | [Snapmirror/vault Check status Playbook ](./playbooks/GetSnapmirrorStatus.yaml) | --- |
 
 
 </details>
@@ -92,8 +93,8 @@ gantt
     section Inode report by Volume Playbook
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: active, p2-3, 2024-04-08,  9d
-    Playbook 수정 : active, p2-4, 2024-04-08 , 9d
+    Playbook 적용 Test: done, p2-3, 2024-04-08,  9d
+    Playbook 수정 : done, p2-4, 2024-04-08 , 9d
 
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
@@ -104,11 +105,12 @@ gantt
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
-    Playbook 적용 Test: active, p4-3, 2024-04-08,  9d
-    Playbook 수정 : active, p4-4, 2024-04-08 , 9d
+    Playbook 적용 Test: done, p4-3, 2024-04-08,  9d
+    Playbook 수정 : done, p4-4, 2024-04-08 , 9d
 
-    section Snapmirror/vault Check Playbook
-    Sample Playbook 작성 : p6-1, after p4-4, 5d
+    section Snapmirror/vault Check status Playbook
+    Sample Playbook 작성 : active, p6-1, after p4-4, 5d
+    Sample Python Script 작성 : active, p6-2, after p6-1, 5d
     Playbook 적용 Test: p6-2, after p6-1,  5d
     Playbook 수정 : p6-3, after p6-1 , 5d
 
