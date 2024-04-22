@@ -198,6 +198,8 @@ def format_html_style(datatables, report_names, custom_col_style_list=[]):
         for col in custom_col_style_list:
             datatable = datatable.applymap(align_right, subset=[col])
         
+        # .sort_values()
+
         html_tables.append(datatable.to_html())
     return html_tables
 
@@ -205,10 +207,10 @@ def main():
     try:
         if args.request == "clusters_inode_info":
             report_names, custom_col_style_list = storage_inode_report_by_cluster(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names)
+            html_tables = format_html_style(datatables,report_names,custom_col_style_list)
         elif args.request == "volume_inode_info":
             report_names, custom_col_style_list = storage_inode_report_by_volume(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names)
+            html_tables = format_html_style(datatables,report_names,custom_col_style_list)
         elif args.request == "clusters_space_info":
             report_names=storage_space_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(datatables,report_names)
