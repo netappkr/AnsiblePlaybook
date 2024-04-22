@@ -48,6 +48,6 @@
     - name: Write results data to a JSON file
       copy:
         dest: "/tmp/volumes_space_usage_info.json"
-        content: "{{ ontap_volumes.results | to_nice_json }}"
+        content: "{{ ontap_volume.results | to_nice_json }}"
       register: datafile
 
