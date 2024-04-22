@@ -3,22 +3,6 @@
   hosts: task_server_1
   gather_facts: no
   tasks:
-    - name: Search for 'script' in all directories
-      find:
-        paths: "{{ scripts_dir }}"
-        patterns: "generate_table.py"
-        recurse: yes
-        file_type: file
-      register: files_matched
-
-    - name: Print the matched files
-      debug:
-        msg: "{{ files_matched.files[0].path }}"
-
-    - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} -r clusters_inode_info -f /tmp/clusters_inode_info.json"
-      register: html_tables
-
     - name: Send inode usage report via email
       mail:
         host: "{{ smtp_server }}"
