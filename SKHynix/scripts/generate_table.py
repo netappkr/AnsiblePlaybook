@@ -55,7 +55,7 @@ def storage_inode_report_by_cluster(data):
         }])
         datatable=datatable._append(add,ignore_index = True)
     datatables.append(datatable)
-    custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
+    custom_col_style_list=['INODE Total','INODE Used','INODE Free']
     sorted = ['INODE Used','INODE Total']
     report_names.append("CAD Storage Cluster INODE 사용량 Summary")
     return report_names, custom_col_style_list, sorted
@@ -84,7 +84,7 @@ def storage_inode_report_by_volume(data):
             datatable=datatable._append(add,ignore_index = True)
         datatables.append(datatable)
         report_names.append(Cluster["cluster"]["name"] + " Storage Volumes INODE Report")
-    custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
+    custom_col_style_list=['INODE Total','INODE Used','INODE Free']
     return report_names, custom_col_style_list
 
 def storage_space_report_by_cluster(data):
