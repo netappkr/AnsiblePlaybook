@@ -240,9 +240,7 @@ def main():
             html_tables = format_html_style(datatables,report_names)
         elif args.request == "aggr_volume_space_info":
             report_names=[]
-            # datatable은 실행순서 대로 list에 추가됨 
-            # report name을 실행 순서대로 list에 추가함 
-            # datatable도 전역 변수 쓰지말고 돌릴까 고민중 
+            # datatable은 실행순서대로 list에 추가됨 
             for report_name in storage_space_report_by_aggr(data[args.file[0]]):
                 report_names.append(report_name)
             for report_name in storage_space_report_by_volume(data[args.file[1]]):
