@@ -48,16 +48,17 @@ def storage_inode_report_by_cluster(data):
         add=pandas.DataFrame.from_records([{
             'Cluster name': cluster["cluster"]["name"],
             '업무 구분': cluster["cluster"]["description"],
-            'INODE Total': format_with_commas(inode_total),
-            'INODE Used': format_with_commas(inode_used),
-            'INODE Free': format_with_commas(inode_total - inode_used),
+            'INODE Total': inode_total,
+            'INODE Used': inode_used,
+            'INODE Free': inode_total - inode_used,
             'INODE Used Rate(%)': round(inode_used / inode_total * 100)
         }])
         datatable=datatable._append(add,ignore_index = True)
     datatables.append(datatable)
     custom_col_style_list=['Total Inodes','Used Inodes','Free Inodes']
+    sorted = ['INODE Used','INODE Total']
     report_names.append("CAD Storage Cluster INODE 사용량 Summary")
-    return report_names, custom_col_style_list
+    return report_names, custom_col_style_list, sorted
 
 def storage_inode_report_by_volume(data):
     global datatables
@@ -190,15 +191,19 @@ def storage_Big_snapshot_report_by_volume(data):
 def align_right():
     return 'text-align: right;'
 
-def format_html_style(datatables, report_names, custom_col_style_list=[]):
+def format_html_style(datatables, report_names, custom_col_style_list=[],sorted=[]):
     html_tables=[]
     for report_name, datatable in zip(report_names, datatables):
-        datatable = datatable.style.set_caption(report_name).set_table_attributes('class="mystyle"').hide()
+        datatable = datatable.style.set_caption(report_name)
+        datatable = datatable.set_table_attributes('class="mystyle"')
+        datatable = datatable.set_option('display.float_format','{:,.0f}'.format)
+        datatable = datatable.hide()
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
-        for col in custom_col_style_list:
-            datatable = datatable.applymap(align_right, subset=[col])
-        
+        if custom_col_style_list:
+            datatable = datatable.applymap(align_right, subset=custom_col_style_list)
         # .sort_values()
+        if sorted:
+            datatable = datatable.sort_values(by=sorted)
 
         html_tables.append(datatable.to_html())
     return html_tables
@@ -206,8 +211,8 @@ def format_html_style(datatables, report_names, custom_col_style_list=[]):
 def main():
     try:
         if args.request == "clusters_inode_info":
-            report_names, custom_col_style_list = storage_inode_report_by_cluster(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names,custom_col_style_list)
+            report_names, custom_col_style_list, sorted = storage_inode_report_by_cluster(data[args.file[0]])
+            html_tables = format_html_style(datatables,report_names,custom_col_style_list,sorted)
         elif args.request == "volume_inode_info":
             report_names, custom_col_style_list = storage_inode_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(datatables,report_names,custom_col_style_list)
