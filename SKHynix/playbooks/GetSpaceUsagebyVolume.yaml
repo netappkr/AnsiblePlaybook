@@ -48,7 +48,7 @@
     - name: Write results data to a JSON file
       copy:
         dest: "/tmp/volumes_space_usage_info.json"
-        content: "{{ ontap_volume.results | to_nice_json }}"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
 
     # #- name: debug show
@@ -75,19 +75,18 @@
     #  ansible.builtin.debug:
     #    msg: "{{ html_table.results }}"
 
-    - name: Send space usage report via email
+    - name: Send storage usage report via email
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Volume Space Usage Report"
-        body: "{{ html_table.stdout }}"
+        subject: "ONTAP Cluster space Usage Report"
+        body: "{{ html_tables.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
-        headers:
+        headers: 
         - Content-Type="text/html"
-      when: html_table.stdout is defined
-
+      when: html_tables.stdout is defined
