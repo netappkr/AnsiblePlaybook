@@ -41,21 +41,28 @@ def storage_inode_report_by_cluster(data):
     custom_col_style_list = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        inode_total=0
-        inode_used=0
-        for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-            inode_total= inode_total+volume["files"]["maximum"]
-            inode_used= inode_used+volume["files"]["used"]
+        try:
+            inode_total=0
+            inode_used=0
+            for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+                inode_total= inode_total+volume["files"]["maximum"]
+                inode_used= inode_used+volume["files"]["used"]
 
-        add=pandas.DataFrame.from_records([{
-            'Cluster name': cluster["cluster"]["name"],
-            '업무 구분': cluster["cluster"]["description"],
-            'INODE Total': inode_total,
-            'INODE Used': inode_used,
-            'INODE Free': inode_total - inode_used,
-            'INODE Used Rate(%)': round(inode_used / inode_total * 100)
-        }])
-        datatable=datatable._append(add,ignore_index = True)
+            add=pandas.DataFrame.from_records([{
+                'Cluster name': cluster["cluster"]["name"],
+                '업무 구분': cluster["cluster"]["description"],
+                'INODE Total': inode_total,
+                'INODE Used': inode_used,
+                'INODE Free': inode_total - inode_used,
+                'INODE Used Rate(%)': round(inode_used / inode_total * 100)
+            }])
+            datatable=datatable._append(add,ignore_index = True)
+        except KeyError as e:
+            # KeyError 발생시 처리 로직
+            logger.error(f"KeyError: {e} - {cluster["cluster"]["name"]}",traceback.format_exc())
+        except Exception as e:
+            print("Error:" ,traceback.format_exc())
+            logger.error(traceback.format_exc())
     datatables.append(datatable)
     custom_col_style_list.append(['INODE Total','INODE Used','INODE Free'])
     sorted_list.append(['None'])
@@ -70,20 +77,27 @@ def storage_inode_report_by_volume(data):
     for Cluster in data:
         datatable = pandas.DataFrame()
         for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
-            Aggr_name = Volume["aggregates"][0]['name']
-            if Volume["style"] == "flexgroup":
-                Aggr_name = "-"
-            add=pandas.DataFrame.from_records([{
-                'cluster Name': Cluster["cluster"]["name"],
-                'SVM Name': Volume["svm"]["name"],
-                'Aggregate': Aggr_name,
-                'type': Volume["style"],
-                'Volume': Volume["name"],
-                'INODE Total': Volume["files"]["maximum"],
-                'INODE Used': Volume["files"]["used"],
-                'INODE Free': Volume["files"]["maximum"] - Volume["files"]["used"],
-                'INode Used Rate(%)': round(Volume["files"]["used"] / Volume["files"]["maximum"] * 100)
-            }])
+            try: 
+                Aggr_name = Volume["aggregates"][0]['name']
+                if Volume["style"] == "flexgroup":
+                    Aggr_name = "-"
+                add=pandas.DataFrame.from_records([{
+                    'cluster Name': Cluster["cluster"]["name"],
+                    'SVM Name': Volume["svm"]["name"],
+                    'Aggregate': Aggr_name,
+                    'type': Volume["style"],
+                    'Volume': Volume["name"],
+                    'INODE Total': Volume["files"]["maximum"],
+                    'INODE Used': Volume["files"]["used"],
+                    'INODE Free': Volume["files"]["maximum"] - Volume["files"]["used"],
+                    'INode Used Rate(%)': round(Volume["files"]["used"] / Volume["files"]["maximum"] * 100)
+                }])
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"KeyError: {e} - {Cluster["cluster"]["name"]}/{Volume["name"]}",traceback.format_exc())
+            except Exception as e:
+                print("Error:" ,traceback.format_exc())
+                logger.error(traceback.format_exc())
 
             datatable=datatable._append(add,ignore_index = True)
         datatables.append(datatable)
@@ -101,19 +115,26 @@ def storage_space_report_by_cluster(data):
     for cluster in data:
         total_size=0
         used_size=0
-        for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
-            total_size= total_size+aggr["space"]["block_storage"]["size"]
-            used_size= used_size+aggr["space"]["block_storage"]["used"]
+        try: 
+            for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+                total_size= total_size+aggr["space"]["block_storage"]["size"]
+                used_size= used_size+aggr["space"]["block_storage"]["used"]
 
-        add=pandas.DataFrame.from_records([{
-            'Cluster name': cluster["cluster"]["name"],
-            '업무 구분': cluster["cluster"]["description"],
-            'Total Size(TB)': round(total_size/1024/1024/1024/1024),
-            'Used Size(TB)': round(used_size/1024/1024/1024/1024),
-            'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
-            'Used Rate(%)': round(used_size / total_size * 100)
-        }])
-        datatable=datatable._append(add,ignore_index = True)
+            add=pandas.DataFrame.from_records([{
+                'Cluster name': cluster["cluster"]["name"],
+                '업무 구분': cluster["cluster"]["description"],
+                'Total Size(TB)': round(total_size/1024/1024/1024/1024),
+                'Used Size(TB)': round(used_size/1024/1024/1024/1024),
+                'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
+                'Used Rate(%)': round(used_size / total_size * 100)
+            }])
+            datatable=datatable._append(add,ignore_index = True)
+        except KeyError as e:
+            # KeyError 발생시 처리 로직
+            logger.error(f"KeyError: {e} - {cluster["cluster"]["name"]}",traceback.format_exc())
+        except Exception as e:
+            print("Error:" ,traceback.format_exc())
+            logger.error(traceback.format_exc())
     datatables.append(datatable)
     custom_col_style_list.append(["None"])
     sorted_list.append(["None"])
@@ -128,22 +149,30 @@ def storage_space_report_by_aggr(data):
     datatable = pandas.DataFrame()
     for cluster in data:
         for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
-            total_size=aggr["space"]["block_storage"]["size"]
-            used_size=aggr["space"]["block_storage"]["used"]
-            logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
-            ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
-            add=pandas.DataFrame.from_records([{
-                'Cluster Name': cluster["cluster"]["name"],
-                'Node Name': aggr["home_node"]["name"],
-                'Aggr Name': aggr["name"],
-                'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
-                'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
-                'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
-                'Used Rate(%)': round(used_size / total_size * 100),
-                'logical_used_size(TB)': round(logical_used_size/1024/1024/1024/1024,1),
-                'Total_Logical_size(TB)': round((logical_used_size*ratio)/1024/1024/1024/1024,1)
-            }])
-            datatable=datatable._append(add,ignore_index = True)
+            try:
+                total_size=aggr["space"]["block_storage"]["size"]
+                used_size=aggr["space"]["block_storage"]["used"]
+                logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
+                ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
+                add=pandas.DataFrame.from_records([{
+                    'Cluster Name': cluster["cluster"]["name"],
+                    'Node Name': aggr["home_node"]["name"],
+                    'Aggr Name': aggr["name"],
+                    'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
+                    'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
+                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
+                    'Used Rate(%)': round(used_size / total_size * 100),
+                    'logical_used_size(TB)': round(logical_used_size/1024/1024/1024/1024,1),
+                    'Total_Logical_size(TB)': round((logical_used_size*ratio)/1024/1024/1024/1024,1)
+                }])
+                datatable=datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"KeyError: {e} - {cluster["cluster"]["name"]}/{aggr["name"]}",traceback.format_exc())
+            except Exception as e:
+                print("Error:" ,traceback.format_exc())
+                logger.error(traceback.format_exc())
+
     datatables.append(datatable)
     custom_col_style_list.append(["None"])
     sorted_list.append(['Cluster Name','Node Name'])
@@ -158,23 +187,31 @@ def storage_space_report_by_volume(data):
     for cluster in data:
         datatable = pandas.DataFrame()
         for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-            total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
-            used_size=Volume["space"]["used"]
-            volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
-            Aggr_name = Volume["aggregates"][0]['name']
-            if Volume["style"] == "flexgroup":
-                Aggr_name = "-"
-            add=pandas.DataFrame.from_records([{
-                'SVM Name': Volume["svm"]["name"],
-                'Aggregate': Aggr_name,
-                'Volume': Volume['name'],
-                'Total Size(TB)': round(total_size/1024/1024/1024),
-                'Used Size(TB)': round(used_size/1024/1024/1024),
-                'Free Size(TB)': round((total_size - used_size)/1024/1024/1024),
-                'Used Rate(%)': round(used_size / total_size * 100),
-                'Logical Used Size(TB)': round(volume_logical_used/1024/1024/1024)
-            }])
-            datatable=datatable._append(add,ignore_index = True)
+            try:
+                total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
+                used_size=Volume["space"]["used"]
+                volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
+                Aggr_name = Volume["aggregates"][0]['name']
+                if Volume["style"] == "flexgroup":
+                    Aggr_name = "-"
+                add=pandas.DataFrame.from_records([{
+                    'SVM Name': Volume["svm"]["name"],
+                    'Aggregate': Aggr_name,
+                    'Volume': Volume['name'],
+                    'Total Size(TB)': round(total_size/1024/1024/1024),
+                    'Used Size(TB)': round(used_size/1024/1024/1024),
+                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024),
+                    'Used Rate(%)': round(used_size / total_size * 100),
+                    'Logical Used Size(TB)': round(volume_logical_used/1024/1024/1024)
+                }])
+                datatable=datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"KeyError: {e} - {Volume["svm"]["name"]}/{Volume['name']}",traceback.format_exc())
+            except Exception as e:
+                print("Error:" ,traceback.format_exc())
+                logger.error(traceback.format_exc())
+
         datatables.append(datatable)
         custom_col_style_list.append(["None"])
         sorted_list.append(['Used Size(TB)','Total Size(TB)'])
