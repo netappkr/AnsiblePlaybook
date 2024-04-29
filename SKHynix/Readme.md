@@ -12,16 +12,22 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
     4. Capacity Report: 전체 Volume 별 용량 사용 현황을 매일 메일로 담당자에게 전송
         1. 추가 항목 : snapshot reserve 공간 표시
         2. aggr 용량 정보와 volume 용량정보을 한 메일에 출력
-    5. Capacity Report 전체 Cluster/Node 지정하여 용량 사용 현황을 매일 메일로 담당자에게 전송
+    5. Capacity Report: 전체 aggr 별 용량 사용 현황을 매일 메일로 담당자에게 전송
         1. 추가 항목 : snapshot reserve 공간 표시
-    6. ~~Big snapshot Alert: Volume 사용량이 50% 이상,Snapshot size가 1TB 이상~~
-    7. Snapmirror/vault check: 정상 여부 확인
-    8. 사용량 DU 메일링: 사용량이 많은 프로젝트 Volume에 대하여 주요 Directory 사용량을 확인하여 프로젝트 인원에게 메일 발송
-    9. 특정 확장자, Size File 메일링: XCP 를 활용하여 특정 확장자 or 특정 Size 의 File 을 찾아 소유자에게 메일링, 
-    10. 완료 snapshot 삭제: Update 가 완료 된 Source 측 snapshot을 확인 후 삭제
-    11. ~~Inode Increase: Inode 사용률 75% 이상 인 Volume 에 대하여 Inode 증설~~</br> 
+        2. aggr 용량 정보와 volume 용량정보을 한 메일에 출력
+    6. Capacity Report: 전체 aggr & volume 별 용량 사용 현황을 매일 메일로 담당자에게 전송
+        1. 추가 항목 : snapshot reserve 공간 표시
+        2. aggr 용량 정보와 volume 용량정보을 한 메일에 출력
+    7. Capacity Report 전체 Cluster/Node 지정하여 용량 사용 현황을 매일 메일로 담당자에게 전송
+        1. 추가 항목 : snapshot reserve 공간 표시
+    8. ~~Big snapshot Alert: Volume 사용량이 50% 이상,Snapshot size가 1TB 이상~~
+    9. Snapmirror/vault check: 정상 여부 확인
+    10. 사용량 DU 메일링: 사용량이 많은 프로젝트 Volume에 대하여 주요 Directory 사용량을 확인하여 프로젝트 인원에게 메일 발송
+    11. 특정 확장자, Size File 메일링: XCP 를 활용하여 특정 확장자 or 특정 Size 의 File 을 찾아 소유자에게 메일링, 
+    12. 완료 snapshot 삭제: Update 가 완료 된 Source 측 snapshot을 확인 후 삭제
+    13. ~~Inode Increase: Inode 사용률 75% 이상 인 Volume 에 대하여 Inode 증설~~</br> 
     [UM으로 대체하기로 결정](https://github.com/netappkr/NetAppCloudSolutionCenter/tree/master/py-RestAPI/Ontap/AIQUM%20Script)
-    12. DLC (Data Life Cycle) : Storage 에서 특정 확장자 별로 Listup 하여 Report, 특정 기간이 지난 확장자에 대하여 식별 진행, 위의 내용이 History 관리가 가능해야 함
+    14. DLC (Data Life Cycle) : Storage 에서 특정 확장자 별로 Listup 하여 Report, 특정 기간이 지난 확장자에 대하여 식별 진행, 위의 내용이 History 관리가 가능해야 함
 
 ## 진행맴버
 - 안우영( wooyoung.ahn@netapp.com )
@@ -87,8 +93,8 @@ gantt
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : done, p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
-    Playbook 적용 Test: done, p1-3, 2024-04-03,  3d
-    Script 메일 css 추가 수정 : done, p1-4, 2024-04-03 , 3d
+    Playbook 적용 Test: done, p1-3, 2024-04-03,  1d
+    Script 메일 css 추가 수정 : done, p1-4, after p1-3 , 3d
     Playbook 적용 Test: done, p1-5, after p1-4,  1d
     Script 정렬 값 수정 : done, p1-6, after p1-5 , 3d
     Playbook 적용 Test: done, p1-7, after p1-6,  1d
