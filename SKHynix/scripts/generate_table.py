@@ -59,7 +59,7 @@ def storage_inode_report_by_cluster(data):
             datatable=datatable._append(add,ignore_index = True)
         except KeyError as e:
             # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {cluster["cluster"]["name"]}",traceback.format_exc())
+            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
         except Exception as e:
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
@@ -94,7 +94,7 @@ def storage_inode_report_by_volume(data):
                 }])
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {Cluster["cluster"]["name"]}/{Volume["name"]}",traceback.format_exc())
+                logger.error(f"KeyError: {e} - {Cluster['cluster']['name']}/{Volume['name']}",traceback.format_exc())
             except Exception as e:
                 print("Error:" ,traceback.format_exc())
                 logger.error(traceback.format_exc())
@@ -131,7 +131,7 @@ def storage_space_report_by_cluster(data):
             datatable=datatable._append(add,ignore_index = True)
         except KeyError as e:
             # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {cluster["cluster"]["name"]}",traceback.format_exc())
+            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
         except Exception as e:
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
@@ -168,7 +168,7 @@ def storage_space_report_by_aggr(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {cluster["cluster"]["name"]}/{aggr["name"]}",traceback.format_exc())
+                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
             except Exception as e:
                 print("Error:" ,traceback.format_exc())
                 logger.error(traceback.format_exc())
@@ -207,7 +207,7 @@ def storage_space_report_by_volume(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {Volume["svm"]["name"]}/{Volume['name']}",traceback.format_exc())
+                logger.error(f"KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
             except Exception as e:
                 print("Error:" ,traceback.format_exc())
                 logger.error(traceback.format_exc())
@@ -225,30 +225,37 @@ def storage_Big_snapshot_report_by_volume(data):
     custom_col_style_list = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        total_size=0
-        used_size=0
-        snapshot_used=0
-        for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-            total_size= volume["space"]["size"]
-            used_size= volume["space"]["used"]
-            snapshot_used=volume["space"]["snapshot"]["used"]
-            if round(used_size / total_size * 100,2) > 50:
-                if snapshot_used > 1099511627776:
-                    add=pandas.DataFrame.from_records([{
-                        'cluster name': cluster["cluster"]["name"],
-                        'volume name' : volume["name"],
-                        'volume path' : volume["nas"]["path"],
-                        'Total Size(GiB)': round(total_size/1024/1024/1024,2),
-                        'Used Size(GiB)': round(used_size/1024/1024/1024,2),
-                        'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
-                        'Used Rate(%)': round(used_size / total_size,2),
-                        'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
-                    }])
-                    datatable = datatable._append(add,ignore_index = True)
-        datatables.append(datatable)
-        custom_col_style_list.append(["None"])
-        sorted_list.append(["None"])
-        report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
+        try:
+            total_size=0
+            used_size=0
+            snapshot_used=0
+            for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+                total_size= volume["space"]["size"]
+                used_size= volume["space"]["used"]
+                snapshot_used=volume["space"]["snapshot"]["used"]
+                if round(used_size / total_size * 100,2) > 50:
+                    if snapshot_used > 1099511627776:
+                        add=pandas.DataFrame.from_records([{
+                            'cluster name': cluster["cluster"]["name"],
+                            'volume name' : volume["name"],
+                            'volume path' : volume["nas"]["path"],
+                            'Total Size(GiB)': round(total_size/1024/1024/1024,2),
+                            'Used Size(GiB)': round(used_size/1024/1024/1024,2),
+                            'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
+                            'Used Rate(%)': round(used_size / total_size,2),
+                            'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
+                        }])
+                        datatable = datatable._append(add,ignore_index = True)
+            datatables.append(datatable)
+            custom_col_style_list.append(["None"])
+            sorted_list.append(["None"])
+            report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
+        except KeyError as e:
+            # KeyError 발생시 처리 로직
+            logger.error(f"KeyError: {e} - {cluster['svm']['name']}/{volume['name']}",traceback.format_exc())
+        except Exception as e:
+            print("Error:" ,traceback.format_exc())
+            logger.error(traceback.format_exc())
     return report_names, custom_col_style_list, sorted_list
 
 def align_right():
