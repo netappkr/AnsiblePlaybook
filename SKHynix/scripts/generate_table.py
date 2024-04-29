@@ -430,6 +430,7 @@ def main():
 
         # 표준 출력으로 HTML 테이블을 출력합니다.
         print(html)
+        logger.info("print success the HTML")
     except Exception as e:
         print("Error:" ,traceback.format_exc())
         logger.error(traceback.format_exc())
