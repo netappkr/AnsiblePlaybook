@@ -148,14 +148,14 @@ gantt
     Sample Playbook 작성 : done, p6-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p6-2, 2024-03-18, 5d
     Playbook 적용 Test: done, p6-3, 2024-04-08,  1d
-    Script 메일 css 추가 수정 : done, p6-4, after p6-3 , 9d
-    Playbook 적용 Test: done, p6-5, after p6-4,  9d
-    Script 정렬 값 수정 : done, p6-6, after p6-5 , 9d
-    Playbook logical 항목 추가 수정: done, p6-7, after p6-6,  9d
-    Playbook 적용 Test: done, p6-8, after p6-7,  9d
-    Script 메일 포맷 수정 : done, p6-9, after p6-8 , 9d
-    Playbook 적용 Test: done, p6-10, after p6-9,  9d
-    Script 자산 tier 추가 수정 : done, p6-11, after p6-10 , 9d
+    Script 메일 css 추가 수정 : done, p6-4, after p6-3 , 3d
+    Playbook 적용 Test: done, p6-5, after p6-4,  1d
+    Script 정렬 값 수정 : done, p6-6, after p6-5 , 3d
+    Playbook logical 항목 추가 수정: done, p6-7, after p6-6, 1d
+    Playbook 적용 Test: done, p6-8, after p6-7,  3d
+    Script 메일 포맷 수정 : done, p6-9, after p6-8 , 3d
+    Playbook 적용 Test: done, p6-10, after p6-9,  1d
+    Script 자산 tier 추가 수정 : done, p6-11, after p6-10 , 3d
 
     section Snapmirror/vault Check status Playbook
     Sample Playbook 작성 : active, p6-1, after p4-4, 5d
