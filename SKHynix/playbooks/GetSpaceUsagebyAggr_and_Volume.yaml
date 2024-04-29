@@ -128,7 +128,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Cluster space Usage Report"
+        subject: "ONTAP Aggr and Volume space Usage Report"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
