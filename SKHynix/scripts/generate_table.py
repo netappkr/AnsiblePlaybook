@@ -167,8 +167,8 @@ def storage_space_report_by_aggr(data):
                 logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
                 ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
                 add=pandas.DataFrame.from_records([{
-                    'tier': cluster["cluster"]["tier"],
                     'Cluster Name': cluster["cluster"]["name"],
+                    'tier': cluster["cluster"]["tier"],
                     'Node Name': aggr["home_node"]["name"],
                     'Aggr Name': aggr["name"],
                     'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
@@ -200,6 +200,96 @@ def storage_space_report_by_aggr(data):
     return tables
 
 def storage_space_report_by_volume(data):
+    tables = []
+    for cluster in data:
+        datatable = pandas.DataFrame()
+        for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+            try:
+                total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
+                used_size=Volume["space"]["used"]
+                volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
+                Aggr_name = Volume["aggregates"][0]['name']
+                if Volume["style"] == "flexgroup":
+                    Aggr_name = "-"
+                add=pandas.DataFrame.from_records([{
+                    'SVM Name': Volume["svm"]["name"],
+                    'Aggregate': Aggr_name,
+                    'Volume': Volume['name'],
+                    'Total Size(TB)': round(total_size/1024/1024/1024),
+                    'Used Size(TB)': round(used_size/1024/1024/1024),
+                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024),
+                    'Used Rate(%)': round(used_size / total_size * 100),
+                    'Logical Used Size(TB)': round(volume_logical_used/1024/1024/1024)
+                }])
+                datatable=datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                print("Error:" ,traceback.format_exc())
+                
+
+        tables.append({
+            'datatable': datatable,
+            'report_config': {
+                'report_name': cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
+                'custom_col_styles': [
+                    'INODE Total', 
+                    'INODE Used', 
+                    'INODE Free'
+                ],
+                'sorting_rules': [
+                    {'column': 'Used Size(TB)', 'order': 'desc'}, 
+                    {'column': 'Total Size(TB)', 'order': 'desc'}
+                ]
+            }
+        })
+    return tables
+def storage_space_report_by_aggr_in_SoC(data):
+    tables = []
+    datatable = pandas.DataFrame()
+    for cluster in data:
+        for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+            try:
+                total_size=aggr["space"]["block_storage"]["size"]
+                used_size=aggr["space"]["block_storage"]["used"]
+                logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
+                ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
+                add=pandas.DataFrame.from_records([{
+                    'Cluster Name': cluster["cluster"]["name"],
+                    'Node Name': aggr["home_node"]["name"],
+                    'Aggr Name': aggr["name"],
+                    'tier': cluster["cluster"]["tier"],
+                    'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
+                    'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
+                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
+                    'Used Rate(%)': round(used_size / total_size * 100),
+                    'logical_used_size(TB)': round(logical_used_size/1024/1024/1024/1024,1),
+                    'Total_Logical_size(TB)': round((logical_used_size*ratio)/1024/1024/1024/1024,1)
+                }])
+                datatable=datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                print("Error:" ,traceback.format_exc())
+
+    tables.append({
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "------ Aggregates Capacity Report ------",
+            'sorting_rules': [
+                {'column': 'tier', 'order': 'asc'},
+                {'column': 'Total Size(TB)', 'order': 'asc'}, 
+                {'column': 'Node Name', 'order': 'desc'}
+            ]
+        }
+    })
+    return tables
+
+def storage_space_report_by_volume_in_SoC(data):
     tables = []
     for cluster in data:
         datatable = pandas.DataFrame()
@@ -347,7 +437,7 @@ def format_html_style(tables=[]):
         datatable = datatable.format(precision=0, thousands=",")
 
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
-        if "custom_col_style_list" in table["report_config"]:
+        if "custom_col_styles" in table["report_config"]:
             datatable = datatable.set_properties(subset=table["report_config"]["custom_col_style_list"], **{'text-align': 'right'})
 
         html_tables.append(datatable.to_html())
@@ -383,6 +473,15 @@ def main():
         elif args.request == "big_snapshot_info":
             tables = storage_Big_snapshot_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(tables)
+        elif args.request == "aggr_volume_space_info_in_soc":
+            tables = []
+            aggr_tables = storage_space_report_by_aggr(data[args.file[0]]) 
+            for table in aggr_tables:
+                tables.append(table)
+            volume_tables = storage_space_report_by_volume(data[args.file[1]])
+            for table in volume_tables:
+                tables.append(table)
+        
         else:
             logger.error(args.request+" request is not matched")
             html_tables = [args.request+" request is not matched"]
