@@ -62,11 +62,11 @@
 
     - name: Generate HTML table from inode information using a Python script
       command: "python3 {{ files_matched.files[0].path }} -r clusters_space_info -f {{ datafiles.dest }}"
-      register: html_tables
+      register: html_table
 
     #- name: debug show
     #  ansible.builtin.debug:
-    #    msg: "{{ html_tables.results }}"
+    #    msg: "{{ html_table.results }}"
 
     - name: Send storage usage report via email
       mail:
@@ -76,10 +76,10 @@
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "ONTAP Cluster space Usage Report"
-        body: "{{ html_tables.stdout }}"
+        body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
-      when: html_tables.stdout is defined
+      when: html_table.stdout is defined

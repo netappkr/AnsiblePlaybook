@@ -11,10 +11,10 @@
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "ONTAP Cluster Inode Usage Report"
-        body: "{{ html_tables.stdout }}"
+        body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: naver
         subtype: html
         headers: 
         - Content-Type="text/html"
-      when: html_tables.stdout is defined
+      when: html_table.stdout is defined
