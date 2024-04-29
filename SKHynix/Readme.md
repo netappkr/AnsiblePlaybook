@@ -94,7 +94,7 @@ gantt
     Sample Playbook 작성 : done, p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
     Playbook 적용 Test: done, p1-3, 2024-04-03,  1d
-    Script 메일 css 추가 수정 : done, p1-4, after p1-3 , 2d
+    Script 메일 css 추가 수정 : done, p1-4, 2024-04-15 , 1d
     Playbook 적용 Test: done, p1-5, after p1-4,  1d
     Script 정렬 값 수정 : done, p1-6, after p1-5 , 2d
     Playbook 적용 Test: done, p1-7, after p1-6,  1d
@@ -104,7 +104,7 @@ gantt
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
     Playbook 적용 Test: done, p2-3, 2024-04-03,  1d
-    Script 메일 css 추가 수정 : done, p2-4, after p2-3 , 2d
+    Script 메일 css 추가 수정 : done, p2-4, 2024-04-15 , 1d
     Playbook 적용 Test: done, p2-5, after p2-4,  1d
     Script 정렬 값 수정 : done, p2-6, after p2-5 , 2d
     Playbook 적용 Test: done, p2-7, after p2-6,  1d
@@ -127,7 +127,7 @@ gantt
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
     Playbook 적용 Test: done, p4-3, 2024-04-11,  1d
-    Script 메일 css 추가 수정 : done, p4-4, after p4-3 , 2d
+    Script 메일 css 추가 수정 : done, p4-4, 2024-04-15 , 1d
     Playbook 적용 Test: done, p4-5, after p4-4,  1d
     Script 정렬 값 수정 : done, p4-6, after p4-5 , 2d
     Playbook logical 항목 추가 수정: done, p4-7, 2024-04-24,  1d
@@ -140,7 +140,7 @@ gantt
     Sample Playbook 작성 : done, p5-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p5-2, 2024-03-18, 5d
     Playbook 적용 Test: done, p5-3, 2024-04-11,  1d
-    Script 메일 css 추가 수정 : done, p5-4, after p5-3 , 2d
+    Script 메일 css 추가 수정 : done, p5-4, 2024-04-15 , 1d
     Playbook 적용 Test: done, p5-5, after p5-4,  1d
     Script 정렬 값 수정 : done, p5-6, after p5-5 , 2d
     Playbook logical 항목 추가 수정: done, p5-7, 2024-04-24,  1d
@@ -153,7 +153,7 @@ gantt
     Sample Playbook 작성 : done, p6-1, 2024-04-08, 5d
     Sample Python Script 작성 : done, p6-2, 2024-04-08, 5d
     Playbook 적용 Test: done, p6-3, 2024-04-24,  1d
-    Script 메일 css 추가 수정 : done, p6-4, after p6-3 , 2d
+    Script 메일 css 추가 수정 : done, p6-4, 2024-04-15 , 1d
     Playbook 적용 Test: done, p6-5, after p6-4,  1d
     Script 정렬 값 수정 : done, p6-6, after p6-5 , 2d
     Playbook logical 항목 추가 수정: done, p6-7, 2024-04-24,  1d
