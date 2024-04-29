@@ -318,8 +318,6 @@ def format_html_style(tables=[]):
         if "sorting_rules" in table["report_config"]:
             sort_columns = [rule['column'] for rule in table["report_config"]["sorting_rules"]]
             ascending_list = [rule['order'] == 'asc' for rule in table["report_config"]["sorting_rules"]]
-            print("sort_columns: ",sort_columns)
-            print("ascending_list: ",ascending_list)
             datatable = datatable.sort_values(by=sort_columns,ascending=ascending_list)
             # 정렬용 컬럼 'Sort_Age' 제거
             # datatable = datatable.drop('tier', axis=1)
