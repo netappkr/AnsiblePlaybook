@@ -13,10 +13,12 @@ all:
             ip: <<cluster_ip>>
             ID: fsxadmin
             PW: <<password>>
+            tier: 1
           - name: FAS8040
             ip: <<cluster_ip>>
             ID: admin
             PW: <<password>>
+            tier: 2
         scripts_dir: '/opt/awx/projects'
         email_to: <<email>>
         email_from: <<email>>

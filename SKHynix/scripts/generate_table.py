@@ -49,6 +49,7 @@ def storage_inode_report_by_cluster(data):
                 inode_used= inode_used+volume["files"]["used"]
 
             add=pandas.DataFrame.from_records([{
+                'tier': cluster["cluster"]["tier"],
                 'Cluster name': cluster["cluster"]["name"],
                 '업무 구분': cluster["cluster"]["description"],
                 'INODE Total': inode_total,
@@ -82,6 +83,7 @@ def storage_inode_report_by_volume(data):
                 if Volume["style"] == "flexgroup":
                     Aggr_name = "-"
                 add=pandas.DataFrame.from_records([{
+                    'tier': Cluster["cluster"]["tier"],
                     'cluster Name': Cluster["cluster"]["name"],
                     'SVM Name': Volume["svm"]["name"],
                     'Aggregate': Aggr_name,
@@ -121,6 +123,7 @@ def storage_space_report_by_cluster(data):
                 used_size= used_size+aggr["space"]["block_storage"]["used"]
 
             add=pandas.DataFrame.from_records([{
+                'tier': cluster["cluster"]["tier"],
                 'Cluster name': cluster["cluster"]["name"],
                 '업무 구분': cluster["cluster"]["description"],
                 'Total Size(TB)': round(total_size/1024/1024/1024/1024),
@@ -137,7 +140,7 @@ def storage_space_report_by_cluster(data):
             logger.error(traceback.format_exc())
     datatables.append(datatable)
     custom_col_style_list.append(["None"])
-    sorted_list.append(["None"])
+    sorted_list.append(['tier'])
     report_names.append("CAD Storage Cluster 사용량 Summary")
     return report_names, custom_col_style_list, sorted_list
 
@@ -155,6 +158,7 @@ def storage_space_report_by_aggr(data):
                 logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
                 ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
                 add=pandas.DataFrame.from_records([{
+                    'tier': cluster["cluster"]["tier"],
                     'Cluster Name': cluster["cluster"]["name"],
                     'Node Name': aggr["home_node"]["name"],
                     'Aggr Name': aggr["name"],
@@ -175,7 +179,7 @@ def storage_space_report_by_aggr(data):
 
     datatables.append(datatable)
     custom_col_style_list.append(["None"])
-    sorted_list.append(['Cluster Name','Node Name'])
+    sorted_list.append(['tier','Node Name'])
     report_names.append("------ Aggregates Capacity Report ------")
     return report_names, custom_col_style_list, sorted_list
 
@@ -195,6 +199,7 @@ def storage_space_report_by_volume(data):
                 if Volume["style"] == "flexgroup":
                     Aggr_name = "-"
                 add=pandas.DataFrame.from_records([{
+                    'tier': cluster["cluster"]["tier"],
                     'SVM Name': Volume["svm"]["name"],
                     'Aggregate': Aggr_name,
                     'Volume': Volume['name'],
@@ -236,6 +241,7 @@ def storage_Big_snapshot_report_by_volume(data):
                 if round(used_size / total_size * 100,2) > 50:
                     if snapshot_used > 1099511627776:
                         add=pandas.DataFrame.from_records([{
+                            'tier': cluster["cluster"]["tier"],
                             'cluster name': cluster["cluster"]["name"],
                             'volume name' : volume["name"],
                             'volume path' : volume["nas"]["path"],
