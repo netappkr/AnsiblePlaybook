@@ -12,7 +12,7 @@ parser.add_argument("-r", "--request", type=str, help="request type",required=Fa
 args= parser.parse_args()
 # logger
 logger = logging.getLogger(name='generate_table_log')
-logger.setLevel(logging.INFO) ## 경고 수준 설정
+logger.setLevel(logging.DEBUG) ## 경고 수준 설정
 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 ## 스트림헨들러로 콘솔에 출력
 # stream_handler = logging.StreamHandler() ## 스트림 핸들러 생성
