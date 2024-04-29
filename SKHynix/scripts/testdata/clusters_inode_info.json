@@ -7,7 +7,8 @@
             "PW": "<<your password>>",
             "description": "Netapp APAC AWS account",
             "ip": "<<your ip>>",
-            "name": "fsxn"
+            "name": "fsxn",
+            "tier": 1
         },
         "failed": false,
         "invocation": {
@@ -272,7 +273,8 @@
             "PW": "<<your password>>",
             "description": "NetappKR local",
             "ip": "<<your ip>>",
-            "name": "FAS8040"
+            "name": "FAS8040",
+            "tier": 2
         },
         "failed": false,
         "invocation": {

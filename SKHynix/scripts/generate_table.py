@@ -28,17 +28,9 @@ data={}
 for json_file in args.file:
     with open(json_file, 'r') as file:
         data[json_file] = json.load(file)
-# Pandas DataFrame을 생성합니다.
-datatables = []
-
-# def format_with_commas(num):
-#     return '{0:,}'.format(num)
 
 def storage_inode_report_by_cluster(data):
-    global datatables
-    report_names = []
-    sorted_dict = {}
-    custom_col_style_list = []
+    tables=[]
     datatable = pandas.DataFrame()
     for cluster in data:
         try:
@@ -64,22 +56,24 @@ def storage_inode_report_by_cluster(data):
         except Exception as e:
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
-    datatables.append(datatable)
-    custom_col_style_list.append(['INODE Total','INODE Used','INODE Free'])
-    sorted_dict.update([
-        {
-            'column': 'tier', 
-            'order': 'asc'
+    tables.append(table = {
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "CAD Storage Cluster INODE 사용량 Summary",
+            'custom_col_styles': [
+                'INODE Total', 
+                'INODE Used', 
+                'INODE Free'
+            ],
+            'sorting_rules': [
+                {'column': 'tier', 'order': 'asc'}
+            ]
         }
-    ])
-    report_names.append("CAD Storage Cluster INODE 사용량 Summary")
-    return report_names, custom_col_style_list, sorted_dict
+    })
+    return tables
 
 def storage_inode_report_by_volume(data):
-    global datatables
-    report_names = []
-    sorted_dict = {}
-    custom_col_style_list = []
+    tables=[]
     for Cluster in data:
         datatable = pandas.DataFrame()
         for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
@@ -106,26 +100,25 @@ def storage_inode_report_by_volume(data):
                 logger.error(traceback.format_exc())
 
             datatable=datatable._append(add,ignore_index = True)
-        datatables.append(datatable)
-        report_names.append(Cluster["cluster"]["name"] + " Storage Volumes INODE Report")
-        custom_col_style_list.append(['INODE Total','INODE Used','INODE Free'])
-        sorted_dict.update([
-            {
-                'column': 'INODE Used', 
-                'order': 'desc'
-            }, 
-            {
-                'column': 'INODE Total', 
-                'order': 'desc'
+        tables.append(table = {
+            'datatable': datatable,
+            'report_config': {
+                'report_name': Cluster["cluster"]["name"] + " Storage Volumes INODE Report",
+                'custom_col_styles': [
+                    'INODE Total', 
+                    'INODE Used', 
+                    'INODE Free'
+                ],
+                'sorting_rules': [
+                    {'column': 'INODE Used', 'order': 'desc'},
+                    {'column': 'INODE Total', 'order': 'desc'}
+                ]
             }
-        ])
-    return report_names, custom_col_style_list, sorted_dict
+        })
+    return tables
 
 def storage_space_report_by_cluster(data):
-    global datatables
-    report_names = []
-    sorted_dict = {}
-    custom_col_style_list = []
+    tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
         total_size=0
@@ -151,30 +144,19 @@ def storage_space_report_by_cluster(data):
         except Exception as e:
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
-    datatables.append(datatable)
-    custom_col_style_list.append(["None"])
-    sorted_dict.update([
-        {
-            'column': 'tier', 
-            'order': 'asc'
-        },
-        {
-            'column': 'Used Size(TB)', 
-            'order': 'desc'
-        }, 
-        {
-            'column': 'Total Size(TB)', 
-            'order': 'desc'
+    tables.append(table = {
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "CAD Storage Cluster INODE 사용량 Summary",
+            'sorting_rules': [
+                {'column': 'tier', 'order': 'asc'}
+            ]
         }
-    ])
-    report_names.append("CAD Storage Cluster 사용량 Summary")
-    return report_names, custom_col_style_list, sorted_dict
+    })
+    return tables
 
 def storage_space_report_by_aggr(data):
-    global datatables
-    report_names = []
-    sorted_dict = {}
-    custom_col_style_list = []
+    tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
         for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
@@ -203,30 +185,21 @@ def storage_space_report_by_aggr(data):
                 print("Error:" ,traceback.format_exc())
                 logger.error(traceback.format_exc())
 
-    datatables.append(datatable)
-    custom_col_style_list.append(["None"])
-    sorted_dict.update([
-        {
-            'column': 'tier', 
-            'order': 'asc'
-        },
-        {
-            'column': 'Total Size(TB)', 
-            'order': 'asc'
-        }, 
-        {
-            'column': 'Node Name', 
-            'order': 'desc'
+    tables.append(table = {
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "------ Aggregates Capacity Report ------",
+            'sorting_rules': [
+                {'column': 'tier', 'order': 'asc'},
+                {'column': 'Total Size(TB)', 'order': 'asc'}, 
+                {'column': 'Node Name', 'order': 'desc'}
+            ]
         }
-    ])
-    report_names.append("------ Aggregates Capacity Report ------")
-    return report_names, custom_col_style_list, sorted_dict
+    })
+    return tables
 
 def storage_space_report_by_volume(data):
-    global datatables
-    report_names = []
-    sorted_dict = {}
-    custom_col_style_list = []
+    tables = []
     for cluster in data:
         datatable = pandas.DataFrame()
         for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
@@ -255,26 +228,25 @@ def storage_space_report_by_volume(data):
                 print("Error:" ,traceback.format_exc())
                 logger.error(traceback.format_exc())
 
-        datatables.append(datatable)
-        custom_col_style_list.append(["None"])
-        sorted_dict.update([
-            {
-                'column': 'Used Size(TB)', 
-                'order': 'desc'
-            }, 
-            {
-                'column': 'Total Size(TB)', 
-                'order': 'desc'
+        tables.append(table = {
+            'datatable': datatable,
+            'report_config': {
+                'report_name': cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
+                'custom_col_styles': [
+                    'INODE Total', 
+                    'INODE Used', 
+                    'INODE Free'
+                ],
+                'sorting_rules': [
+                    {'column': 'Used Size(TB)', 'order': 'desc'}, 
+                    {'column': 'Total Size(TB)', 'order': 'desc'}
+                ]
             }
-        ])
-        report_names.append(cluster["cluster"]["name"] + " Storage Volumes Capacity Report")
-    return report_names, custom_col_style_list, sorted_dict
+        })
+    return tables
 
 def storage_Big_snapshot_report_by_volume(data):
-    global datatables
-    report_names = []
-    sorted_dict = {}
-    custom_col_style_list = []
+    tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
         try:
@@ -298,43 +270,62 @@ def storage_Big_snapshot_report_by_volume(data):
                             'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
                         }])
                         datatable = datatable._append(add,ignore_index = True)
-            datatables.append(datatable)
-            custom_col_style_list.append(["None"])
-            sorted_dict.update([
-                {
-                    'column': 'Used Size(TB)', 
-                    'order': 'desc'
-                }, 
-                {
-                    'column': 'Total Size(TB)', 
-                    'order': 'desc'
-                }
-            ])
-            report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
         except KeyError as e:
             # KeyError 발생시 처리 로직
             logger.error(f"KeyError: {e} - {cluster['svm']['name']}/{volume['name']}",traceback.format_exc())
         except Exception as e:
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
-    return report_names, custom_col_style_list, sorted_dict
+
+    tables.append(table = {
+        'datatable': datatable,
+        'report_config': {
+            'report_name': data["cluster"]["name"] + " Storage Volumes Capacity Report-",
+            'custom_col_styles': [
+                'INODE Total', 
+                'INODE Used', 
+                'INODE Free'
+            ],
+            'sorting_rules': [
+                {'column': 'Used Size(TB)', 'order': 'desc'}, 
+                {'column': 'Total Size(TB)', 'order': 'desc'}
+            ]
+        }
+    })
+    return tables
 
 def align_right():
     return 'text-align: right;'
 
-def format_html_style(datatables, report_names, custom_col_style_lists=[],sorted_dicts=[]):
+def format_html_style(tables=[]):
     html_tables=[]
-    for report_name, datatable, custom_col_style_list, sorted_dict in zip(report_names, datatables, custom_col_style_lists, sorted_dicts):
-        # .sort_values()
-        if sorted_dict != {}:
-            sort_columns = [rule['column'] for rule in sorted_dict]
-            ascending_list = [rule['order'] == 'asc' for rule in sorted_dict]
+    for table in tables:
+        # table = {
+        #     'datatable': datatable,
+        #     'report_config': {
+        #         'report_name': "CAD Storage Cluster INODE 사용량 Summary",
+        #         'custom_col_styles': [
+        #             'INODE Total', 
+        #             'INODE Used', 
+        #             'INODE Free'
+        #         ],
+        #         'sorting_rules': [
+        #             {'column': 'tier', 'order': 'asc'}
+        #         ]
+        #     }
+        # }
+        datatable = table["datatable"]
+        if "sorting_rules" in table["report_config"]:
+            sort_columns = [rule['column'] for rule in table["report_config"]["sorting_rules"]]
+            ascending_list = [rule['order'] == 'asc' for rule in table["report_config"]["sorting_rules"]]
+            print("sort_columns: ",sort_columns)
+            print("ascending_list: ",ascending_list)
             datatable = datatable.sort_values(by=sort_columns,ascending=ascending_list)
             # 정렬용 컬럼 'Sort_Age' 제거
             # datatable = datatable.drop('tier', axis=1)
 
         # 여기서 부터 스타일 객체로 변환됨
-        datatable = datatable.style.set_caption(report_name)
+        datatable = datatable.style.set_caption(table["report_config"]["report_name"])
         datatable = datatable.set_table_attributes('class="mystyle"').hide()
         # Css 클래스를 정의 해서 사용하기로함
         # styles = [
@@ -355,8 +346,8 @@ def format_html_style(datatables, report_names, custom_col_style_lists=[],sorted
         datatable = datatable.format(precision=0, thousands=",")
 
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
-        if custom_col_style_list != ["None"]:
-            datatable = datatable.set_properties(subset=custom_col_style_list, **{'text-align': 'right'})
+        if "custom_col_style_list" in table["report_config"]:
+            datatable = datatable.set_properties(subset=table["report_config"]["custom_col_style_list"], **{'text-align': 'right'})
 
         html_tables.append(datatable.to_html())
     return html_tables
@@ -364,40 +355,33 @@ def format_html_style(datatables, report_names, custom_col_style_lists=[],sorted
 def main():
     try:
         if args.request == "clusters_inode_info":
-            report_names, custom_col_style_list, sorted_dict = storage_inode_report_by_cluster(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names,custom_col_style_list,sorted_dict)
+            tables = storage_inode_report_by_cluster(data[args.file[0]])
+            html_tables = format_html_style(tables)
         elif args.request == "volume_inode_info":
-            report_names, custom_col_style_list, sorted_dict = storage_inode_report_by_volume(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names,custom_col_style_list,sorted_dict)
+            tables = storage_inode_report_by_volume(data[args.file[0]])
+            html_tables = format_html_style(tables)
         elif args.request == "clusters_space_info":
-            report_names, custom_col_style_list, sorted_dict = storage_space_report_by_cluster(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names,custom_col_style_list,sorted_dict)
+            tables = storage_space_report_by_cluster(data[args.file[0]])
+            html_tables = format_html_style(tables)
         elif args.request == "aggr_volume_space_info":
-            report_names=[]
-            sorted_dicts=[]
-            custom_col_style_lists=[]
-            # datatable은 실행순서대로 list에 추가됨
-            report_name, custom_col_style_list, sorted_dict = storage_space_report_by_aggr(data[args.file[0]]) 
-            for report_name, custom_col_style_list, sorted_dict in zip(report_name, custom_col_style_list, sorted_dict):
-                report_names.append(report_name)
-                custom_col_style_lists.append(custom_col_style_list)
-                sorted_dicts.append(sorted_dict)
-            report_name, custom_col_style_list, sorted_dict = storage_space_report_by_volume(data[args.file[1]])
-            for report_name, custom_col_style_list, sorted_dict in zip(report_name, custom_col_style_list, sorted_dict):
-                report_names.append(report_name)
-                custom_col_style_lists.append(custom_col_style_list)
-                sorted_dicts.append(sorted_dict)
+            tables = []
+            aggr_tables = storage_space_report_by_aggr(data[args.file[0]]) 
+            for table in aggr_tables:
+                tables.append(table)
+            volume_tables = storage_space_report_by_volume(data[args.file[1]])
+            for table in volume_tables:
+                tables.append(table)
             
-            html_tables = format_html_style(datatables,report_names,custom_col_style_lists,sorted_dicts)
+            html_tables = format_html_style(tables)
         elif args.request == "aggrs_space_info":
-            report_name, custom_col_style_list, sorted_dict = storage_space_report_by_aggr(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names)
+            tables = storage_space_report_by_aggr(data[args.file[0]])
+            html_tables = format_html_style(tables)
         elif args.request == "volume_space_info":
-            report_name, custom_col_style_list, sorted_dict = storage_space_report_by_volume(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names)
+            tables = storage_space_report_by_volume(data[args.file[0]])
+            html_tables = format_html_style(tables)
         elif args.request == "big_snapshot_info":
-            report_name, custom_col_style_list, sorted_dict = storage_Big_snapshot_report_by_volume(data[args.file[0]])
-            html_tables = format_html_style(datatables,report_names)
+            tables = storage_Big_snapshot_report_by_volume(data[args.file[0]])
+            html_tables = format_html_style(tables)
         else:
             logger.error(args.request+" request is not matched")
             html_tables = [args.request+" request is not matched"]
