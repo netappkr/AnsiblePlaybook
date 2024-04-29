@@ -116,13 +116,12 @@ gantt
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
     Playbook 적용 Test: done, p3-3, 2024-04-11,  1d
-    Script 메일 css 추가 수정 : done, p3-4, after p3-3 , 2d
-    Playbook 적용 Test: done, p3-5, after p3-4,  1d
-    Script 정렬 값 수정 : done, p3-6, after p3-5 , 3d
-    Playbook 적용 Test: done, p3-7, after p3-6,  1d
-    Playbook logical 항목 추가 수정: done, p3-8, 2024-04-24,  1d
-    Playbook 적용 Test: done, p3-9, 2024-04-24,  1d
-    Script 자산 tier 추가 수정 : done, p3-10, 2024-04-25 , 2d
+    Script 메일 css 추가 수정 : done, p3-4, 2024-04-15 , 1d
+    Script 정렬 값 수정 : done, p3-5, 2024-04-15 , 1d
+    Playbook 적용 Test: done, p3-6, 2024-04-17,  1d
+    Playbook logical 항목 추가 수정: done, p3-7, 2024-04-24,  1d
+    Playbook 적용 Test: done, p3-8, 2024-04-24,  1d
+    Script 자산 tier 추가 수정 : done, p3-09, 2024-04-25 , 2d
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
