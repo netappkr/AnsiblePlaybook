@@ -19,7 +19,7 @@ formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s',d
 # stream_handler.setFormatter(formatter) ## 텍스트 포맷 설정
 # logger.addHandler(stream_handler) ## 핸들러 등록
 ## 파일 핸들러로 파일에 남김
-file_handler = logging.FileHandler('generate_table.log', mode='w') ## 파일 핸들러 생성
+file_handler = logging.FileHandler('generate_table.log', mode='a') ## 파일 핸들러 생성
 file_handler.setFormatter(formatter) ## 텍스트 포맷 설정
 logger.addHandler(file_handler) ## 핸들러 등록
 
@@ -56,7 +56,7 @@ def storage_inode_report_by_cluster(data):
         except Exception as e:
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
-    tables.append(table = {
+    tables.append({
         'datatable': datatable,
         'report_config': {
             'report_name': "CAD Storage Cluster INODE 사용량 Summary",
@@ -100,7 +100,7 @@ def storage_inode_report_by_volume(data):
                 logger.error(traceback.format_exc())
 
             datatable=datatable._append(add,ignore_index = True)
-        tables.append(table = {
+        tables.append({
             'datatable': datatable,
             'report_config': {
                 'report_name': Cluster["cluster"]["name"] + " Storage Volumes INODE Report",
@@ -144,7 +144,7 @@ def storage_space_report_by_cluster(data):
         except Exception as e:
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
-    tables.append(table = {
+    tables.append({
         'datatable': datatable,
         'report_config': {
             'report_name': "CAD Storage Cluster INODE 사용량 Summary",
@@ -185,7 +185,7 @@ def storage_space_report_by_aggr(data):
                 print("Error:" ,traceback.format_exc())
                 logger.error(traceback.format_exc())
 
-    tables.append(table = {
+    tables.append({
         'datatable': datatable,
         'report_config': {
             'report_name': "------ Aggregates Capacity Report ------",
@@ -228,7 +228,7 @@ def storage_space_report_by_volume(data):
                 print("Error:" ,traceback.format_exc())
                 logger.error(traceback.format_exc())
 
-        tables.append(table = {
+        tables.append({
             'datatable': datatable,
             'report_config': {
                 'report_name': cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
@@ -277,7 +277,7 @@ def storage_Big_snapshot_report_by_volume(data):
             print("Error:" ,traceback.format_exc())
             logger.error(traceback.format_exc())
 
-    tables.append(table = {
+    tables.append({
         'datatable': datatable,
         'report_config': {
             'report_name': data["cluster"]["name"] + " Storage Volumes Capacity Report-",
