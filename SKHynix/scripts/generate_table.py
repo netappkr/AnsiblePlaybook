@@ -66,7 +66,7 @@ def storage_inode_report_by_cluster(data):
             logger.error(traceback.format_exc())
     datatables.append(datatable)
     custom_col_style_list.append(['INODE Total','INODE Used','INODE Free'])
-    sorted_list.append(['None'])
+    sorted_list.append(['tier'])
     report_names.append("CAD Storage Cluster INODE 사용량 Summary")
     return report_names, custom_col_style_list, sorted_list
 
