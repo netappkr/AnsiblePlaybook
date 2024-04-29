@@ -130,7 +130,7 @@ gantt
     Playbook 적용 Test: done, p4-3, 2024-04-11,  1d
     Script 메일 css 추가 수정 : done, p4-4, after p4-3 , 3d
     Playbook 적용 Test: done, p4-5, after p4-4,  1d
-    Script 정렬 값 수정 : done, p4-6, after p4-5 , 3d
+    Script 정렬 값 수정 : done, p4-6, after p4-5 , 2d
     Playbook logical 항목 추가 수정: done, p4-7, after p4-6,  3d
     Playbook 적용 Test: done, p4-8, after p4-7,  1d
     Script 메일 포맷 수정 : done, p4-9, after p4-8 , 3d
@@ -143,7 +143,7 @@ gantt
     Playbook 적용 Test: done, p5-3, 2024-04-11,  1d
     Script 메일 css 추가 수정 : done, p5-4, after p5-3 , 3d
     Playbook 적용 Test: done, p5-5, after p5-4,  1d
-    Script 정렬 값 수정 : done, p5-6, after p5-5 , 3d
+    Script 정렬 값 수정 : done, p5-6, after p5-5 , 2d
     Playbook logical 항목 추가 수정: done, p5-7, after p5-6, 3d
     Playbook 적용 Test: done, p5-8, after p5-7,  1d
     Script 메일 포맷 수정 : done, p5-9, after p5-8 , 3d
@@ -156,7 +156,7 @@ gantt
     Playbook 적용 Test: done, p6-3, 2024-04-24,  1d
     Script 메일 css 추가 수정 : done, p6-4, after p6-3 , 3d
     Playbook 적용 Test: done, p6-5, after p6-4,  1d
-    Script 정렬 값 수정 : done, p6-6, after p6-5 , 3d
+    Script 정렬 값 수정 : done, p6-6, after p6-5 , 2d
     Playbook logical 항목 추가 수정: done, p6-7, after p6-6, 1d
     Playbook 적용 Test: done, p6-8, after p6-7,  3d
     Script 메일 포맷 수정 : done, p6-9, after p6-8 , 3d
