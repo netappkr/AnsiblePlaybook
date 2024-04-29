@@ -115,7 +115,7 @@ gantt
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p3-3, 2024-04-03,  1d
+    Playbook 적용 Test: done, p3-3, 2024-04-11,  1d
     Script 메일 css 추가 수정 : done, p3-4, after p3-3 , 3d
     Playbook 적용 Test: done, p3-5, after p3-4,  1d
     Script 정렬 값 수정 : done, p3-6, after p3-5 , 3d
@@ -127,7 +127,7 @@ gantt
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p4-3, 2024-04-08,  1d
+    Playbook 적용 Test: done, p4-3, 2024-04-11,  1d
     Script 메일 css 추가 수정 : done, p4-4, after p4-3 , 3d
     Playbook 적용 Test: done, p4-5, after p4-4,  1d
     Script 정렬 값 수정 : done, p4-6, after p4-5 , 3d
@@ -140,7 +140,7 @@ gantt
     section Capacity Report by volume Playbook
     Sample Playbook 작성 : done, p5-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p5-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p5-3, 2024-04-08,  1d
+    Playbook 적용 Test: done, p5-3, 2024-04-11,  1d
     Script 메일 css 추가 수정 : done, p5-4, after p5-3 , 3d
     Playbook 적용 Test: done, p5-5, after p5-4,  1d
     Script 정렬 값 수정 : done, p5-6, after p5-5 , 3d
@@ -153,7 +153,7 @@ gantt
     section Capacity Report by Aggregate & volume Playbook
     Sample Playbook 작성 : done, p6-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p6-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p6-3, 2024-04-08,  1d
+    Playbook 적용 Test: done, p6-3, 2024-04-24,  1d
     Script 메일 css 추가 수정 : done, p6-4, after p6-3 , 3d
     Playbook 적용 Test: done, p6-5, after p6-4,  1d
     Script 정렬 값 수정 : done, p6-6, after p6-5 , 3d
