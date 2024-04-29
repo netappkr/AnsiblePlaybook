@@ -331,7 +331,7 @@ def format_html_style(datatables, report_names, custom_col_style_lists=[],sorted
             ascending_list = [rule['order'] == 'asc' for rule in sorted_dict]
             datatable = datatable.sort_values(by=sort_columns,ascending=ascending_list)
             # 정렬용 컬럼 'Sort_Age' 제거
-            datatable = datatable.drop('tier', axis=1)
+            # datatable = datatable.drop('tier', axis=1)
 
         # 여기서 부터 스타일 객체로 변환됨
         datatable = datatable.style.set_caption(report_name)
