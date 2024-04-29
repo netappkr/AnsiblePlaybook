@@ -286,7 +286,7 @@ def format_html_style(datatables, report_names, custom_col_style_lists=[],sorted
         # ]
         # datatable = datatable.set_table_styles(styles)
         # datatable = datatable.format('{:,.0f}', subset=custom_col_style_list)
-        datatable = datatable.format(precision=3, thousands=",")
+        datatable = datatable.format(precision=0, thousands=",")
 
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         if custom_col_style_list != ["None"]:
