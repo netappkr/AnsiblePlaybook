@@ -49,9 +49,9 @@ def storage_inode_report_by_cluster(data):
                 inode_used= inode_used+volume["files"]["used"]
 
             add=pandas.DataFrame.from_records([{
-                'tier': cluster["cluster"]["tier"],
                 'Cluster name': cluster["cluster"]["name"],
                 '업무 구분': cluster["cluster"]["description"],
+                'tier': cluster["cluster"]["tier"],
                 'INODE Total': inode_total,
                 'INODE Used': inode_used,
                 'INODE Free': inode_total - inode_used,
@@ -83,7 +83,6 @@ def storage_inode_report_by_volume(data):
                 if Volume["style"] == "flexgroup":
                     Aggr_name = "-"
                 add=pandas.DataFrame.from_records([{
-                    'tier': Cluster["cluster"]["tier"],
                     'cluster Name': Cluster["cluster"]["name"],
                     'SVM Name': Volume["svm"]["name"],
                     'Aggregate': Aggr_name,
@@ -123,9 +122,9 @@ def storage_space_report_by_cluster(data):
                 used_size= used_size+aggr["space"]["block_storage"]["used"]
 
             add=pandas.DataFrame.from_records([{
-                'tier': cluster["cluster"]["tier"],
                 'Cluster name': cluster["cluster"]["name"],
                 '업무 구분': cluster["cluster"]["description"],
+                'tier': cluster["cluster"]["tier"],
                 'Total Size(TB)': round(total_size/1024/1024/1024/1024),
                 'Used Size(TB)': round(used_size/1024/1024/1024/1024),
                 'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
@@ -199,7 +198,6 @@ def storage_space_report_by_volume(data):
                 if Volume["style"] == "flexgroup":
                     Aggr_name = "-"
                 add=pandas.DataFrame.from_records([{
-                    'tier': cluster["cluster"]["tier"],
                     'SVM Name': Volume["svm"]["name"],
                     'Aggregate': Aggr_name,
                     'Volume': Volume['name'],
@@ -241,7 +239,6 @@ def storage_Big_snapshot_report_by_volume(data):
                 if round(used_size / total_size * 100,2) > 50:
                     if snapshot_used > 1099511627776:
                         add=pandas.DataFrame.from_records([{
-                            'tier': cluster["cluster"]["tier"],
                             'cluster name': cluster["cluster"]["name"],
                             'volume name' : volume["name"],
                             'volume path' : volume["nas"]["path"],
