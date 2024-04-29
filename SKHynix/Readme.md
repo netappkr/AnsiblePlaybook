@@ -81,88 +81,85 @@ gantt
     excludes    weekends
 
     section AWX 구성
-    AWX install Guide 작성  : done, awx1, 2024-02-26, 4d
-    AWX install Guide 추가 수정  : done, awx1-1, after awx3, 2d
-    AWX 설치 환경 구성  : done, awx2, 2024-03-05, 4d
-    AWX 설치 진행 : done, awx3, after awx2 , 3d
-    AWX 설치 재진행 : done, awx3-1, after awx1-1 , 3d
-    AWX task 컨테이너 커스텀 구성: done, awx3-2, after awx3-1, 5d
-    AWX 세부설정 추가 : done, awx4, after awx3-2, 1d
+    AWX install Guide 작성               : done, awx1, 2024-02-26, 4d
+    AWX install Guide 추가 수정          : done, awx1-1, after awx3, 2d
+    AWX 설치 환경 구성                    : done, awx2, 2024-03-05, 4d
+    AWX 설치 진행                        : done, awx3, after awx2 , 3d
+    AWX 설치 재진행                      : done, awx3-1, after awx1-1 , 3d
+    AWX task 컨테이너 커스텀 구성         : done, awx3-2, after awx3-1, 5d
+    AWX 세부설정 추가                    : done, awx4, after awx3-2, 1d
     
 
     section Inode report by Cluster Playbook
-    Sample Playbook 작성 : done, p1-1, 2024-03-04, 5d
-    Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
-    Playbook 적용 Test: done, p1-3, 2024-04-03,  1d
-    Script 메일 css 추가 수정 : done, p1-4, 2024-04-15 , 1d
-    Playbook 적용 Test: done, p1-5, after p1-4,  1d
-    Script 정렬 값 수정 : done, p1-6, after p1-5 , 2d
-    Playbook 적용 Test: done, p1-7, after p1-6,  1d
-    Script 자산 tier 추가 수정 : done, p1-8, after p1-7 , 2d
+    Sample Playbook 작성                : done, p1-1, 2024-03-04, 5d
+    Sample Python Script 작성           : done, p1-2, 2024-03-04, 5d
+    Playbook 적용 Test                  : done, p1-3, 2024-04-03,  1d
+    Script 메일 css 추가 수정            : done, p1-4, 2024-04-15 , 1d
+    Playbook 적용 Test                  : done, p1-5, after p1-4,  1d
+    Script 정렬 값 수정                 : done, p1-6, after p1-5 , 2d
+    Playbook 적용 Test                  : done, p1-7, after p1-6,  1d
+    Script 자산 tier 추가 수정           : done, p1-8, after p1-7 , 2d
 
     section Inode report by Volume Playbook
-    Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
-    Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: done, p2-3, 2024-04-03,  1d
-    Script 메일 css 추가 수정 : done, p2-4, 2024-04-15 , 1d
-    Playbook 적용 Test: done, p2-5, after p2-4,  1d
-    Script 정렬 값 수정 : done, p2-6, after p2-5 , 2d
-    Playbook 적용 Test: done, p2-7, after p2-6,  1d
-    Script 메일 포맷 수정 : done, p2-8, 2024-04-15 , 1d
-    Playbook 적용 Test: done, p2-9, after p2-8,  1d
-    Script 자산 tier 추가 수정 : done, p2-10, after p2-9 , 2d
+    Sample Playbook 작성                : done, p2-1, 2024-03-04, 5d
+    Sample Python Script 작성           : done, p2-2, 2024-03-04, 5d
+    Playbook 적용 Test                  : done, p2-3, 2024-04-03,  1d
+    Script 메일 css 추가 수정           : done, p2-4, 2024-04-15 , 1d
+    Playbook 적용 Test                  : done, p2-5, after p2-4,  1d
+    Script 정렬 값 수정                 : done, p2-6, after p2-5 , 2d
+    Playbook 적용 Test                  : done, p2-7, after p2-6,  1d
+    Script 메일 포맷 수정               : done, p2-8, 2024-04-15 , 1d
+    Playbook 적용 Test                  : done, p2-9, after p2-8,  1d
+    Script 자산 tier 추가 수정          : done, p2-10, after p2-9 , 2d
 
     section Capacity Report by cluster Playbook
-    Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
-    Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p3-3, 2024-04-11,  1d
-    Script 메일 css 추가 수정 : done, p3-4, 2024-04-15 , 1d
-    Script 정렬 값 수정 : done, p3-5, 2024-04-15 , 1d
-    Playbook 적용 Test: done, p3-6, 2024-04-17,  1d
-    Playbook logical 항목 추가 수정: done, p3-7, 2024-04-24,  1d
-    Playbook 적용 Test: done, p3-8, 2024-04-24,  1d
-    Script 자산 tier 추가 수정 : done, p3-09, 2024-04-25 , 2d
+    Sample Playbook 작성                : done, p3-1, 2024-03-18, 5d
+    Sample Python Script 작성           : done, p3-2, 2024-03-18, 5d
+    Playbook 적용 Test                  : done, p3-3, 2024-04-11,  1d
+    Script 메일 css 추가 수정            : done, p3-4, 2024-04-15 , 1d
+    Script 정렬 값 수정                  : done, p3-5, 2024-04-15 , 1d
+    Playbook 적용 Test                  : done, p3-6, 2024-04-17,  1d
+    Playbook logical 항목 추가 수정      : done, p3-7, 2024-04-24,  1d
+    Playbook 적용 Test                  : done, p3-8, 2024-04-24,  1d
+    Script 자산 tier 추가 수정          : done, p3-09, 2024-04-25 , 2d
 
     section Capacity Report by Aggregate Playbook
-    Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
-    Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p4-3, 2024-04-11,  1d
-    Script 메일 css 추가 수정 : done, p4-4, 2024-04-15 , 1d
-    Script 메일 포맷 수정 : done, p4-5, 2024-04-15 , 1d
-    Playbook 적용 Test: done, p4-6, after p4-5,  1d
-    Script 정렬 값 수정 : done, p4-7, after p4-6 , 2d
-    Playbook logical 항목 추가 수정: done, p4-8, 2024-04-24,  1d
-    Playbook 적용 Test: done, p4-9, after p4-8,  1d
+    Sample Playbook 작성                : done, p4-1, 2024-03-18, 5d
+    Sample Python Script 작성           : done, p4-2, 2024-03-18, 5d
+    Playbook 적용 Test                  : done, p4-3, 2024-04-11,  1d
+    Script 메일 css 추가 수정            : done, p4-4, 2024-04-15 , 1d
+    Script 메일 포맷 수정                : done, p4-5, 2024-04-15 , 1d
+    Playbook 적용 Test                  : done, p4-6, after p4-5,  1d
+    Script 정렬 값 수정                 : done, p4-7, after p4-6 , 2d
+    Playbook logical 항목 추가 수정     : done, p4-8, 2024-04-24,  1d
+    Playbook 적용 Test                  : done, p4-9, after p4-8,  1d
     
     Playbook 적용 Test: done, p4-10, 2024-04-24,  1d
     Script 자산 tier 추가 수정 : done, p4-11, 2024-04-25 , 2d
 
     section Capacity Report by volume Playbook
-    Sample Playbook 작성 : done, p5-1, 2024-03-18, 5d
-    Sample Python Script 작성 : done, p5-2, 2024-03-18, 5d
-    Playbook 적용 Test: done, p5-3, 2024-04-11,  1d
-    Script 메일 css 추가 수정 : done, p5-4, 2024-04-15 , 1d
-    Playbook 적용 Test: done, p5-5, after p5-4,  1d
-    Script 정렬 값 수정 : done, p5-6, after p5-5 , 2d
-    Playbook logical 항목 추가 수정: done, p5-7, 2024-04-24,  1d
-    Playbook 적용 Test: done, p5-8, after p5-7,  1d
-    Script 메일 포맷 수정 : done, p5-9, 2024-04-15 , 1d
-    Playbook 적용 Test: done, p5-10, 2024-04-24,  1d
-    Script 자산 tier 추가 수정 : done, p5-11, 2024-04-25 , 2d
+    Sample Playbook 작성                : done, p5-1, 2024-03-18 , 5d
+    Sample Python Script 작성           : done, p5-2, 2024-03-18 , 5d
+    Playbook 적용 Test                  : done, p5-3, 2024-04-11 , 1d
+    Script 메일 css 추가 수정            : done, p5-4, 2024-04-15 , 1d
+    Script 메일 포맷 수정                : done, p5-5, 2024-04-15 , 1d
+    Playbook 적용 Test                  : done, p5-6, 2024-04-17 , 1d
+    Script 정렬 값 수정                  : done, p5-7, 2024-04-18 , 2d
+    Playbook logical 항목 추가 수정      : done, p5-8, 2024-04-24 , 1d
+    Playbook 적용 Test                  : done, p5-9, 2024-04-24 , 1d
+    Playbook 적용 Test                  : done, p5-10, 2024-04-24, 1d
+    Script 자산 tier 추가 수정           : done, p5-11, 2024-04-25 , 2d
 
     section Capacity Report by Aggregate & volume Playbook
-    Sample Playbook 작성            : done, p6-1, 2024-04-08, 5d
-    Sample Python Script 작성       : done, p6-2, 2024-04-08, 5d
+    Sample Playbook 작성            : done, p6-1, 2024-04-08 , 5d
+    Sample Python Script 작성       : done, p6-2, 2024-04-08 , 5d
     Script 메일 css 추가 수정        : done, p6-3, 2024-04-15 , 1d
     Script 메일 포맷 수정            : done, p6-4, 2024-04-15 , 1d
-    Playbook 적용 Test              : done, p6-5, 2024-04-17,  1d
+    Playbook 적용 Test              : done, p6-5, 2024-04-17 , 1d
     Script 정렬 값 수정             : done, p6-6, 2024-04-18 , 2d
-    Playbook logical 항목 추가 수정  : done, p6-7, 2024-04-24,  1d
-    Playbook 적용 Test              : done, p6-8, 2024-04-24,  1d
-    
-    
-    Playbook 적용 Test: done, p6-9, 2024-04-24,  1d
-    Script 자산 tier 추가 수정 : done, p6-10, 2024-04-25 , 2d
+    Playbook logical 항목 추가 수정  : done, p6-7, 2024-04-24 , 1d
+    Playbook 적용 Test              : done, p6-8, 2024-04-24 , 1d
+    Script 자산 tier 추가 수정       : done, p6-9, 2024-04-25 , 2d
 
     section Snapmirror/vault Check status Playbook
     Sample Playbook 작성 : active, p6-1, after p4-4, 5d
