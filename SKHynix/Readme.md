@@ -87,30 +87,83 @@ gantt
     section Inode report by Cluster Playbook
     Sample Playbook 작성 : done, p1-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p1-2, 2024-03-04, 5d
-    Playbook 적용 Test: done, p1-3, 2024-04-03,  9d
-    Playbook 수정 : done, p1-4, 2024-04-03 , 9d
+    Playbook 적용 Test: done, p1-3, 2024-04-03,  3d
+    Script 메일 css 추가 수정 : done, p1-4, 2024-04-03 , 3d
+    Playbook 적용 Test: done, p1-5, after p1-4,  1d
+    Script 정렬 값 수정 : done, p1-6, after p1-5 , 3d
+    Playbook 적용 Test: done, p1-7, after p1-6,  1d
+    Script 자산 tier 추가 수정 : done, p1-8, after p1-8 , 3d
 
     section Inode report by Volume Playbook
     Sample Playbook 작성 : done, p2-1, 2024-03-04, 5d
     Sample Python Script 작성 : done, p2-2, 2024-03-04, 5d
-    Playbook 적용 Test: done, p2-3, 2024-04-08,  9d
-    Playbook 수정 : done, p2-4, 2024-04-08 , 9d
+    Playbook 적용 Test: done, p2-3, 2024-04-08,  3d
+    Script 메일 css 추가 수정 : done, p2-4, after p2-3 , 3d
+    Playbook 적용 Test: done, p2-5, after p2-4,  1d
+    Script 정렬 값 수정 : done, p2-6, after p2-3 , 9d
+    Playbook 적용 Test: done, p2-7, 2024-04-08,  9d
+    Script 메일 포맷 수정 : done, p2-8, 2024-04-08 , 9d
+    Playbook 적용 Test: done, p2-9, 2024-04-08,  9d
+    Script 자산 tier 추가 수정 : done, p2-10, 2024-04-08 , 9d
 
     section Capacity Report by cluster Playbook
     Sample Playbook 작성 : done, p3-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p3-2, 2024-03-18, 5d
     Playbook 적용 Test: done, p3-3, 2024-04-03,  9d
-    Playbook 수정 : done, p3-4, 2024-04-03 , 9d
+    Script 메일 css 추가 수정 : done, p3-4, 2024-04-03 , 9d
+    Playbook 적용 Test: done, p3-5, 2024-04-03,  9d
+    Script 정렬 값 수정 : done, p3-6, 2024-04-03 , 9d
+    Playbook logical 항목 추가 수정: done, p3-7, 2024-04-03,  9d
+    Playbook 적용 Test: done, p3-8, 2024-04-03,  9d
+    Playbook 적용 Test: done, p3-9, 2024-04-03,  9d
+    Script 자산 tier 추가 수정 : done, p3-10, 2024-04-03 , 9d
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
     Sample Python Script 작성 : done, p4-2, 2024-03-18, 5d
     Playbook 적용 Test: done, p4-3, 2024-04-08,  9d
-    Playbook 수정 : done, p4-4, 2024-04-08 , 9d
+    Script 메일 css 추가 수정 : done, p4-4, 2024-04-08 , 9d
+    Playbook 적용 Test: done, p4-5, 2024-04-08,  9d
+    Script 정렬 값 수정 : done, p4-6, 2024-04-08 , 9d
+    Playbook logical 항목 추가 수정: done, p4-7, 2024-04-03,  9d
+    Playbook 적용 Test: done, p4-8, 2024-04-08,  9d
+    Script 메일 포맷 수정 : done, p4-9, 2024-04-03 , 9d
+    Playbook 적용 Test: done, p4-10, 2024-04-08,  9d
+    Script 자산 tier 추가 수정 : done, p4-11, 2024-04-08 , 9d
+
+    section Capacity Report by volume Playbook
+    Sample Playbook 작성 : done, p5-1, 2024-03-18, 5d
+    Sample Python Script 작성 : done, p5-2, 2024-03-18, 5d
+    Playbook 적용 Test: done, p5-3, 2024-04-08,  9d
+    Script 메일 css 추가 수정 : done, p5-4, 2024-04-08 , 9d
+    Playbook 적용 Test: done, p5-5, 2024-04-08,  9d
+    Script 정렬 값 수정 : done, p5-6, 2024-04-08 , 9d
+    Playbook logical 항목 추가 수정: done, p5-7, 2024-04-03,  9d
+    Playbook 적용 Test: done, p5-8, 2024-04-08,  9d
+    Script 메일 포맷 수정 : done, p5-9, 2024-04-03 , 9d
+    Playbook 적용 Test: done, p5-10, 2024-04-08,  9d
+    Script 자산 tier 추가 수정 : done, p5-11, 2024-04-08 , 9d
+
+    section Capacity Report by Aggregate & volume Playbook
+    Sample Playbook 작성 : done, p6-1, 2024-03-18, 5d
+    Sample Python Script 작성 : done, p6-2, 2024-03-18, 5d
+    Playbook 적용 Test: done, p6-3, 2024-04-08,  9d
+    Script 메일 css 추가 수정 : done, p6-4, 2024-04-08 , 9d
+    Playbook 적용 Test: done, p6-5, 2024-04-08,  9d
+    Script 정렬 값 수정 : done, p6-6, 2024-04-08 , 9d
+    Playbook logical 항목 추가 수정: done, p6-7, 2024-04-03,  9d
+    Playbook 적용 Test: done, p6-8, 2024-04-08,  9d
+    Script 메일 포맷 수정 : done, p6-9, 2024-04-03 , 9d
+    Playbook 적용 Test: done, p6-10, 2024-04-08,  9d
+    Script 자산 tier 추가 수정 : done, p6-11, 2024-04-08 , 9d
 
     section Snapmirror/vault Check status Playbook
     Sample Playbook 작성 : active, p6-1, after p4-4, 5d
     Sample Python Script 작성 : active, p6-2, after p6-1, 5d
+    Playbook 적용 Test: p6-2, after p6-1,  5d
+    Playbook 수정 : p6-3, after p6-1 , 5d
+    Playbook 적용 Test: p6-2, after p6-1,  5d
+    Playbook 수정 : p6-3, after p6-1 , 5d
     Playbook 적용 Test: p6-2, after p6-1,  5d
     Playbook 수정 : p6-3, after p6-1 , 5d
 
