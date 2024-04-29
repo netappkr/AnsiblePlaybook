@@ -121,8 +121,8 @@ gantt
     Script 정렬 값 수정 : done, p3-6, after p3-5 , 3d
     Playbook 적용 Test: done, p3-7, after p3-6,  1d
     Playbook logical 항목 추가 수정: done, p3-8, after p3-7,  3d
-    Playbook 적용 Test: done, p3-9, after p3-8,  1d
-    Script 자산 tier 추가 수정 : done, p3-10, after p3-9 , 3d
+    Playbook 적용 Test: done, p3-9, 2024-04-24,  1d
+    Script 자산 tier 추가 수정 : done, p3-10, 2024-04-25 , 2d
 
     section Capacity Report by Aggregate Playbook
     Sample Playbook 작성 : done, p4-1, 2024-03-18, 5d
@@ -134,8 +134,8 @@ gantt
     Playbook logical 항목 추가 수정: done, p4-7, after p4-6,  3d
     Playbook 적용 Test: done, p4-8, after p4-7,  1d
     Script 메일 포맷 수정 : done, p4-9, after p4-8 , 3d
-    Playbook 적용 Test: done, p4-10, after p4-9,  1d
-    Script 자산 tier 추가 수정 : done, p4-11, after p4-10 , 3d
+    Playbook 적용 Test: done, p4-10, 2024-04-24,  1d
+    Script 자산 tier 추가 수정 : done, p4-11, 2024-04-25 , 2d
 
     section Capacity Report by volume Playbook
     Sample Playbook 작성 : done, p5-1, 2024-03-18, 5d
@@ -147,8 +147,8 @@ gantt
     Playbook logical 항목 추가 수정: done, p5-7, after p5-6, 3d
     Playbook 적용 Test: done, p5-8, after p5-7,  1d
     Script 메일 포맷 수정 : done, p5-9, after p5-8 , 3d
-    Playbook 적용 Test: done, p5-10, after p5-9,  1d
-    Script 자산 tier 추가 수정 : done, p5-11, after p5-10 , 3d
+    Playbook 적용 Test: done, p5-10, 2024-04-24,  1d
+    Script 자산 tier 추가 수정 : done, p5-11, 2024-04-25 , 2d
 
     section Capacity Report by Aggregate & volume Playbook
     Sample Playbook 작성 : done, p6-1, 2024-03-18, 5d
@@ -160,8 +160,8 @@ gantt
     Playbook logical 항목 추가 수정: done, p6-7, after p6-6, 1d
     Playbook 적용 Test: done, p6-8, after p6-7,  3d
     Script 메일 포맷 수정 : done, p6-9, after p6-8 , 3d
-    Playbook 적용 Test: done, p6-10, after p6-9,  1d
-    Script 자산 tier 추가 수정 : done, p6-11, after p6-10 , 3d
+    Playbook 적용 Test: done, p6-10, 2024-04-24,  1d
+    Script 자산 tier 추가 수정 : done, p6-11, 2024-04-25 , 2d
 
     section Snapmirror/vault Check status Playbook
     Sample Playbook 작성 : active, p6-1, after p4-4, 5d
