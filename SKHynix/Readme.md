@@ -151,8 +151,8 @@ gantt
     Script 자산 tier 추가 수정 : done, p5-11, 2024-04-25 , 2d
 
     section Capacity Report by Aggregate & volume Playbook
-    Sample Playbook 작성 : done, p6-1, 2024-03-18, 5d
-    Sample Python Script 작성 : done, p6-2, 2024-03-18, 5d
+    Sample Playbook 작성 : done, p6-1, 2024-04-08, 5d
+    Sample Python Script 작성 : done, p6-2, 2024-04-08, 5d
     Playbook 적용 Test: done, p6-3, 2024-04-24,  1d
     Script 메일 css 추가 수정 : done, p6-4, after p6-3 , 2d
     Playbook 적용 Test: done, p6-5, after p6-4,  1d
