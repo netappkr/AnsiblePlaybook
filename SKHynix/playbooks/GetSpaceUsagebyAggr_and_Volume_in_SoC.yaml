@@ -40,12 +40,12 @@
 
     - name: Write results data to a JSON file
       copy:
-        dest: "/tmp/aggrs_space_usage_info.json"
+        dest: "/tmp/aggrs_space_usage_info_in_SoC.json"
         content: "{{ ontap_aggrs.results | to_nice_json }}"
       register: aggr_datafile
 
 - name: query to usage by volume from each ONTAP cluster
-  hosts: task_server_1
+  hosts: task_server_1_soc
   gather_facts: no
   collections:
     - netapp.ontap
@@ -93,7 +93,7 @@
 
     - name: Write results data to a JSON file
       copy:
-        dest: "/tmp/volume_space_usage_info.json"
+        dest: "/tmp/volume_space_usage_info_in_SoC.json"
         content: "{{ ontap_volume.results | to_nice_json }}"
       register: volume_datafile
 

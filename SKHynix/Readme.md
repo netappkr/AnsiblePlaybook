@@ -159,6 +159,11 @@ gantt
     Playbook 적용 Test                  : done, p6-8, 2024-04-24 , 1d
     Script 자산 tier 추가 수정          : done, p6-9, 2024-04-29 , 1d
 
+    section Capacity Report by Aggregate & volume in SoC Playbook
+    Sample Playbook 작성                : done, p6-1, 2024-04-29 , 1d
+    Sample Python Script 작성           : done, p6-2, 2024-04-29 , 1d
+    Playbook 적용 Test                  : done, p6-5, 2024-05-02 , 1d
+
     section Snapmirror/vault Check status Playbook
     Sample Playbook 작성 : active, p6-1, after p4-4, 5d
     Sample Python Script 작성 : active, p6-2, after p6-1, 5d
