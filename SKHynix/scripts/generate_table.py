@@ -66,7 +66,12 @@ def storage_inode_report_by_cluster(data):
             logger.error(traceback.format_exc())
     datatables.append(datatable)
     custom_col_style_list.append(['INODE Total','INODE Used','INODE Free'])
-    sorted_dict.update({'asc': ['tier'],'desc': ['None']})
+    sorted_dict.update([
+        {
+            'column': 'tier', 
+            'order': 'asc'
+        }
+    ])
     report_names.append("CAD Storage Cluster INODE 사용량 Summary")
     return report_names, custom_col_style_list, sorted_dict
 
@@ -104,7 +109,16 @@ def storage_inode_report_by_volume(data):
         datatables.append(datatable)
         report_names.append(Cluster["cluster"]["name"] + " Storage Volumes INODE Report")
         custom_col_style_list.append(['INODE Total','INODE Used','INODE Free'])
-        sorted_dict.update({'asc': ['None'],'desc': ['INODE Used','INODE Total']})
+        sorted_dict.update([
+            {
+                'column': 'INODE Used', 
+                'order': 'desc'
+            }, 
+            {
+                'column': 'INODE Total', 
+                'order': 'desc'
+            }
+        ])
     return report_names, custom_col_style_list, sorted_dict
 
 def storage_space_report_by_cluster(data):
@@ -139,7 +153,20 @@ def storage_space_report_by_cluster(data):
             logger.error(traceback.format_exc())
     datatables.append(datatable)
     custom_col_style_list.append(["None"])
-    sorted_dict.update({'asc': ['tier'],'desc': ['Used Size(TB)', 'Total Size(TB)']})
+    sorted_dict.update([
+        {
+            'column': 'tier', 
+            'order': 'asc'
+        },
+        {
+            'column': 'Used Size(TB)', 
+            'order': 'desc'
+        }, 
+        {
+            'column': 'Total Size(TB)', 
+            'order': 'desc'
+        }
+    ])
     report_names.append("CAD Storage Cluster 사용량 Summary")
     return report_names, custom_col_style_list, sorted_dict
 
@@ -178,7 +205,20 @@ def storage_space_report_by_aggr(data):
 
     datatables.append(datatable)
     custom_col_style_list.append(["None"])
-    sorted_dict.update({'asc': ['tier', 'Total Size(TB)'],'desc': ['Node Name']})
+    sorted_dict.update([
+        {
+            'column': 'tier', 
+            'order': 'asc'
+        },
+        {
+            'column': 'Total Size(TB)', 
+            'order': 'asc'
+        }, 
+        {
+            'column': 'Node Name', 
+            'order': 'desc'
+        }
+    ])
     report_names.append("------ Aggregates Capacity Report ------")
     return report_names, custom_col_style_list, sorted_dict
 
@@ -217,7 +257,16 @@ def storage_space_report_by_volume(data):
 
         datatables.append(datatable)
         custom_col_style_list.append(["None"])
-        sorted_dict.update({'asc': ['None'],'desc': ['Used Size(TB)', 'Total Size(TB)']})
+        sorted_dict.update([
+            {
+                'column': 'Used Size(TB)', 
+                'order': 'desc'
+            }, 
+            {
+                'column': 'Total Size(TB)', 
+                'order': 'desc'
+            }
+        ])
         report_names.append(cluster["cluster"]["name"] + " Storage Volumes Capacity Report")
     return report_names, custom_col_style_list, sorted_dict
 
@@ -251,7 +300,16 @@ def storage_Big_snapshot_report_by_volume(data):
                         datatable = datatable._append(add,ignore_index = True)
             datatables.append(datatable)
             custom_col_style_list.append(["None"])
-            sorted_dict.update(["None"])({'asc': ['Used Size(TB)', 'Total Size(TB)'],'desc': ['None']})
+            sorted_dict.update([
+                {
+                    'column': 'Used Size(TB)', 
+                    'order': 'desc'
+                }, 
+                {
+                    'column': 'Total Size(TB)', 
+                    'order': 'desc'
+                }
+            ])
             report_names.append(data["cluster"]["name"] + " Storage Volumes Capacity Report-")
         except KeyError as e:
             # KeyError 발생시 처리 로직
@@ -268,10 +326,13 @@ def format_html_style(datatables, report_names, custom_col_style_lists=[],sorted
     html_tables=[]
     for report_name, datatable, custom_col_style_list, sorted_dict in zip(report_names, datatables, custom_col_style_lists, sorted_dicts):
         # .sort_values()
-        if sorted_dict != ['None']:
-            datatable = datatable.sort_values(by=sorted_dict,ascending=False)
+        if sorted_dict != {}:
+            sort_columns = [rule['column'] for rule in sorted_dict]
+            ascending_list = [rule['order'] == 'asc' for rule in sorted_dict]
+            datatable = datatable.sort_values(by=sort_columns,ascending=ascending_list)
             # 정렬용 컬럼 'Sort_Age' 제거
             datatable = datatable.drop('tier', axis=1)
+
         # 여기서 부터 스타일 객체로 변환됨
         datatable = datatable.style.set_caption(report_name)
         datatable = datatable.set_table_attributes('class="mystyle"').hide()
