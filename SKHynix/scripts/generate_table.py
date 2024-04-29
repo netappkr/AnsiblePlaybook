@@ -256,11 +256,12 @@ def storage_space_report_by_aggr_in_SoC(data):
                 used_size=aggr["space"]["block_storage"]["used"]
                 logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
                 ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
+                Aggr_tier = aggr["name"][:2]
                 add=pandas.DataFrame.from_records([{
                     'Cluster Name': cluster["cluster"]["name"],
                     'Node Name': aggr["home_node"]["name"],
                     'Aggr Name': aggr["name"],
-                    'tier': cluster["cluster"]["tier"],
+                    'tier': Aggr_tier,
                     'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
                     'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
                     'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
@@ -299,11 +300,13 @@ def storage_space_report_by_volume_in_SoC(data):
                 used_size=Volume["space"]["used"]
                 volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
                 Aggr_name = Volume["aggregates"][0]['name']
+                Aggr_tier = Aggr_name[:2]
                 if Volume["style"] == "flexgroup":
-                    Aggr_name = "-"
+                    Aggr_name = "flexgroup"
                 add=pandas.DataFrame.from_records([{
                     'SVM Name': Volume["svm"]["name"],
                     'Aggregate': Aggr_name,
+                    'Tier': Aggr_tier,
                     'Volume': Volume['name'],
                     'Total Size(TB)': round(total_size/1024/1024/1024),
                     'Used Size(TB)': round(used_size/1024/1024/1024),
@@ -475,10 +478,10 @@ def main():
             html_tables = format_html_style(tables)
         elif args.request == "aggr_volume_space_info_in_soc":
             tables = []
-            aggr_tables = storage_space_report_by_aggr(data[args.file[0]]) 
+            aggr_tables = storage_space_report_by_aggr_in_SoC(data[args.file[0]]) 
             for table in aggr_tables:
                 tables.append(table)
-            volume_tables = storage_space_report_by_volume(data[args.file[1]])
+            volume_tables = storage_space_report_by_volume_in_SoC(data[args.file[1]])
             for table in volume_tables:
                 tables.append(table)
         
