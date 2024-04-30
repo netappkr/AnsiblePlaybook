@@ -68,22 +68,9 @@
 
     - name: Write result data to a JSON file
       copy:
-        dest: "/tmp/volume_path_info.json"
+        dest: "/tmp/net_interface_info.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
-
-
-    #- name: debug show
-    #  ansible.builtin.debug:
-    #    msg: "{{ datafile.results }}"
-
-    - name: Search for 'script' in all directories
-      find:
-        paths: "{{ scripts_dir }}"
-        patterns: "generate_table.py"
-        recurse: yes
-        file_type: file
-      register: files_matched
 
     # - name: Print the matched files
     #   debug:
