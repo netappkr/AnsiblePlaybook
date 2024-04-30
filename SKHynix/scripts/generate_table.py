@@ -340,6 +340,41 @@ def storage_space_report_by_volume_in_SoC(data):
         })
     return tables
 
+
+def storage_snapmirror_report_by_cluster(data):
+    tables = []
+    datatable = pandas.DataFrame()
+    for cluster in data:
+        for snapmirror in cluster["ontap_info"]["snapmirror/relationships"]["records"]:
+            try:
+                add=pandas.DataFrame.from_records([{
+                    'Cluster Name': cluster["cluster"]["name"],
+                    'transfer time': snapmirror["transfer"]["end_time"],
+                    'status': snapmirror["transfer"]["state"],
+                    'end_time': snapmirror["transfer"]["end_time"]
+                }])
+                datatable=datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{snapmirror['name']}",traceback.format_exc())
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                print("Error:" ,traceback.format_exc())
+
+    tables.append({
+        'datatable': datatable,
+        'report_config': {
+            'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report",
+            'sorting_rules': [
+                {'column': 'tier', 'order': 'asc'},
+                {'column': 'Total Size(TB)', 'order': 'asc'}, 
+                {'column': 'Node Name', 'order': 'desc'}
+            ]
+        }
+    })
+    return tables
+
+
 def storage_Big_snapshot_report_by_volume(data):
     tables = []
     datatable = pandas.DataFrame()
@@ -484,6 +519,10 @@ def main():
             volume_tables = storage_space_report_by_volume_in_SoC(data[args.file[1]])
             for table in volume_tables:
                 tables.append(table)
+        elif args.request == "clusters_smapmirror_info":
+            tables = storage_snapmirror_report_by_cluster(data[args.file[0]])
+            html_tables = format_html_style(tables)
+                
         
         else:
             logger.error(args.request+" request is not matched")

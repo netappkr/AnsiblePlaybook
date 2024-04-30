@@ -26,6 +26,8 @@
         validate_certs: false
         gather_subset:
           - snapmirror_info
+          - snapmirror_policy_info
+          - snapmirror_destination_info
         fields:
           - '*'
       register: ontap_snapmirror

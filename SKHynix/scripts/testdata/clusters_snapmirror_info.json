@@ -1,0 +1,242 @@
+[
+    {
+        "ansible_loop_var": "cluster",
+        "changed": false,
+        "cluster": {
+            "ID": "fsxadmin",
+            "PW": "<<password>>",
+            "description": "Netapp APAC AWS account",
+            "ip": "<<mgmt ip>>",
+            "name": "fsxn"
+        },
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "cert_filepath": null,
+                "feature_flags": null,
+                "fields": [
+                    "transfer",
+                    "healthy",
+                    "destination",
+                    "state",
+                    "unhealthy_reason"
+                ],
+                "force_ontap_version": null,
+                "gather_subset": [
+                    "snapmirror_info"
+                ],
+                "hal_linking": true,
+                "hostname": "mgmt ip",
+                "http_port": null,
+                "https": true,
+                "ignore_api_errors": null,
+                "key_filepath": null,
+                "max_records": 1024,
+                "ontapi": null,
+                "owning_resource": null,
+                "parameters": null,
+                "password": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
+                "state": null,
+                "use_python_keys": false,
+                "use_rest": "auto",
+                "username": "fsxadmin",
+                "validate_certs": false
+            }
+        },
+        "ontap_info": {
+            "snapmirror/relationships": {
+                "_links": {
+                    "self": {
+                        "href": "/api/snapmirror/relationships?max_records=1024&fields=transfer%2Chealthy%2Cdestination%2Cstate%2Cunhealthy_reason"
+                    }
+                },
+                "num_records": 1,
+                "records": [
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/snapmirror/relationships/ac996e2e-ffba-11ee-bbe5-2b713e767e1d/"
+                            }
+                        },
+                        "destination": {
+                            "path": "fsx-peer:vol1_dest",
+                            "svm": {
+                                "_links": {
+                                    "self": {
+                                        "href": "/api/svm/svms/9cb4f1ad-ffb9-11ee-9e42-efefe3ffc375"
+                                    }
+                                },
+                                "name": "fsx-peer",
+                                "uuid": "9cb4f1ad-ffb9-11ee-9e42-efefe3ffc375"
+                            }
+                        },
+                        "healthy": true,
+                        "state": "snapmirrored",
+                        "transfer": {
+                            "bytes_transferred": 3352,
+                            "end_time": "2024-04-24T03:35:04+00:00",
+                            "state": "success",
+                            "total_duration": "PT2S"
+                        },
+                        "uuid": "ac996e2e-ffba-11ee-bbe5-2b713e767e1d"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "ansible_loop_var": "cluster",
+        "changed": false,
+        "cluster": {
+            "ID": "admin",
+            "PW": "<<password>>",
+            "description": "Netapp APAC AWS account",
+            "ip": "<<mgmt ip>>",
+            "name": "FAS8040"
+        },
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "cert_filepath": null,
+                "feature_flags": null,
+                "fields": [
+                    "transfer",
+                    "healthy",
+                    "destination",
+                    "state",
+                    "unhealthy_reason"
+                ],
+                "force_ontap_version": null,
+                "gather_subset": [
+                    "snapmirror_info"
+                ],
+                "hal_linking": true,
+                "hostname": "mgmt ip",
+                "http_port": null,
+                "https": true,
+                "ignore_api_errors": null,
+                "key_filepath": null,
+                "max_records": 1024,
+                "ontapi": null,
+                "owning_resource": null,
+                "parameters": null,
+                "password": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
+                "state": null,
+                "use_python_keys": false,
+                "use_rest": "auto",
+                "username": "admin",
+                "validate_certs": false
+            }
+        },
+        "ontap_info": {
+            "snapmirror/relationships": {
+                "_links": {
+                    "self": {
+                        "href": "/api/snapmirror/relationships?max_records=1024&fields=transfer%2Chealthy%2Cdestination%2Cstate%2Cunhealthy_reason"
+                    }
+                },
+                "num_records": 5,
+                "records": [
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/snapmirror/relationships/176a391c-e752-11ee-8d8a-90e2baa80d8c/"
+                            }
+                        },
+                        "destination": {
+                            "path": "telco1:dest",
+                            "svm": {
+                                "name": "telco1"
+                            }
+                        },
+                        "healthy": false,
+                        "state": "broken_off",
+                        "unhealthy_reason": [
+                            {
+                                "arguments": [
+                                    "telco1:dest"
+                                ],
+                                "code": "6619546",
+                                "message": "Destination telco1:dest must be a data-protection volume."
+                            }
+                        ],
+                        "uuid": "176a391c-e752-11ee-8d8a-90e2baa80d8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/snapmirror/relationships/3b51e67c-e752-11ee-8d8a-90e2baa80d8c/"
+                            }
+                        },
+                        "destination": {
+                            "path": "telco1:dest2",
+                            "svm": {
+                                "name": "telco1"
+                            }
+                        },
+                        "healthy": true,
+                        "state": "broken_off",
+                        "uuid": "3b51e67c-e752-11ee-8d8a-90e2baa80d8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/snapmirror/relationships/639f03ba-2368-11ed-9a74-90e2baa80c8c/"
+                            }
+                        },
+                        "destination": {
+                            "path": "db_test_dr:t1_dr",
+                            "svm": {
+                                "name": "db_test_dr"
+                            }
+                        },
+                        "healthy": true,
+                        "state": "snapmirrored",
+                        "uuid": "639f03ba-2368-11ed-9a74-90e2baa80c8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/snapmirror/relationships/c9405bd5-e752-11ee-8d8a-90e2baa80d8c/"
+                            }
+                        },
+                        "destination": {
+                            "path": "telco1:dest3",
+                            "svm": {
+                                "name": "telco1"
+                            }
+                        },
+                        "healthy": false,
+                        "state": "broken_off",
+                        "unhealthy_reason": [
+                            {
+                                "arguments": [
+                                    "telco1:dest3"
+                                ],
+                                "code": "6619546",
+                                "message": "Destination telco1:dest3 must be a data-protection volume."
+                            }
+                        ],
+                        "uuid": "c9405bd5-e752-11ee-8d8a-90e2baa80d8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/snapmirror/relationships/f49d5df2-e756-11ee-8d8a-90e2baa80d8c/"
+                            }
+                        },
+                        "destination": {
+                            "path": "telco1:source",
+                            "svm": {
+                                "name": "telco1"
+                            }
+                        },
+                        "healthy": true,
+                        "state": "snapmirrored",
+                        "uuid": "f49d5df2-e756-11ee-8d8a-90e2baa80d8c"
+                    }
+                ]
+            }
+        }
+    }
+]
