@@ -61,26 +61,26 @@
       debug:
         msg: "{{ files_matched.files[0].path }}"
 
-    # - name: Generate HTML table from inode information using a Python script
-    #   command: "python3 {{ files_matched.files[0].path }} -r clusters_smapmirror_info -f {{ datafiles.dest }}"
-    #   register: html_tables
+    - name: Generate HTML table from inode information using a Python script
+      command: "python3 {{ files_matched.files[0].path }} -r clusters_smapmirror_info -f {{ datafiles.dest }}"
+      register: html_tables
 
-    #- name: debug show
-    #  ansible.builtin.debug:
-    #    msg: "{{ html_tables.results }}"
+    - name: debug show
+     ansible.builtin.debug:
+       msg: "{{ html_tables.results }}"
 
-    # - name: Send storage usage report via email
-    #   mail:
-    #     host: "{{ smtp_server }}"
-    #     port: "{{ smtp_port }}"
-    #     username: "{{ smtp_username }}"
-    #     password: "{{ smtp_password }}"
-    #     to: "{{ email_to }}"
-    #     subject: "ONTAP Clusters Snapmirror status Report"
-    #     body: "{{ html_tables.stdout }}"
-    #     from: "{{ email_from }}"
-    #     secure: starttls
-    #     subtype: html
-    #     headers: 
-    #     - Content-Type="text/html"
-    #   when: html_tables.stdout is defined
+    - name: Send storage usage report via email
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        subject: "ONTAP Clusters Snapmirror status Report"
+        body: "{{ html_tables.stdout }}"
+        from: "{{ email_from }}"
+        secure: starttls
+        subtype: html
+        headers: 
+        - Content-Type="text/html"
+      when: html_tables.stdout is defined
