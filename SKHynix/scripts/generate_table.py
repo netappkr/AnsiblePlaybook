@@ -350,7 +350,6 @@ def storage_snapmirror_report_by_cluster(data):
                 unhealthy_reason = ""
                 transfer_time = ""
                 if "unhealthy_reason" in snapmirror:
-                    print(snapmirror)
                     unhealthy_reason = snapmirror["unhealthy_reason"][0]["message"]
                 
                 if 'transfer' in snapmirror:
