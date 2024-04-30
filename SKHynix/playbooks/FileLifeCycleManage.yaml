@@ -28,10 +28,8 @@
         gather_subset:
           - volume_info
         fields:
-          - 'svm.name'
-          - 'nas.junction_parent'
-          - 'nas.path'
-          - 'name'
+          - '*'
+
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
