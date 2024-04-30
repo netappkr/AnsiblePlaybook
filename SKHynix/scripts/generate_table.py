@@ -350,7 +350,8 @@ def storage_snapmirror_report_by_cluster(data):
                 unhealthy_reason = ""
                 transfer_time = ""
                 if "unhealthy_reason" in snapmirror:
-                    unhealthy_reason = snapmirror["unhealthy_reason"]["message"]
+                    print(snapmirror)
+                    unhealthy_reason = snapmirror["unhealthy_reason"][0]["message"]
                 
                 if 'transfer time' in snapmirror:
                     transfer_time = snapmirror["transfer"]["end_time"]
@@ -527,7 +528,7 @@ def main():
             volume_tables = storage_space_report_by_volume_in_SoC(data[args.file[1]])
             for table in volume_tables:
                 tables.append(table)
-        elif args.request == "clusters_smapmirror_info":
+        elif args.request == "clusters_snapmirror_info":
             tables = storage_snapmirror_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(tables)
                 
