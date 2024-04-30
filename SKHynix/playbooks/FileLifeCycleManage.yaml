@@ -63,7 +63,7 @@
           - 'ip.address'
           - 'services'
           - 'service_policy.name'
-      register: ontap_volumes
+      register: ontap_interface
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
@@ -74,10 +74,14 @@
         content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
 
-    # - name: Print the matched files
-    #   debug:
-    #     msg: "{{ files_matched.files[0].path }}"
-    # - name: xcp scan dir
-    #   command: "python3 {{ files_matched.files[0].path }} -r volume_space_info -f {{ datafile.dest }}"
-    #   register: html_table
+    - name: Filter volumes with NAS path
+      set_fact:
+        filtered_interfaces: "{{ filtered_interfaces | default([]) + [item] }}"
+      loop: "{{ ontap_interface.results }}"
+      when: item.ontap_info['network/ip/interfaces'].records | json_query('[?service_policy.name=="default-data-files"]')
+    
+    - name: Display filtered interfaces
+      debug:
+        msg: "{{ filtered_interfaces }}"
+
 
