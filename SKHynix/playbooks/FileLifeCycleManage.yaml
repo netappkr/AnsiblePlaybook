@@ -61,6 +61,7 @@
           - 'svm.name'
           - 'state'
           - 'ip.address'
+          - 'services'
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
