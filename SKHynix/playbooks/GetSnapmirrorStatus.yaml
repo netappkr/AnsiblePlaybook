@@ -17,26 +17,31 @@
         - "pandas>2.0"
         executable: pip3
 
-    - name: Get rest data information
-      na_ontap_rest_info:
-        hostname: "{{ cluster.ip }}"
-        username: "{{ cluster.ID }}"
-        password: "{{ cluster.PW }}"
-        https: true
-        validate_certs: false
-        gather_subset:
-          - snapmirror_info
-        fields:
+- name: Get rest data information
+  na_ontap_rest_info:
+    hostname: "{{ cluster.ip }}"
+    username: "{{ cluster.ID }}"
+    password: "{{ cluster.PW }}"
+    https: true
+    validate_certs: false
+    gather_subset:
+      - snapmirror_info
+      - snapmirror_policy_info
+    fields:
+      - snapmirror_info:
           - transfer
           - healthy
           - destination
           - state
           - unhealthy_reason
           - policy
-      register: ontap_snapmirror
-      loop: "{{ clusters }}"
-      loop_control:
-        loop_var: cluster
+      - snapmirror_policy_info:
+          - name
+          - type
+  register: ontap_snapmirror
+  loop: "{{ clusters }}"
+  loop_control:
+    loop_var: cluster
   
     # - name: debug show
     #   ansible.builtin.debug:
@@ -52,38 +57,38 @@
     #  ansible.builtin.debug:
     #    msg: "{{ datafiles.results }}"
 
-    - name: Search for 'script' in all directories
-      find:
-        paths: "{{ scripts_dir }}"
-        patterns: "generate_table.py"
-        recurse: yes
-        file_type: file
-      register: files_matched
+- name: Search for 'script' in all directories
+  find:
+    paths: "{{ scripts_dir }}"
+    patterns: "generate_table.py"
+    recurse: yes
+    file_type: file
+  register: files_matched
 
-    - name: Print the matched files
-      debug:
-        msg: "{{ files_matched.files[0].path }}"
+- name: Print the matched files
+  debug:
+    msg: "{{ files_matched.files[0].path }}"
 
-    - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} -r clusters_smapmirror_info -f {{ datafiles.dest }}"
-      register: html_tables
+- name: Generate HTML table from inode information using a Python script
+  command: "python3 {{ files_matched.files[0].path }} -r clusters_smapmirror_info -f {{ datafiles.dest }}"
+  register: html_tables
 
-    - name: debug show
-     ansible.builtin.debug:
-       msg: "{{ html_tables.results }}"
+- name: debug show
+  ansible.builtin.debug:
+    msg: "{{ html_tables.results }}"
 
-    - name: Send storage usage report via email
-      mail:
-        host: "{{ smtp_server }}"
-        port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
-        to: "{{ email_to }}"
-        subject: "ONTAP Clusters Snapmirror status Report"
-        body: "{{ html_tables.stdout }}"
-        from: "{{ email_from }}"
-        secure: starttls
-        subtype: html
-        headers: 
-        - Content-Type="text/html"
-      when: html_tables.stdout is defined
+- name: Send storage usage report via email
+  mail:
+    host: "{{ smtp_server }}"
+    port: "{{ smtp_port }}"
+    username: "{{ smtp_username }}"
+    password: "{{ smtp_password }}"
+    to: "{{ email_to }}"
+    subject: "ONTAP Clusters Snapmirror status Report"
+    body: "{{ html_tables.stdout }}"
+    from: "{{ email_from }}"
+    secure: starttls
+    subtype: html
+    headers: 
+    - Content-Type="text/html"
+  when: html_tables.stdout is defined
