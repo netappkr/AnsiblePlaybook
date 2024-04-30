@@ -26,7 +26,6 @@
         validate_certs: false
         gather_subset:
           - snapmirror_info
-          - snapmirror_policy_info
         fields:
           - transfer
           - healthy
