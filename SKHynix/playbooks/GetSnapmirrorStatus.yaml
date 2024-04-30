@@ -39,9 +39,9 @@
       loop_control:
         loop_var: cluster
       
-        # - name: debug show
-        #   ansible.builtin.debug:
-        #     msg: "{{ ontap_aggrs.results }}"
+      # - name: debug show
+      #   ansible.builtin.debug:
+      #     msg: "{{ ontap_aggrs.results }}"
 
     - name: Write result data to a JSON file
       copy:
@@ -49,9 +49,9 @@
         content: "{{ ontap_snapmirror.results | to_nice_json }}"
       register: datafiles
 
-      #- name: debug show
-      #  ansible.builtin.debug:
-      #    msg: "{{ datafiles.results }}"
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ datafiles.results }}"
 
     - name: Search for 'script' in all directories
       find:
@@ -69,9 +69,9 @@
       command: "python3 {{ files_matched.files[0].path }} -r clusters_smapmirror_info -f {{ datafiles.dest }}"
       register: html_tables
 
-    - name: debug show
-      ansible.builtin.debug:
-        msg: "{{ html_tables.results }}"
+    # - name: debug show
+    #   ansible.builtin.debug:
+    #     msg: "{{ html_tables.results }}"
 
     - name: Send storage usage report via email
       mail:

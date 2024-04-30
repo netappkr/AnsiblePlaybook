@@ -47,7 +47,7 @@
             "snapmirror/relationships": {
                 "_links": {
                     "self": {
-                        "href": "/api/snapmirror/relationships?max_records=1024&fields=transfer%2Chealthy%2Cdestination%2Cstate%2Cunhealthy_reason"
+                        "href": "/api/snapmirror/relationships?max_records=1024&fields=transfer%2Chealthy%2Cdestination%2Cstate%2Cunhealthy_reason%2Cpolicy"
                     }
                 },
                 "num_records": 1,
@@ -71,10 +71,18 @@
                             }
                         },
                         "healthy": true,
+                        "policy": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/snapmirror/policies/1f6d795a-d5d9-11ee-93e9-67ab2b152bbe"
+                                }
+                            },
+                            "uuid": "1f6d795a-d5d9-11ee-93e9-67ab2b152bbe"
+                        },
                         "state": "snapmirrored",
                         "transfer": {
                             "bytes_transferred": 3352,
-                            "end_time": "2024-04-24T03:35:04+00:00",
+                            "end_time": "2024-04-30T02:05:05+00:00",
                             "state": "success",
                             "total_duration": "PT2S"
                         },
@@ -132,10 +140,10 @@
             "snapmirror/relationships": {
                 "_links": {
                     "self": {
-                        "href": "/api/snapmirror/relationships?max_records=1024&fields=transfer%2Chealthy%2Cdestination%2Cstate%2Cunhealthy_reason"
+                        "href": "/api/snapmirror/relationships?max_records=1024&fields=transfer%2Chealthy%2Cdestination%2Cstate%2Cunhealthy_reason%2Cpolicy"
                     }
                 },
-                "num_records": 5,
+                "num_records": 6,
                 "records": [
                     {
                         "_links": {
@@ -150,6 +158,16 @@
                             }
                         },
                         "healthy": false,
+                        "policy": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/snapmirror/policies/d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                                }
+                            },
+                            "name": "MirrorAllSnapshots",
+                            "type": "async",
+                            "uuid": "d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                        },
                         "state": "broken_off",
                         "unhealthy_reason": [
                             {
@@ -175,6 +193,16 @@
                             }
                         },
                         "healthy": true,
+                        "policy": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/snapmirror/policies/d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                                }
+                            },
+                            "name": "MirrorAllSnapshots",
+                            "type": "async",
+                            "uuid": "d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                        },
                         "state": "broken_off",
                         "uuid": "3b51e67c-e752-11ee-8d8a-90e2baa80d8c"
                     },
@@ -191,8 +219,44 @@
                             }
                         },
                         "healthy": true,
+                        "policy": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/snapmirror/policies/d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                                }
+                            },
+                            "name": "MirrorAllSnapshots",
+                            "type": "async",
+                            "uuid": "d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                        },
                         "state": "snapmirrored",
                         "uuid": "639f03ba-2368-11ed-9a74-90e2baa80c8c"
+                    },
+                    {
+                        "_links": {
+                            "self": {
+                                "href": "/api/snapmirror/relationships/aa017bd6-01ed-11ef-8d8a-90e2baa80d8c/"
+                            }
+                        },
+                        "destination": {
+                            "path": "an_svm:wy_dest",
+                            "svm": {
+                                "name": "an_svm"
+                            }
+                        },
+                        "healthy": true,
+                        "policy": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/snapmirror/policies/d6c40da9-8469-11ea-a6e9-90e2baa80c8c"
+                                }
+                            },
+                            "name": "MirrorAndVault",
+                            "type": "async",
+                            "uuid": "d6c40da9-8469-11ea-a6e9-90e2baa80c8c"
+                        },
+                        "state": "uninitialized",
+                        "uuid": "aa017bd6-01ed-11ef-8d8a-90e2baa80d8c"
                     },
                     {
                         "_links": {
@@ -207,6 +271,16 @@
                             }
                         },
                         "healthy": false,
+                        "policy": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/snapmirror/policies/d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                                }
+                            },
+                            "name": "MirrorAllSnapshots",
+                            "type": "async",
+                            "uuid": "d6c36e0e-8469-11ea-a6e9-90e2baa80c8c"
+                        },
                         "state": "broken_off",
                         "unhealthy_reason": [
                             {
@@ -232,6 +306,16 @@
                             }
                         },
                         "healthy": true,
+                        "policy": {
+                            "_links": {
+                                "self": {
+                                    "href": "/api/snapmirror/policies/d6c40da9-8469-11ea-a6e9-90e2baa80c8c"
+                                }
+                            },
+                            "name": "MirrorAndVault",
+                            "type": "async",
+                            "uuid": "d6c40da9-8469-11ea-a6e9-90e2baa80c8c"
+                        },
                         "state": "snapmirrored",
                         "uuid": "f49d5df2-e756-11ee-8d8a-90e2baa80d8c"
                     }
