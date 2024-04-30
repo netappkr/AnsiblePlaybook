@@ -28,7 +28,9 @@
         gather_subset:
           - volume_info
         fields:
-          - '*'
+          - 'svm.name'
+          - 'nas'
+          - 'name'
 
       register: ontap_volumes
       loop: "{{ clusters }}"
