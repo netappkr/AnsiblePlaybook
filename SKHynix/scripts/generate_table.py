@@ -366,9 +366,8 @@ def storage_snapmirror_report_by_cluster(data):
         'report_config': {
             'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report",
             'sorting_rules': [
-                {'column': 'tier', 'order': 'asc'},
-                {'column': 'Total Size(TB)', 'order': 'asc'}, 
-                {'column': 'Node Name', 'order': 'desc'}
+                {'column': 'end_time', 'order': 'asc'},
+                {'column': 'status', 'order': 'asc'}
             ]
         }
     })
