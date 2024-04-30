@@ -380,7 +380,7 @@ def storage_snapmirror_report_by_cluster(data):
             'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report",
             'sorting_rules': [
                 {'column': 'transfer end time', 'order': 'asc'},
-                {'column': 'status', 'order': 'asc'}
+                {'column': 'healthy', 'order': 'asc'}
             ]
         }
     })
