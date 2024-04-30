@@ -347,11 +347,20 @@ def storage_snapmirror_report_by_cluster(data):
     for cluster in data:
         for snapmirror in cluster["ontap_info"]["snapmirror/relationships"]["records"]:
             try:
+                unhealthy_reason = ""
+                transfer_time = ""
+                if "unhealthy_reason" in snapmirror:
+                    unhealthy_reason = snapmirror["unhealthy_reason"]["message"]
+                
+                if 'transfer time' in snapmirror:
+                    transfer_time = snapmirror["transfer"]["end_time"]
+
                 add=pandas.DataFrame.from_records([{
                     'Cluster Name': cluster["cluster"]["name"],
-                    'transfer time': snapmirror["transfer"]["end_time"],
+                    'transfer time': transfer_time,
                     'status': snapmirror["transfer"]["state"],
-                    'end_time': snapmirror["transfer"]["end_time"]
+                    'end_time': snapmirror["transfer"]["end_time"],
+                    'unhealthy_reason': unhealthy_reason
                 }])
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
