@@ -353,13 +353,14 @@ def storage_snapmirror_report_by_cluster(data):
                 if "unhealthy_reason" in snapmirror:
                     unhealthy_reason = snapmirror["unhealthy_reason"][0]["message"]
                 
-                if 'transfer' in snapmirror:
+                if "transfer" in snapmirror:
                     transfer_time = snapmirror["transfer"]["end_time"]
                     transfer_status = snapmirror["transfer"]["state"]
 
                 add=pandas.DataFrame.from_records([{
                     'Cluster Name': cluster["cluster"]["name"],
-                    'status': snapmirror["state"],
+                    'state': snapmirror["state"],
+                    'healthy': snapmirror['healthy'],
                     'transfer end time': transfer_time,
                     'transfer status': transfer_status,
                     'policy': snapmirror["policy"]["name"],
