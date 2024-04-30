@@ -356,7 +356,7 @@ def storage_snapmirror_report_by_cluster(data):
                 if 'transfer' in snapmirror:
                     transfer_time = snapmirror["transfer"]["end_time"]
                     transfer_status = snapmirror["transfer"]["state"]
-                    end_time = snapmirror["transfer"]["end_time"],
+                    end_time = snapmirror["transfer"]["end_time"]
 
                 add=pandas.DataFrame.from_records([{
                     'Cluster Name': cluster["cluster"]["name"],
