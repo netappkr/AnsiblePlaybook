@@ -355,14 +355,12 @@ def storage_snapmirror_report_by_cluster(data):
                 if 'transfer' in snapmirror:
                     transfer_time = snapmirror["transfer"]["end_time"]
                     transfer_status = snapmirror["transfer"]["state"]
-                    end_time = snapmirror["transfer"]["end_time"]
 
                 add=pandas.DataFrame.from_records([{
                     'Cluster Name': cluster["cluster"]["name"],
                     'status': snapmirror["state"],
-                    'transfer time': transfer_time,
+                    'transfer end time': transfer_time,
                     'transfer status': transfer_status,
-                    'end_time': end_time,
                     'policy': snapmirror["policy"]["name"],
                     'unhealthy_reason': unhealthy_reason
                 }])
@@ -379,7 +377,7 @@ def storage_snapmirror_report_by_cluster(data):
         'report_config': {
             'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report",
             'sorting_rules': [
-                {'column': 'end_time', 'order': 'asc'},
+                {'column': 'transfer end time', 'order': 'asc'},
                 {'column': 'status', 'order': 'asc'}
             ]
         }
