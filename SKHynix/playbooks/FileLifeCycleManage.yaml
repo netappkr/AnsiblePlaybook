@@ -62,6 +62,7 @@
           - 'state'
           - 'ip.address'
           - 'services'
+          - 'service_policy.name'
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
