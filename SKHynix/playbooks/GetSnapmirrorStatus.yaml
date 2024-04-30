@@ -28,16 +28,13 @@
           - snapmirror_info
           - snapmirror_policy_info
         fields:
-          - snapmirror_info:
-              - transfer
-              - healthy
-              - destination
-              - state
-              - unhealthy_reason
-              - policy
-          - snapmirror_policy_info:
-              - name
-              - type
+          - transfer
+          - healthy
+          - destination
+          - state
+          - unhealthy_reason
+          - policy
+
       register: ontap_snapmirror
       loop: "{{ clusters }}"
       loop_control:
