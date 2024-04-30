@@ -31,7 +31,6 @@
           - 'svm.name'
           - 'nas'
           - 'name'
-
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
@@ -42,6 +41,37 @@
         dest: "/tmp/volume_path_info.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
+
+    # - name: Filter volumes with NAS path
+    #   set_fact:
+    #     filtered_volumes: "{{ filtered_volumes | default([]) + [item] }}"
+    #   loop: "{{ ontap_volumes.results }}"
+    #   when: item.ontap_info['storage/volumes'].records | json_query('[?nas.path]
+
+    - name: Get rest data information
+      na_ontap_rest_info:
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+        https: true
+        validate_certs: false
+        gather_subset:
+          - net_interface_info
+        fields:
+          - 'svm.name'
+          - 'state'
+          - 'ip.address'
+      register: ontap_volumes
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/volume_path_info.json"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
+      register: datafile
+
 
     #- name: debug show
     #  ansible.builtin.debug:
