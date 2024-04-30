@@ -356,7 +356,7 @@ def storage_snapmirror_report_by_cluster(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{snapmirror['name']}",traceback.format_exc())
+                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{snapmirror['uuid']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
                 print("Error:" ,traceback.format_exc())
