@@ -1,0 +1,64 @@
+---
+- name: Ontap File Lifecycle Managed
+  hosts: task_server_1
+  gather_facts: no
+  collections:
+    - netapp.ontap
+  tasks:
+    - name: install the package, force upgrade
+      pip:
+        name: pip
+        executable: pip3
+        state: latest
+
+    - name: Install Docker SDK for Python
+      ansible.builtin.pip:
+        name:
+        - "pip>=24.0"
+        - "pandas>2.0"
+        executable: pip3
+
+    - name: Get rest data information
+      na_ontap_rest_info:
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+        https: true
+        validate_certs: false
+        gather_subset:
+          - volume_info
+        fields:
+          - 'svm.name'
+          - 'nas.junction_parent'
+          - 'nas.path'
+          - 'name'
+      register: ontap_volumes
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/volume_path_info.json"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
+      register: datafile
+
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ datafile.results }}"
+
+    - name: Search for 'script' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "generate_table.py"
+        recurse: yes
+        file_type: file
+      register: files_matched
+
+    # - name: Print the matched files
+    #   debug:
+    #     msg: "{{ files_matched.files[0].path }}"
+    # - name: xcp scan dir
+    #   command: "python3 {{ files_matched.files[0].path }} -r volume_space_info -f {{ datafile.dest }}"
+    #   register: html_table
+
