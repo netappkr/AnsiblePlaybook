@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# 2024 05 02
 import warnings
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
@@ -41,9 +42,9 @@ def storage_inode_report_by_cluster(data):
                 inode_used= inode_used+volume["files"]["used"]
 
             add=pandas.DataFrame.from_records([{
+                'No': cluster["cluster"]["tier"],
                 'Cluster name': cluster["cluster"]["name"],
                 '업무 구분': cluster["cluster"]["description"],
-                'tier': cluster["cluster"]["tier"],
                 'INODE Total': inode_total,
                 'INODE Used': inode_used,
                 'INODE Free': inode_total - inode_used,
@@ -66,7 +67,7 @@ def storage_inode_report_by_cluster(data):
                 'INODE Free'
             ],
             'sorting_rules': [
-                {'column': 'tier', 'order': 'asc'}
+                {'column': 'No', 'order': 'asc'}
             ]
         }
     })
@@ -129,9 +130,9 @@ def storage_space_report_by_cluster(data):
                 used_size= used_size+aggr["space"]["block_storage"]["used"]
 
             add=pandas.DataFrame.from_records([{
+                'No': cluster["cluster"]["tier"],
                 'Cluster name': cluster["cluster"]["name"],
                 '업무 구분': cluster["cluster"]["description"],
-                'tier': cluster["cluster"]["tier"],
                 'Total Size(TB)': round(total_size/1024/1024/1024/1024),
                 'Used Size(TB)': round(used_size/1024/1024/1024/1024),
                 'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
@@ -148,9 +149,9 @@ def storage_space_report_by_cluster(data):
     tables.append({
         'datatable': datatable,
         'report_config': {
-            'report_name': "CAD Storage Cluster INODE 사용량 Summary",
+            'report_name': "CAD Storage Cluster Capacity Summary",
             'sorting_rules': [
-                {'column': 'tier', 'order': 'asc'}
+                {'column': 'No', 'order': 'asc'}
             ]
         }
     })
@@ -167,8 +168,8 @@ def storage_space_report_by_aggr(data):
                 logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
                 ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
                 add=pandas.DataFrame.from_records([{
+                    'No': cluster["cluster"]["tier"],
                     'Cluster Name': cluster["cluster"]["name"],
-                    'tier': cluster["cluster"]["tier"],
                     'Node Name': aggr["home_node"]["name"],
                     'Aggr Name': aggr["name"],
                     'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
@@ -190,10 +191,10 @@ def storage_space_report_by_aggr(data):
         'datatable': datatable,
         'report_config': {
             'report_name': "------ Aggregates Capacity Report ------",
-            'sorting_rules': [
-                {'column': 'tier', 'order': 'asc'},
-                {'column': 'Total Size(TB)', 'order': 'asc'}, 
-                {'column': 'Node Name', 'order': 'desc'}
+            'sorting_rules': 
+            [
+                {'column': 'No', 'order': 'asc'},
+                {'column': 'Node Name', 'order': 'asc'}
             ]
         }
     })
@@ -234,12 +235,8 @@ def storage_space_report_by_volume(data):
             'datatable': datatable,
             'report_config': {
                 'report_name': cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
-                'custom_col_styles': [
-                    'INODE Total', 
-                    'INODE Used', 
-                    'INODE Free'
-                ],
-                'sorting_rules': [
+                'sorting_rules': 
+                [
                     {'column': 'Used Size(TB)', 'order': 'desc'}, 
                     {'column': 'Total Size(TB)', 'order': 'desc'}
                 ]
@@ -258,10 +255,10 @@ def storage_space_report_by_aggr_in_SoC(data):
                 ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
                 Aggr_tier = aggr["name"][:2]
                 add=pandas.DataFrame.from_records([{
+                    'Tier': Aggr_tier,
                     'Cluster Name': cluster["cluster"]["name"],
                     'Node Name': aggr["home_node"]["name"],
                     'Aggr Name': aggr["name"],
-                    'tier': Aggr_tier,
                     'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
                     'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
                     'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
@@ -281,8 +278,9 @@ def storage_space_report_by_aggr_in_SoC(data):
         'datatable': datatable,
         'report_config': {
             'report_name': "------ Aggregates Capacity Report ------",
-            'sorting_rules': [
-                {'column': 'tier', 'order': 'asc'},
+            'sorting_rules': 
+            [
+                {'column': 'No', 'order': 'asc'},
                 {'column': 'Total Size(TB)', 'order': 'asc'}, 
                 {'column': 'Node Name', 'order': 'desc'}
             ]
@@ -304,9 +302,9 @@ def storage_space_report_by_volume_in_SoC(data):
                 if Volume["style"] == "flexgroup":
                     Aggr_name = "flexgroup"
                 add=pandas.DataFrame.from_records([{
+                    'Tier': Aggr_tier,
                     'SVM Name': Volume["svm"]["name"],
                     'Aggregate': Aggr_name,
-                    'Tier': Aggr_tier,
                     'Volume': Volume['name'],
                     'Total Size(TB)': round(total_size/1024/1024/1024),
                     'Used Size(TB)': round(used_size/1024/1024/1024),
@@ -326,12 +324,7 @@ def storage_space_report_by_volume_in_SoC(data):
         tables.append({
             'datatable': datatable,
             'report_config': {
-                'report_name': cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
-                'custom_col_styles': [
-                    'INODE Total', 
-                    'INODE Used', 
-                    'INODE Free'
-                ],
+                'report_name': "SoC" + cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
                 'sorting_rules': [
                     {'column': 'Used Size(TB)', 'order': 'desc'}, 
                     {'column': 'Total Size(TB)', 'order': 'desc'}
@@ -350,12 +343,19 @@ def storage_snapmirror_report_by_cluster(data):
                 unhealthy_reason = ""
                 transfer_time = ""
                 transfer_status = ""
+                policy_name = ""
                 if "unhealthy_reason" in snapmirror:
                     unhealthy_reason = snapmirror["unhealthy_reason"][0]["message"]
                 
                 if "transfer" in snapmirror:
                     transfer_time = snapmirror["transfer"]["end_time"]
                     transfer_status = snapmirror["transfer"]["state"]
+                
+                if "policy" in snapmirror:
+                    if "name" in snapmirror["policy"]:
+                        policy_name = snapmirror["policy"]["name"]
+                    elif "uuid" in snapmirror["policy"]:
+                        policy_name = snapmirror["policy"]["uuid"]
 
                 add=pandas.DataFrame.from_records([{
                     'Cluster Name': cluster["cluster"]["name"],
@@ -363,7 +363,7 @@ def storage_snapmirror_report_by_cluster(data):
                     'healthy': snapmirror['healthy'],
                     'transfer end time': transfer_time,
                     'transfer status': transfer_status,
-                    'policy': snapmirror["policy"]["name"],
+                    'policy': policy_name,
                     'unhealthy_reason': unhealthy_reason
                 }])
                 datatable=datatable._append(add,ignore_index = True)
@@ -377,11 +377,11 @@ def storage_snapmirror_report_by_cluster(data):
     tables.append({
         'datatable': datatable,
         'report_config': {
-            'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report",
-            'sorting_rules': [
-                {'column': 'transfer end time', 'order': 'asc'},
-                {'column': 'healthy', 'order': 'asc'}
-            ]
+            'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report"
+            # 'sorting_rules': [
+            #     {'column': 'transfer end time', 'order': 'asc'},
+            #     {'column': 'healthy', 'order': 'asc'}
+            # ]
         }
     })
     return tables
@@ -488,7 +488,7 @@ def format_html_style(tables=[]):
 
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         if "custom_col_styles" in table["report_config"]:
-            datatable = datatable.set_properties(subset=table["report_config"]["custom_col_style_list"], **{'text-align': 'right'})
+            datatable = datatable.set_properties(subset=table["report_config"]["custom_col_styles"], **{'text-align': 'right'})
 
         html_tables.append(datatable.to_html())
     return html_tables
@@ -531,6 +531,7 @@ def main():
             volume_tables = storage_space_report_by_volume_in_SoC(data[args.file[1]])
             for table in volume_tables:
                 tables.append(table)
+            html_tables = format_html_style(tables)
         elif args.request == "clusters_snapmirror_info":
             tables = storage_snapmirror_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(tables)
@@ -591,5 +592,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 

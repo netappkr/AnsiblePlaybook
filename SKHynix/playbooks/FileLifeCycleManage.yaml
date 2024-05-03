@@ -71,17 +71,18 @@
     - name: Write result data to a JSON file
       copy:
         dest: "/tmp/net_interface_info.json"
-        content: "{{ ontap_volumes.results | to_nice_json }}"
+        content: "{{ ontap_interface.results | to_nice_json }}"
       register: datafile
 
     - name: Filter volumes with NAS path
       set_fact:
-        filtered_interfaces: "{{ filtered_interfaces | default([]) + [item] }}"
+        interfaces: "{{ filtered_interfaces | default([]) + [item] }}"
       loop: "{{ ontap_interface.results }}"
-      when: item.ontap_info['network/ip/interfaces'].records | json_query('[?service_policy.name=="default-data-files"]')
+      when: item.ontap_info.'network/ip/interfaces'.records | json_query('[?service_policy.name=="default-data-files"]')
     
     - name: Display filtered interfaces
       debug:
-        msg: "{{ filtered_interfaces }}"
+        msg: "{{ interfaces }}"
+
 
 
