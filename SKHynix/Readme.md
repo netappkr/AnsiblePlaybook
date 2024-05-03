@@ -28,7 +28,7 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
     13. ~~Inode Increase: Inode 사용률 75% 이상 인 Volume 에 대하여 Inode 증설~~</br> 
     [UM으로 대체하기로 결정](https://github.com/netappkr/NetAppCloudSolutionCenter/tree/master/py-RestAPI/Ontap/AIQUM%20Script)
     14. DLC (Data Life Cycle) : Storage 에서 특정 확장자 별로 Listup 하여 Report, 특정 기간이 지난 확장자에 대하여 식별 진행, 위의 내용이 History 관리가 가능해야 함
-    - 자세한 요구사항은 [File Life Cycle Manager.md](./FileLifeCycleManager.md) 확인
+      - 자세한 요구사항은 [File Life Cycle Manager.md](./FileLifeCycleManager.md) 확인
 
 
 ## 진행맴버
