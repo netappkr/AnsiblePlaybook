@@ -4,18 +4,18 @@
   collections:
     - netapp.ontap
   tasks:
-    - name: install the package, force upgrade
-      pip:
-        name: pip
-        executable: pip3
-        state: latest
+    # - name: install the package, force upgrade
+    #   pip:
+    #     name: pip
+    #     executable: pip3
+    #     state: latest
 
-    - name: Install Docker SDK for Python
-      ansible.builtin.pip:
-        name:
-        - "pip>=24.0"
-        - "pandas>2.0"
-        executable: pip3
+    # - name: Install Docker SDK for Python
+    #   ansible.builtin.pip:
+    #     name:
+    #     - "pip>=24.0"
+    #     - "pandas>2.0"
+    #     executable: pip3
 
     - name: Get rest data information
       na_ontap_rest_info:
