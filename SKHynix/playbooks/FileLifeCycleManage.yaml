@@ -27,26 +27,26 @@
       debug:
         msg: "{{ ontap_volumes.results }}"
     
-    - name: Filter volumes where export_policy name is 'default'
-      set_fact:
-        default_volumes: "{{ default_volumes | default([]) + [item.name] }}"
-      loop: "{{ item.ontap_info['storage/volumes'].records }}"
-      when: "item.nas.export_policy.name == 'default'"
-      vars:
-        default_volumes: []
-      with_items: "{{ ontap_volumes.results }}"
+    # - name: Filter volumes where export_policy name is 'default'
+    #   set_fact:
+    #     default_volumes: "{{ default_volumes | default([]) + [item.name] }}"
+    #   loop: "{{ item.ontap_info['storage/volumes'].records }}"
+    #   when: "item.nas.export_policy.name == 'default'"
+    #   vars:
+    #     default_volumes: []
+    #   with_items: "{{ ontap_volumes.results }}"
 
-    - name: Display volumes with default export policy
-      debug:
-        msg: "{{ default_volumes }}"
+    # - name: Display volumes with default export policy
+    #   debug:
+    #     msg: "{{ default_volumes }}"
 
-    - name: Write result data to a JSON file
-      copy:
-        dest: "/tmp/volume_path_info.json"
-        content: "{{ ontap_volumes.results | to_nice_json }}"
-      register: datafile
+    # - name: Write result data to a JSON file
+    #   copy:
+    #     dest: "/tmp/volume_path_info.json"
+    #     content: "{{ ontap_volumes.results | to_nice_json }}"
+    #   register: datafile
 
-    - name: "/tmp/volume_path_info.json"
+    # - name: "/tmp/volume_path_info.json"
       
 
 
