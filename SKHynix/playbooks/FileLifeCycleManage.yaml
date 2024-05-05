@@ -29,14 +29,14 @@
 
     - name: Apply json_query and debug result
       debug:
-        msg: "{{ ontap_volumes.results | json_query('ontap_info.\"storage/volumes\".records[?nas.export_policy.name == \"default\"].name | [0]') }}"
+        msg: "{{ ontap_volumes.results | json_query('ontap_info.\"storage/volumes\".records[?nas.export_policy.name == \"default\"].name') }}"
         
     - name: Filter volumes where export_policy name is 'default'
       set_fact:
         default_volumes: "{{ default_volumes | default([]) + item }}"
       loop: "{{ ontap_volumes.results | json_query(query) }}"
       vars:
-        query: "ontap_info.\"storage/volumes\".records[?nas.export_policy.name == \"default\"].name | [0]"
+        query: "ontap_info.\"storage/volumes\".records[?nas.export_policy.name == 'default'].name | [0]"
         default_volumes: []
 
     - name: Display volumes with default export policy
