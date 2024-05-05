@@ -30,7 +30,7 @@
       when: "item.nas.export_policy.name == 'default'"
       loop_control:
         extended: yes
-      loop_var: item
+        loop_var: item
       with_items: "{{ ontap_volumes.results }}"
 
     - name: Display volumes with default export policy
