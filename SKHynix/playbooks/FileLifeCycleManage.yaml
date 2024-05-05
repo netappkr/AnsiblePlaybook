@@ -23,9 +23,9 @@
       loop_control:
         loop_var: cluster
 
-    # - name: debug show
-    #   debug:
-    #     msg: "{{ ontap_volumes.results }}"
+    - name: debug show
+      debug:
+        msg: "{{ ontap_volumes.results }}"
     
     - name: Filter volumes where export_policy name is 'default'
       set_fact:
