@@ -5,19 +5,6 @@
   collections:
     - netapp.ontap
   tasks:
-    # - name: install the package, force upgrade
-    #   pip:
-    #     name: pip
-    #     executable: pip3
-    #     state: latest
-
-    # - name: Install Docker SDK for Python
-    #   ansible.builtin.pip:
-    #     name:
-    #     - "pip>=24.0"
-    #     - "pandas>2.0"
-    #     executable: pip3
-
     - name: Get rest data information
       na_ontap_rest_info:
         hostname: "{{ cluster.ip }}"
@@ -35,6 +22,20 @@
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
+    
+    - name: Filter volumes where export_policy name is 'default'
+      set_fact:
+        default_volumes: "{{ default_volumes | default([]) + [item.name] }}"
+      loop: "{{ item.ontap_info['storage/volumes'].records }}"
+      when: "item.nas.export_policy.name == 'default'"
+      loop_control:
+        extended: yes
+      loop_var: item
+      with_items: "{{ ontap_volumes.results }}"
+
+    - name: Display volumes with default export policy
+      debug:
+        msg: "{{ default_volumes }}"
 
     - name: Write result data to a JSON file
       copy:
@@ -42,47 +43,7 @@
         content: "{{ ontap_volumes.results | to_nice_json }}"
       register: datafile
 
-    # - name: Filter volumes with NAS path
-    #   set_fact:
-    #     filtered_volumes: "{{ filtered_volumes | default([]) + [item] }}"
-    #   loop: "{{ ontap_volumes.results }}"
-    #   when: item.ontap_info['storage/volumes'].records | json_query('[?nas.path]
-
-    - name: Get rest data information
-      na_ontap_rest_info:
-        hostname: "{{ cluster.ip }}"
-        username: "{{ cluster.ID }}"
-        password: "{{ cluster.PW }}"
-        https: true
-        validate_certs: false
-        gather_subset:
-          - net_interface_info
-        fields:
-          - 'svm.name'
-          - 'state'
-          - 'ip.address'
-          - 'services'
-          - 'service_policy.name'
-      register: ontap_interface
-      loop: "{{ clusters }}"
-      loop_control:
-        loop_var: cluster
-
-    - name: Write result data to a JSON file
-      copy:
-        dest: "/tmp/net_interface_info.json"
-        content: "{{ ontap_interface.results | to_nice_json }}"
-      register: datafile
-
-    - name: Filter volumes with NAS path
-      set_fact:
-        interfaces: "{{ filtered_interfaces | default([]) + [item] }}"
-      loop: "{{ ontap_interface.results }}"
-      when: item.ontap_info.'network/ip/interfaces'.records | json_query('[?service_policy.name=="default-data-files"]')
-    
-    - name: Display filtered interfaces
-      debug:
-        msg: "{{ interfaces }}"
-
+    - name: "/tmp/volume_path_info.json"
+      
 
 
