@@ -29,7 +29,7 @@
 
     - name: Apply json_query and debug result
       debug:
-        msg: "{{ ontap_volumes.results | json_query() }}"
+        msg: "{{ ontap_volumes.results | json_query([]) }}"
         
     # - name: Filter volumes where export_policy name is 'default'
     #   set_fact:
