@@ -32,9 +32,8 @@
         default_volumes: "{{ default_volumes | default([]) + [item.name] }}"
       loop: "{{ item.ontap_info['storage/volumes'].records }}"
       when: "item.nas.export_policy.name == 'default'"
-      loop_control:
-        extended: yes
-        loop_var: item
+      vars:
+        default_volumes: []
       with_items: "{{ ontap_volumes.results }}"
 
     - name: Display volumes with default export policy
