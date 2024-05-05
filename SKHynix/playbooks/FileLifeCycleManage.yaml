@@ -1,6 +1,6 @@
 ---
 - name: Ontap File Lifecycle Managed
-  hosts: task_server_1
+  hosts: task_server_1_flm
   gather_facts: no
   collections:
     - netapp.ontap
