@@ -96,7 +96,7 @@ def get_scan_objects(data,config):
     
     for cluster in data:
         try:
-            datacenter = cluster["datacenter"]
+            datacenter = cluster["cluster"]["datacenter"]
             for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
                 svm_name = volume["svm"]["name"] if "name" in volume["svm"] else ""
                 export_policy = volume["nas"]["export_policy"]["name"] if "export_policy" in volume["nas"] and "name" in volume["nas"]["export_policy"] else ""
