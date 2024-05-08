@@ -62,11 +62,11 @@ all:
           config:
             domain: "netappkr.com"
             division:
-              - name: "vol"
+              - name: "soc"
                 vol_name_regexp  : '.*soc.*'
                 exportpolicy:
-                  - name: "exportro_wy"
-                  - name: "exportrw_wy"
+                  - name: "exportro_soc"
+                  - name: "exportrw_soc"
               - name: "wy"
                 vol_name_regexp  : '.*wy.*'
                 exportpolicy:
