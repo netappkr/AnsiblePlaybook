@@ -97,7 +97,7 @@ def check_yaml_integrity(file_path):
             vol_name_regexp = division['vol_name_regexp']
             if not check_regex(vol_name_regexp):
                 exit
-                
+
         logger.error(f"Validation error: {result}")
         print(f"Validation error: {result}")
         exit
@@ -137,11 +137,18 @@ def get_scan_objects(data,config):
                     
                     # Check if volume name matches the regexp or export policy names
                     if re.search(vol_name_regexp, name) or export_policy in exportpolicy_names:
-                        scan_objects.append({
-                            'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
-                            'div' : f"{div['name']}"
-                            }
-                        )
+                        if datacenter == "aws":
+                            scan_objects.append({
+                                'mount_path': f"{svm_name}.{domain}:{path}",
+                                'div' : f"{div['name']}"
+                                }
+                            )
+                        else:
+                            scan_objects.append({
+                                'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
+                                'div' : f"{div['name']}"
+                                }
+                            )
         except KeyError as e:
             # KeyError 발생시 처리 로직
             logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
