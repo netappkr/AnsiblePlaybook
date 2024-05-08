@@ -36,13 +36,15 @@ for json_file in args.file:
 def check_yaml_integrity(file_path):
     required_structure = {
         'config': {
+            'domain': str,
             'division': [
                 {
                     'name': str,
                     'vol_name_regexp': str,
                     'exportpolicy': [{'name': str}]
                 }
-            ]
+            ],
+            'exclude': [{'name': str}]
         }
     }
     # YAML 파일 로드
@@ -52,20 +54,22 @@ def check_yaml_integrity(file_path):
     except Exception as e:
         logger.error(f"validate error: reading YAML file: {e}")
         return f"Error reading YAML file: {e}"
-        # 필수 키 및 구조 검증
 
+    # 필수 키 및 구조 검증
     def validate_structure(data, structure):
         if not isinstance(data, dict):
-            logger.error(f"validate error: data is not a dictionary check the config.yaml")
-            exit
+            return "Data is not a dictionary"
 
         for key, value_type in structure.items():
-            if isinstance(value_type, dict):
+            if isinstance(value_type, list):
                 if key not in data:
                     return f"Missing key {key}"
-                result = validate_structure(data[key], value_type)
-                if result != True:
-                    return result
+                if not isinstance(data[key], list):
+                    return f"Key '{key}' must be a list"
+                for item in data[key]:
+                    result = validate_structure(item, value_type[0])
+                    if result != True:
+                        return result
             else:
                 if key not in data or not isinstance(data[key], value_type):
                     return f"Key '{key}' must be a {value_type.__name__}"
