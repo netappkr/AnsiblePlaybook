@@ -26,28 +26,35 @@
     # - name: debug show
     #   debug:
     #     msg: "{{ ontap_volumes.results }}"
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/volume_path_info.json"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
+      register: datafile
 
-    - name: Apply json_query and debug result
-      debug:
-        msg: "{{ ontap_volumes.results | json_query('[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == `default`].name') }}"
+    - name: Write result data to a config file
+      copy:
+        dest: "/tmp/config.yaml"
+        content: "{{ config | to_nice_yaml }}"
+      register: config
+
+    # - name: Apply json_query and debug result
+    #   debug:
+    #     msg: "{{ ontap_volumes.results | json_query('[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == `default`].name') }}"
         
-    - name: Filter volumes where export_policy name is 'default'
-      set_fact:
-        default_volumes: "{{ default_volumes | default([]) + item }}"
-      loop: "{{ ontap_volumes.results | json_query(query) }}"
-      vars:
-        query: "[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == 'default'].name | [0]"
-        default_volumes: []
+    # - name: Filter volumes where export_policy name is 'default'
+    #   set_fact:
+    #     default_volumes: "{{ default_volumes | default([]) + item }}"
+    #   loop: "{{ ontap_volumes.results | json_query(query) }}"
+    #   vars:
+    #     query: "[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == 'default'].name | [0]"
+    #     default_volumes: []
 
-    - name: Display volumes with default export policy
-      debug:
-        msg: "{{ default_volumes }}"
+    # - name: Display volumes with default export policy
+    #   debug:
+    #     msg: "{{ default_volumes }}"
 
-    # - name: Write result data to a JSON file
-    #   copy:
-    #     dest: "/tmp/volume_path_info.json"
-    #     content: "{{ ontap_volumes.results | to_nice_json }}"
-    #   register: datafile
+
 
     # - name: "/tmp/volume_path_info.json"
       
