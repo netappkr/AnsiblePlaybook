@@ -53,7 +53,7 @@ def check_yaml_integrity(file_path):
             config = yaml.safe_load(file)
     except Exception as e:
         logger.error(f"validate error: reading YAML file: {e}")
-        return f"Error reading YAML file: {e}"
+        exit
 
     # 필수 키 및 구조 검증
     def validate_structure(data, structure):
@@ -70,6 +70,12 @@ def check_yaml_integrity(file_path):
                     result = validate_structure(item, value_type[0])
                     if result != True:
                         return result
+            elif isinstance(value_type, dict):
+                if key not in data:
+                    return f"Missing key {key}"
+                result = validate_structure(data[key], value_type)
+                if result != True:
+                    return result
             else:
                 if key not in data or not isinstance(data[key], value_type):
                     return f"Key '{key}' must be a {value_type.__name__}"
@@ -77,8 +83,7 @@ def check_yaml_integrity(file_path):
     
     result = validate_structure(config, required_structure)
     if result != True:
-        logger.error(f"validate error: {result}")
-        exit
+        return f"Validation error: {result}"
     else:
         return config
     
