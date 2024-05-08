@@ -163,10 +163,18 @@ def main():
     # cURL command's target URL
     # url = 'http://10.10.242.101:12993/metrics'  # Replace with your actual URL
     # 무결성 검사 실행
-    config = check_yaml_integrity(args.config)
-    print(get_scan_objects(data[args.file[0]],config))
-    # test.
-    # read_the_file_and_save_metrics(files,args.output_json_file_path,includelist,excludelist)
+    try:
+        if args.request == "get_scan_object":
+            config = check_yaml_integrity(args.config)
+            print(get_scan_objects(data[args.file[0]],config))
+            logger.info("print success the HTML")        
+        else:
+            logger.error(args.request+" request is not matched")
+            print(args.request+" request is not matched")
+
+    except Exception as e:
+        print("Error:" ,traceback.format_exc())
+        logger.error(traceback.format_exc())
 
 if __name__ == "__main__":
     main()

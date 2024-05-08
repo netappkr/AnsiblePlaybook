@@ -66,8 +66,23 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate HTML table from inode information using a Python script
-      command: "python3 {{ files_matched.files[0].path }} --config {{ config.dest }} -f {{ datafile.dest }}"
-      register: html_table
-      
+      command: "python3 {{ files_matched.files[0].path }} -r get_scan_object --config {{ config.dest }} -f {{ datafile.dest }}"
+      register: volume_list
+
+    - name: Display volume_list
+      debug:
+        msg: "{{ volume_list }}"
+
+    # - name: Execute ls -al for each mount path
+    #   command: "ls -al {{ item.mount_path.split(':')[1] }}"
+    #   loop: "{{ volume_list }}"
+    #   register: ls_result
+    #   changed_when: false
+    #   ignore_errors: true
+
+    # - name: Print ls -al results for each mount path
+    #   debug:
+    #     msg: "Result for {{ item.item.mount_path }}:\n{{ item.stdout }}"
+    #   loop: "{{ ls_result.results }}"
 
 
