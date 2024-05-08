@@ -140,13 +140,15 @@ def get_scan_objects(data,config):
                         if datacenter == "aws":
                             scan_objects.append({
                                 'mount_path': f"{svm_name}.{domain}:{path}",
-                                'div' : f"{div['name']}"
+                                'div' : f"{div['name']}",
+                                'export_policy': f"{export_policy}"
                                 }
                             )
                         else:
                             scan_objects.append({
                                 'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
-                                'div' : f"{div['name']}"
+                                'div' : f"{div['name']}",
+                                'export_policy': f"{export_policy}"
                                 }
                             )
         except KeyError as e:
