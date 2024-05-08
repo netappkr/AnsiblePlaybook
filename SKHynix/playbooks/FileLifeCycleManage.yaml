@@ -71,7 +71,7 @@
 
     - name: Display volume_list
       debug:
-        msg: "{{ volume_list }}"
+        msg: "{{ volume_list.stdout }}"
 
     # - name: Execute ls -al for each mount path
     #   command: "ls -al {{ item.mount_path.split(':')[1] }}"
