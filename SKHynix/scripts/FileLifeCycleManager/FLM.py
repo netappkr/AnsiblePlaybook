@@ -39,6 +39,7 @@ def check_yaml_integrity(file_path):
     try:
         with open(file_path, 'r') as file:
             config = yaml.safe_load(file)
+        return config
     except Exception as e:
         return f"Error reading YAML file: {e}"
 
