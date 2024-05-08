@@ -81,9 +81,23 @@ def check_yaml_integrity(file_path):
                     return f"Key '{key}' must be a {value_type.__name__}"
         return True
     
+    def check_regex(regexp):
+        try:
+            re.compile(regexp)
+            return True
+        except re.error:
+            return False
+
     result = validate_structure(config, required_structure)
     if result != True:
-        return f"Validation error: {result}"
+        # 정규식 표현 검증
+        for division in config['config']['division']:
+            vol_name_regexp = division['vol_name_regexp']
+            if not check_regex(vol_name_regexp):
+                logger.error(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.")
+                exit
+        logger.error(f"Validation error: {result}")
+        exit
     else:
         return config
     
