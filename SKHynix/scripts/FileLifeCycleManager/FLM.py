@@ -84,8 +84,10 @@ def get_scan_objects(data,config):
     domain = config['config']['domain']
     division = config['config']['division']
     exclude = config['config']['exclude']
+    
     for cluster in data:
         try:
+            datacenter = cluster["datacenter"]
             for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
                 svm_name = volume["svm"]["name"] if "name" in volume["svm"] else ""
                 export_policy = volume["nas"]["export_policy"]["name"] if "export_policy" in volume["nas"] and "name" in volume["nas"]["export_policy"] else ""
@@ -110,7 +112,7 @@ def get_scan_objects(data,config):
                     # Check if volume name matches the regexp or export policy names
                     if re.match(vol_name_regexp, name) or export_policy in exportpolicy_names:
                         scan_objects.append({
-                            'mount_path': f"{svm_name}.{cluster["datacenter"]}.{config["domain"]}:{path}",
+                            'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
                             'div' : f"{div['name']}"
                             }
                         )
