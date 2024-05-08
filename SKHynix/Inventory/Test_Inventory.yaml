@@ -42,6 +42,7 @@ all:
             description: "Netapp APAC AWS account"
             ID: ID
             PW: PW
+            datacenter: aws
             tier: 1
           - name: FAS8040
             ip: 0.0.0.0
@@ -49,21 +50,30 @@ all:
             ID: ID
             PW: PW
             tier: 2
+            datacenter: nkic
           - name: AFF8080
             ip: 0.0.0.0
             description: "NetappKR local"
             ID: ID
             PW: PW
             tier: 3
-        config:
-          exportpolicy:
-            - name: "default"
-            - name: "exportrw"
-          kind:
-            - division: "sim1"
-              vol_name_regexp  : '\b(sim1\w*)'
-            - division: "soc"
-              vol_name_regexp  : '\b(sim1\w*)'
+            datacenter: nkic
+        flm:
+          config:
+            domain: "netappkr.com"
+            division:
+              - name: "vol"
+                vol_name_regexp  : '*vol*'
+                exportpolicy:
+                  - name: "exportro_wy"
+                  - name: "exportrw_wy"
+              - name: "wy"
+                vol_name_regexp  : '*wy*'
+                exportpolicy:
+                  - name: "exportro_wy"
+                  - name: "exportrw_wy"
+            exclude:
+              - name: "test"
         scripts_dir: '/opt/awx/projects'
         email_to: <<email>>
         email_from: <<email>>

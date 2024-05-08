@@ -8,6 +8,7 @@ import json
 import logging
 import traceback
 import yaml
+import re
 parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
@@ -26,11 +27,22 @@ file_handler = logging.FileHandler('flm.log', mode='a') ## 파일 핸들러 생�
 file_handler.setFormatter(formatter) ## 텍스트 포맷 설정
 logger.addHandler(file_handler) ## 핸들러 등록
 
+# JSON 파일로부터 데이터를 읽어옵니다.
+data={}
+for json_file in args.file:
+    with open(json_file, 'r') as file:
+        data[json_file] = json.load(file)
+
 def check_yaml_integrity(file_path):
     required_structure = {
-    'config': {
-        'exportpolicy': [{'name': str}],
-        'kind': [{'division': str, 'vol_name_regexp': str}]
+        'config': {
+            'division': [
+                {
+                    'name': str,
+                    'vol_name_regexp': str,
+                    'exportpolicy': [{'name': str}]
+                }
+            ]
         }
     }
     # YAML 파일 로드
@@ -45,31 +57,77 @@ def check_yaml_integrity(file_path):
     def validate_structure(data, structure):
         if not isinstance(data, dict):
             logger.error(f"validate error: data is not a dictionary check the config.yaml")
-            return f"Data is not a dictionary"
+            exit
 
         for key, value_type in structure.items():
-            if isinstance(value_type, list):
+            if isinstance(value_type, dict):
                 if key not in data:
                     return f"Missing key {key}"
-                if not isinstance(data[key], list):
-                    return f"Key '{key}' must be a list"
-                for item in data[key]:
-                    result = validate_structure(item, value_type[0])
-                    if result != True:
-                        return result
+                result = validate_structure(data[key], value_type)
+                if result != True:
+                    return result
+            else:
+                if key not in data or not isinstance(data[key], value_type):
+                    return f"Key '{key}' must be a {value_type.__name__}"
         return True
     
     result = validate_structure(config, required_structure)
     if result != True:
-        return f"validate error: {result}"
+        logger.error(f"validate error: {result}")
+        exit
     else:
         return config
+    
+def get_scan_objects(data,config):
+    scan_objects =[]
+    # Extract configuration details
+    domain = config['config']['domain']
+    division = config['config']['division']
+    exclude = config['config']['exclude']
+    for cluster in data:
+        try:
+            for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+                svm_name = volume["svm"]["name"] if "name" in volume["svm"] else ""
+                export_policy = volume["nas"]["export_policy"]["name"] if "export_policy" in volume["nas"] and "name" in volume["nas"]["export_policy"] else ""
+                path = volume["nas"]["path"] if "path" in volume["nas"] else ""
+                name = volume["name"]
+                if not svm_name:
+                    logger.debug(f"{cluster['cluster']['name']} svm.name key가 비어 있습니다.")
+                if not export_policy:
+                    logger.debug(f"{cluster['cluster']['name']} nas.export_policy.name key가 비어 있습니다.")
+                if not path:
+                    logger.debug(f"{cluster['cluster']['name']} nas.path key가 비어 있습니다.")
+
+                # Check if the volume should be excluded
+                if any(ex['name'] == name for ex in exclude):
+                    continue
+
+                # Check if volume matches any division criteria
+                for div in division:
+                    vol_name_regexp = div['vol_name_regexp']
+                    exportpolicy_names = [exp['name'] for exp in div['exportpolicy']]
+                    
+                    # Check if volume name matches the regexp or export policy names
+                    if re.match(vol_name_regexp, name) or export_policy in exportpolicy_names:
+                        scan_objects.append({
+                            'mount_path': f"{svm_name}.{cluster["datacenter"]}.{config["domain"]}:{path}",
+                            'div' : f"{div['name']}"
+                            }
+                        )
+        except KeyError as e:
+            # KeyError 발생시 처리 로직
+            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
+        except Exception as e:
+            logger.error(traceback.format_exc())
+            print("Error:" ,traceback.format_exc())
+    return scan_objects
 
 def main():
     # cURL command's target URL
     # url = 'http://10.10.242.101:12993/metrics'  # Replace with your actual URL
     # 무결성 검사 실행
-    print(check_yaml_integrity(args.config))
+    config = check_yaml_integrity(args.config)
+    print(get_scan_objects(data[args.file[0]],config))
     # test.
     # read_the_file_and_save_metrics(files,args.output_json_file_path,includelist,excludelist)
 
