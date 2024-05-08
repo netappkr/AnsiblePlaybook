@@ -63,12 +63,12 @@ all:
             domain: "netappkr.com"
             division:
               - name: "vol"
-                vol_name_regexp  : '*vol*'
+                vol_name_regexp  : '.*vol.*'
                 exportpolicy:
                   - name: "exportro_wy"
                   - name: "exportrw_wy"
               - name: "wy"
-                vol_name_regexp  : '*wy*'
+                vol_name_regexp  : '.*wy.*'
                 exportpolicy:
                   - name: "exportro_wy"
                   - name: "exportrw_wy"

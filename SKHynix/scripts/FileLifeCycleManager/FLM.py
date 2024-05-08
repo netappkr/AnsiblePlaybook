@@ -119,7 +119,7 @@ def get_scan_objects(data,config):
                     exportpolicy_names = [exp['name'] for exp in div['exportpolicy']]
                     
                     # Check if volume name matches the regexp or export policy names
-                    if re.match(vol_name_regexp, name) or export_policy in exportpolicy_names:
+                    if re.search(vol_name_regexp, name) or export_policy in exportpolicy_names:
                         scan_objects.append({
                             'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
                             'div' : f"{div['name']}"
