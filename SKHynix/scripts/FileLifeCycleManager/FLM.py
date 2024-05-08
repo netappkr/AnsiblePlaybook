@@ -86,6 +86,8 @@ def check_yaml_integrity(file_path):
             re.compile(regexp)
             return True
         except re.error:
+            logger.error(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.")
+            print(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.")
             return False
 
     result = validate_structure(config, required_structure)
@@ -94,9 +96,10 @@ def check_yaml_integrity(file_path):
         for division in config['config']['division']:
             vol_name_regexp = division['vol_name_regexp']
             if not check_regex(vol_name_regexp):
-                logger.error(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.")
                 exit
+                
         logger.error(f"Validation error: {result}")
+        print(f"Validation error: {result}")
         exit
     else:
         return config
