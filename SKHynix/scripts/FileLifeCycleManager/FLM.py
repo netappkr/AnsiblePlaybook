@@ -40,11 +40,13 @@ def check_yaml_integrity(file_path):
         with open(file_path, 'r') as file:
             config = yaml.safe_load(file)
     except Exception as e:
+        logger.error(f"validate error: reading YAML file: {e}")
         return f"Error reading YAML file: {e}"
         # 필수 키 및 구조 검증
 
     def validate_structure(data, structure):
         if not isinstance(data, dict):
+            logger.error(f"validate error: data is not a dictionary check the config.yaml")
             return f"Data is not a dictionary"
 
         for key, value_type in structure.items():
@@ -63,7 +65,8 @@ def check_yaml_integrity(file_path):
     if result != True:
         print("validate error: ",result)
         exit
-    return config
+    else:
+        return config
 
 def main():
     # cURL command's target URL
