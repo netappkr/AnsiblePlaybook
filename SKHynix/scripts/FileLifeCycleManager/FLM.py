@@ -48,15 +48,15 @@ def check_yaml_integrity(file_path):
             return f"Data is not a dictionary"
 
         for key, value_type in structure.items():
-            if isinstance(value_type, dict):
+            if isinstance(value_type, list):
                 if key not in data:
                     return f"Missing key {key}"
-                result = validate_structure(data[key], value_type)
-                if result != True:
-                    return result
-            else:
-                if key not in data or not isinstance(data[key], value_type):
-                    return f"Key '{key}' must be a {value_type.__name__}"
+                if not isinstance(data[key], list):
+                    return f"Key '{key}' must be a list"
+                for item in data[key]:
+                    result = validate_structure(item, value_type[0])
+                    if result != True:
+                        return result
         return True
     
     result = validate_structure(config, required_structure)
