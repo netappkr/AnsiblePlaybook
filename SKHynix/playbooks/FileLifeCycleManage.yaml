@@ -53,10 +53,21 @@
     # - name: Display volumes with default export policy
     #   debug:
     #     msg: "{{ default_volumes }}"
+    - name: Search for 'script' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "FLM.py"
+        recurse: yes
+        file_type: file
+      register: files_matched
 
+    - name: Print the matched files
+      debug:
+        msg: "{{ files_matched.files[0].path }}"
 
-
-    # - name: "/tmp/volume_path_info.json"
+    - name: Generate HTML table from inode information using a Python script
+      command: "python3 {{ files_matched.files[0].path }} --config {{ config.dest }} -f {{ datafile.dest }}"
+      register: html_table
       
 
 
