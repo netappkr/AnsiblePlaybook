@@ -39,11 +39,31 @@ def check_yaml_integrity(file_path):
     try:
         with open(file_path, 'r') as file:
             config = yaml.safe_load(file)
-        return config
     except Exception as e:
         return f"Error reading YAML file: {e}"
+        # 필수 키 및 구조 검증
 
+    def validate_structure(data, structure):
+        if not isinstance(data, dict):
+            return f"Data is not a dictionary"
 
+        for key, value_type in structure.items():
+            if isinstance(value_type, dict):
+                if key not in data:
+                    return f"Missing key {key}"
+                result = validate_structure(data[key], value_type)
+                if result != True:
+                    return result
+            else:
+                if key not in data or not isinstance(data[key], value_type):
+                    return f"Key '{key}' must be a {value_type.__name__}"
+        return True
+    
+    result = validate_structure(config, required_structure)
+    if result != True:
+        print("validate error: ",result)
+        exit
+    return config
 
 def main():
     # cURL command's target URL
