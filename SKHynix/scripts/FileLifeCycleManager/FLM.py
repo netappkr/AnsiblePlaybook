@@ -28,11 +28,9 @@ logger.addHandler(file_handler) ## 핸들러 등록
 
 def check_yaml_integrity(file_path):
     required_structure = {
-        'exportpolicy': {
-            'name': str
-        },
-        'kind': {
-            'division': str
+    'config': {
+        'exportpolicy': [{'name': str}],
+        'kind': [{'division': str, 'vol_name_regexp': str}]
         }
     }
     # YAML 파일 로드
