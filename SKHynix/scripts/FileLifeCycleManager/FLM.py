@@ -63,8 +63,7 @@ def check_yaml_integrity(file_path):
     
     result = validate_structure(config, required_structure)
     if result != True:
-        print("validate error: ",result)
-        exit
+        return f"validate error: {result}"
     else:
         return config
 
