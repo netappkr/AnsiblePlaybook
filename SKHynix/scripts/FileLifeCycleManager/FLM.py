@@ -142,7 +142,7 @@ def get_scan_objects(data,config):
                                 'mount_path': f"{svm_name}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option':f"{div['xcp_option']}"
+                                'xcp_option':div['xcp_option']
                                 }
                             )
                         else:
@@ -150,7 +150,7 @@ def get_scan_objects(data,config):
                                 'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option':f"{div['xcp_option']}"
+                                'xcp_option':div['xcp_option']
                                 }
                             )
         except KeyError as e:
