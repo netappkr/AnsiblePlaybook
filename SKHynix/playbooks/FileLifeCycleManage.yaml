@@ -86,8 +86,7 @@
     #   loop: "{{ ls_result.results }}"
 
     - name: xcp scan
-      command: xcp scan -match "{{volume.xcp_option.match}}" 
-        -fmt "{{volume.xcp_option.fmt}}" "{{ volume.mount_path }}"
+      command: xcp scan -match {{volume.xcp_option.match}} -fmt {{volume.xcp_option.fmt}} {{ volume.mount_path }}
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
