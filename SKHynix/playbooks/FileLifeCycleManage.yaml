@@ -85,10 +85,15 @@
     #     msg: "Result for {{ item.item.mount_path }}:\n{{ item.stdout }}"
     #   loop: "{{ ls_result.results }}"
 
-    - name: Generate HTML table from inode information using a Python script
+    - name: xcp scan
       command: xcp scan -match "type == f and modified > 1*day and (fnm('*.fsdb') or fnm('*.tr') or fnm('*.wlf') or fnm('*.tr[0-9]'))" 
         -fmt "'{} {}'.format(size, x)" "{{ volume.mount_path }}"
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
         loop_var: volume
+      register: scan_list
+
+    - name: Display volume_list
+      debug:
+        msg: "{{ volume_list.stdout }}"
