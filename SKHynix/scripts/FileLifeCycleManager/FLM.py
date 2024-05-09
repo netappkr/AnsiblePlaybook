@@ -120,11 +120,11 @@ def get_scan_objects(data,config):
                 path = volume["nas"]["path"] if "path" in volume["nas"] else ""
                 name = volume["name"]
                 if not svm_name:
-                    logger.debug(f"{cluster['cluster']['name']} svm.name key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸의 svm.name key가 비어 있습니다.")
                 if not export_policy:
-                    logger.debug(f"{cluster['cluster']['name']} nas.export_policy.name key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸의 nas.export_policy.name key가 비어 있습니다.")
                 if not path:
-                    logger.debug(f"{cluster['cluster']['name']} nas.path key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸의 nas.path key가 비어 있습니다.")
 
                 # Check if the volume should be excluded
                 if any(ex['name'] == name for ex in exclude):
