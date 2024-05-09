@@ -96,7 +96,7 @@
 
     - name: Display scan list stdout
       debug:
-        msg: "{{ scan_list.stdout_lines }}"
+        msg: "{{ scan_list }}"
     - name: Display scan list stderr
       debug:
         msg: "{{ scan_list.stderr_lines }}"
