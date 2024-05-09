@@ -96,7 +96,14 @@
 
     - name: Display scan list stdout
       debug:
-        msg: "{{ scan_list }}"
+        msg: "{{ results.stdout }} {{results.stdout_lines}}"
+      loop: "{{ scan_list.results }}"
+      loop_control:
+        loop_var: results
+
     - name: Display scan list stderr
       debug:
         msg: "{{ scan_list.stderr_lines }}"
+      loop: "{{ scan_list.results }}"
+      loop_control:
+        loop_var: results
