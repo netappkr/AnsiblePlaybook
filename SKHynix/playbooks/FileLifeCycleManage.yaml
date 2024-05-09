@@ -87,7 +87,7 @@
 
     - name: Generate HTML table from inode information using a Python script
       command: xcp scan -match "type == f and modified > 1*day and (fnm('*.fsdb') or fnm('*.tr') or fnm('*.wlf') or fnm('*.tr[0-9]'))" 
-        -fmt "'{{size}} {{x}}'" "{{ volume.mount_path }}"
-      loop: "{{ volume_list }}"
+        -fmt "'{} {}'.format(size, x)" "{{ volume.mount_path }}"
+      loop: "{{ volume_list.stdout }}"
       loop_control:
         loop_var: volume
