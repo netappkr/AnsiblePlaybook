@@ -103,7 +103,7 @@
 
     - name: Display scan list stderr
       debug:
-        msg: "{{ scan_list.stderr_lines }}"
+        msg: "{{ results.stderr_lines }}"
       loop: "{{ scan_list.results }}"
       loop_control:
         loop_var: results
