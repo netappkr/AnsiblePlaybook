@@ -96,4 +96,4 @@
 
     - name: Display volume_list
       debug:
-        msg: "{{ volume_list.stdout }}"
+        msg: "{{ scan_list }}"
