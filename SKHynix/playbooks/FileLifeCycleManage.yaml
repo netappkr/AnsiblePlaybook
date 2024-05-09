@@ -94,6 +94,9 @@
         loop_var: volume
       register: scan_list
 
-    - name: Display scan list
+    - name: Display scan list stout
       debug:
-        msg: "{{ scan_list }}"
+        msg: "{{ scan_list.stout }}"
+    - name: Display scan list sterr
+      debug:
+        msg: "{{ scan_list.sterr }}"
