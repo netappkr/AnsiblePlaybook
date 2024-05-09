@@ -141,14 +141,16 @@ def get_scan_objects(data,config):
                             scan_objects.append({
                                 'mount_path': f"{svm_name}.{domain}:{path}",
                                 'div' : f"{div['name']}",
-                                'export_policy': f"{export_policy}"
+                                'export_policy': f"{export_policy}",
+                                'xcp_option':f"{div['xcp_option']}"
                                 }
                             )
                         else:
                             scan_objects.append({
                                 'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
                                 'div' : f"{div['name']}",
-                                'export_policy': f"{export_policy}"
+                                'export_policy': f"{export_policy}",
+                                'xcp_option':f"{div['xcp_option']}"
                                 }
                             )
         except KeyError as e:

@@ -86,7 +86,7 @@
     #   loop: "{{ ls_result.results }}"
 
     - name: xcp scan
-      command: xcp scan -match "type == f and modified > 1*day and (fnm('*.fsdb') or fnm('*.tr') or fnm('*.wlf') or fnm('*.tr[0-9]'))" 
+      command: xcp scan -match "{{xcp_option.match}}" 
         -fmt "'{} {}'.format(size, x)" "{{ volume.mount_path }}"
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"

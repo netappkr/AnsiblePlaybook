@@ -67,11 +67,17 @@ all:
                 exportpolicy:
                   - name: "exportro_soc"
                   - name: "exportrw_soc"
+                xcp_option:
+                  - match : "type == f and modified > 1*day and (fnm('*.fsdb') or fnm('*.tr') or fnm('*.wlf') or fnm('*.tr[0-9]'))"
+                  - fmt: "'{} {}'.format(size, x)"
               - name: "wy"
                 vol_name_regexp  : '.*wy.*'
                 exportpolicy:
                   - name: "exportro_wy"
                   - name: "exportrw_wy"
+                xcp_option:
+                  - match : "type == f and modified > 1*day and (fnm('*.txt') or fnm('*.log') or fnm('*.json')"
+                  - fmt: "'{} {}'.format(size, x)"
             exclude:
               - name: "test"
         scripts_dir: '/opt/awx/projects'
