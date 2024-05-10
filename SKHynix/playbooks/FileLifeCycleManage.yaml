@@ -97,6 +97,13 @@
     #   debug:
     #     msg: "{{scan_list}}"
 
+    - name: Format scan results
+      set_fact:
+        formatted_results: "{{ formatted_results | default([]) + [item[2:] | join('\n')] }}"
+      loop: "{{ scan_list.results }}"
+      loop_control:
+        loop_var: item
+
     - name: Send storage scan report via email
       mail:
         host: "{{ smtp_server }}"
@@ -105,12 +112,12 @@
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "FLM list"
-        body: "{{ scan_list.results | map(attribute='stdout_lines') | join('</br>') }}"
+        body: "{{ formatted_results | join('\n\n') }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
-        - Content-Type="text/html"
+          - Content-Type="text/html"
 
     # - name: Display scan list stdout
     #   debug:
