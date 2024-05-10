@@ -99,7 +99,7 @@
 
     - name: Format scan results
       set_fact:
-        formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
+        formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
       loop: "{{ scan_list.results }}"
       loop_control:
         loop_var: item
