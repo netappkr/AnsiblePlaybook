@@ -180,7 +180,7 @@ gantt
     Sample Playbook 작성                : done, p7-1, 2024-05-06, 5d
     Sample Python Script 작성           : done, p7-2, 2024-05-06, 5d
     Playbook 적용 Test: p7-3, after p7-2,  2d
-    Playbook 수정 : p7-3, after p7-3 , 3d
+    Playbook 수정 : p7-4, after p7-3 , 3d
 
     section Check usage by Directory Playbook
     Sample Playbook 작성 : p8-1, after p4-4, 5d
