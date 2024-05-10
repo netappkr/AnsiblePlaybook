@@ -112,7 +112,7 @@
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "FLM list"
-        body: "{{ formatted_results | join('<br><br>') }}"
+        body: "{{ formatted_results | join('<br>') }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
