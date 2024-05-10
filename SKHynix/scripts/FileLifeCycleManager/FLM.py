@@ -19,26 +19,30 @@ args= parser.parse_args()
 # 사용자 홈 디렉토리 경로 얻기
 home_dir = os.path.expanduser("~")
 log_dir = os.path.join(home_dir, "logs")
+
 # 로그 디렉토리가 존재하지 않으면 생성
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
+
 # 로그 파일 경로 설정
 log_file_path = os.path.join(log_dir, "flm.log")
 
-# 로깅 설정
-logging.basicConfig(filename=log_file_path)
-# logger
-logger = logging.getLogger(name='flm_log')
-logger.setLevel(logging.DEBUG) ## 경고 수준 설정
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
-## 스트림헨들러로 콘솔에 출력
-# stream_handler = logging.StreamHandler() ## 스트림 핸들러 생성
-# stream_handler.setFormatter(formatter) ## 텍스트 포맷 설정
-# logger.addHandler(stream_handler) ## 핸들러 등록
-## 파일 핸들러로 파일에 남김
-file_handler = logging.FileHandler('flm.log', mode='a') ## 파일 핸들러 생성
-file_handler.setFormatter(formatter) ## 텍스트 포맷 설정
-logger.addHandler(file_handler) ## 핸들러 등록
+# 로거 설정
+logger = logging.getLogger('generate_table_log')
+logger.setLevel(logging.DEBUG)  # 로그 레벨 설정
+
+# 로그 포맷 설정
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+
+# 파일 핸들러 설정
+file_handler = logging.FileHandler(log_file_path, mode='a')  # 파일 경로를 정확하게 지정
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+# 선택적으로 콘솔 로그 출력
+# stream_handler = logging.StreamHandler()
+# stream_handler.setFormatter(formatter)
+# logger.addHandler(stream_handler)
 
 # JSON 파일로부터 데이터를 읽어옵니다.
 data={}
