@@ -23,7 +23,7 @@ log_dir = os.path.join(home_dir, "logs")
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 # 로그 파일 경로 설정
-log_file_path = os.path.join(log_dir, "application.log")
+log_file_path = os.path.join(log_dir, "flm.log")
 
 # 로깅 설정
 logging.basicConfig(filename=log_file_path)
