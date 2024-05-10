@@ -175,18 +175,18 @@ gantt
     section check the Data Life Cycle Playbook
     Sample Playbook 작성                : done, p7-1, 2024-05-06, 5d
     Sample Python Script 작성           : done, p7-2, 2024-05-06, 5d
-    Playbook 적용 Test: p7-3, after p7-2,  2d
-    Playbook 수정 : p7-4, after p7-3 , 3d
+    Playbook 적용 Test                  : p7-3, after p7-2,  2d
+    Playbook 수정                       : p7-4, after p7-3 , 3d
 
     section Check usage by Directory Playbook
-    Sample Playbook 작성 : p8-1, after p4-4, 5d
-    Playbook 적용 Test: p8-2, after p7-1,  5d
-    Playbook 수정 : p8-3, after p7-1 , 5d
+    Sample Playbook 작성                : p8-1, after p7-4, 2d
+    Playbook 적용 Test                  : p8-2, after p8-1, 3d
+    Playbook 수정                       : p8-3, after p8-2, 3d
 
     section check the File status Playbook
-    Sample Playbook 작성 : p9-1, after p7-3, 5d
-    Playbook 적용 Test: p9-2, after p8-1,  5d
-    Playbook 수정 : p9-3, after p8-1 , 5d
+    Sample Playbook 작성                : p9-1, after p8-2, 2d
+    Playbook 적용 Test                  : p9-2, after p9-1, 3d
+    Playbook 수정                       : p9-3, after p9-2, 3d
 ```
 
 # 참조
