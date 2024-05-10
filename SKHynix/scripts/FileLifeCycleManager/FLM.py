@@ -9,11 +9,24 @@ import logging
 import traceback
 import yaml
 import re
+import os
 parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
 parser.add_argument("--config", type=str, help="config.yaml",required=True)
 args= parser.parse_args()
+
+# 사용자 홈 디렉토리 경로 얻기
+home_dir = os.path.expanduser("~")
+log_dir = os.path.join(home_dir, "logs")
+# 로그 디렉토리가 존재하지 않으면 생성
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+# 로그 파일 경로 설정
+log_file_path = os.path.join(log_dir, "application.log")
+
+# 로깅 설정
+logging.basicConfig(filename=log_file_path)
 # logger
 logger = logging.getLogger(name='flm_log')
 logger.setLevel(logging.DEBUG) ## 경고 수준 설정

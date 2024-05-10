@@ -43,8 +43,6 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 
 > Task 상태에 대한 설명은 참조란을 확인합니다.
 
-### 이슈사항 요약
-- [등록된 AWX 설치가이드가 인터넷이 차단된 환경에서 작동하지 않습니다.](https://github.com/netappkr/AnsiblePlaybook/issues/2)
 <details>
 <summary>Task table</summary>
 
