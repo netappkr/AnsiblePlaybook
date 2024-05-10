@@ -92,26 +92,25 @@
       loop_control:
         loop_var: volume
       register: scan_list
-      
-    - name: Display scan list
-      debug:
-        msg: "{{scan_list}}"
 
-    # - name: Send storage scan report via email
-    #   mail:
-    #     host: "{{ smtp_server }}"
-    #     port: "{{ smtp_port }}"
-    #     username: "{{ smtp_username }}"
-    #     password: "{{ smtp_password }}"
-    #     to: "{{ email_to }}"
-    #     subject: "FLM list"
-    #     body: "{{ scan_list.results.stdout }}"
-    #     from: "{{ email_from }}"
-    #     secure: starttls
-    #     subtype: html
-    #     headers: 
-    #     - Content-Type="text/html"
-    #   when: html_table.stdout is defined
+    # - name: Display scan list
+    #   debug:
+    #     msg: "{{scan_list}}"
+
+    - name: Send storage scan report via email
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        subject: "FLM list"
+        body: "{{ scan_list.msg.results | map(attribute='stdout_lines') | join('\n') }}"
+        from: "{{ email_from }}"
+        secure: starttls
+        subtype: html
+        headers: 
+        - Content-Type="text/html"
 
     # - name: Display scan list stdout
     #   debug:
