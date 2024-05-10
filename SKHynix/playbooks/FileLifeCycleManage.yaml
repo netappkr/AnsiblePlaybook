@@ -65,7 +65,7 @@
       debug:
         msg: "{{ files_matched.files[0].path }}"
 
-    - name: Generate HTML table from inode information using a Python script
+    - name: Generate FLM list
       command: "python3 {{ files_matched.files[0].path }} -r get_scan_object --config {{ config.dest }} -f {{ datafile.dest }}"
       register: volume_list
 
@@ -92,17 +92,37 @@
       loop_control:
         loop_var: volume
       register: scan_list
-
-    - name: Display scan list stdout
+      
+    - name: Display scan list
       debug:
-        msg: "{{ results.stdout }} {{results.stdout_lines}}"
-      loop: "{{ scan_list.results }}"
-      loop_control:
-        loop_var: results
+        msg: "{{scan_list}}"
 
-    - name: Display scan list stderr
-      debug:
-        msg: "{{ results.stderr_lines }}"
-      loop: "{{ scan_list.results }}"
-      loop_control:
-        loop_var: results
+    # - name: Send storage scan report via email
+    #   mail:
+    #     host: "{{ smtp_server }}"
+    #     port: "{{ smtp_port }}"
+    #     username: "{{ smtp_username }}"
+    #     password: "{{ smtp_password }}"
+    #     to: "{{ email_to }}"
+    #     subject: "FLM list"
+    #     body: "{{ scan_list.results.stdout }}"
+    #     from: "{{ email_from }}"
+    #     secure: starttls
+    #     subtype: html
+    #     headers: 
+    #     - Content-Type="text/html"
+    #   when: html_table.stdout is defined
+
+    # - name: Display scan list stdout
+    #   debug:
+    #     msg: "{{results.stdout_lines}}"
+    #   loop: "{{ scan_list.results }}"
+    #   loop_control:
+    #     loop_var: results
+
+    # - name: Display scan list stderr
+    #   debug:
+    #     msg: "{{ results.stderr_lines }}"
+    #   loop: "{{ scan_list.results }}"
+    #   loop_control:
+    #     loop_var: results
