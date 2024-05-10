@@ -99,7 +99,7 @@
 
     - name: Format scan results
       set_fact:
-        formatted_results: "{{ formatted_results | default([]) + [item[2:] | join('\n')] }}"
+        formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
       loop: "{{ scan_list.results }}"
       loop_control:
         loop_var: item
@@ -112,7 +112,7 @@
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "FLM list"
-        body: "{{ formatted_results | join('\n\n') }}"
+        body: "{{ formatted_results | join('<br><br>') }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
