@@ -167,14 +167,10 @@ gantt
     Playbook 적용 Test                  : done, p6-5, 2024-05-02 , 1d
 
     section Snapmirror/vault Check status Playbook
-    Sample Playbook 작성 : active, p6-1, after p4-4, 5d
-    Sample Python Script 작성 : active, p6-2, after p6-1, 5d
-    Playbook 적용 Test: p6-2, after p6-1,  5d
-    Playbook 수정 : p6-3, after p6-1 , 5d
-    Playbook 적용 Test: p6-2, after p6-1,  5d
-    Playbook 수정 : p6-3, after p6-1 , 5d
-    Playbook 적용 Test: p6-2, after p6-1,  5d
-    Playbook 수정 : p6-3, after p6-1 , 5d
+    Sample Playbook 작성                : done, p6-1, 2024-04-29, 1d
+    Sample Python Script 작성           : done, p6-2, 2024-04-29, 1d
+    Playbook 적용 Test                  : done, p6-3, 2024-05-02, 1d
+    Playbook 수정                       : p6-4, after p6-3 , 1d
 
     section check the Data Life Cycle Playbook
     Sample Playbook 작성                : done, p7-1, 2024-05-06, 5d
