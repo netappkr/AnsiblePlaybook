@@ -105,7 +105,7 @@
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "FLM list"
-        body: "{{ scan_list.results | map(attribute='stdout_lines') | join('\n') }}"
+        body: "{{ scan_list.results | map(attribute='stdout_lines') | join('</br>') }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
