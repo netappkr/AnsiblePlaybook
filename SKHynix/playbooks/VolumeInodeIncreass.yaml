@@ -1,0 +1,38 @@
+---
+- name: Increase volume inode with NetApp ONTAP
+  hosts: task_server_1_receiver
+  gather_facts: no
+  collections:
+    - netapp.ontap
+  tasks:
+    - name: Get rest data information
+      na_ontap_rest_info:
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+        https: true
+        validate_certs: false
+        gather_subset:
+          - volume_info
+        fields:
+          - 'svm.name'
+          - 'files'
+          - 'name'
+          - 'aggregates.name'
+          - 'style'
+      register: ontap_volumes
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+      when: clusters.name == target.name
+
+    - name: modify files by FlexVol
+      na_ontap_volume:
+        state: present
+        name: {{}}
+        size: {{}}
+        vserver: ansibleVServer
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+
