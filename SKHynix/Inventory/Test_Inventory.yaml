@@ -58,27 +58,27 @@ all:
             PW: PW
             tier: 3
             datacenter: nkic
-        flm:
-          config:
-            domain: "netappkr.com"
-            division:
-              - name: "soc"
-                vol_name_regexp  : '.*soc.*'
-                exportpolicy:
+        flm:                                            # flm
+          config:                                       
+            domain: "netappkr.com"                      # 클러스터들이 바라보는 운영 DNS 이름
+            division:                                   # 부서별 설정 별도 설정을 위한 분기
+              - name: "soc"                             # 태깅할 이름
+                vol_name_regexp  : '.*soc.*'            # 볼륨이름을 정규식 표현을 통해 매치조건을 설정합니다.        
+                exportpolicy:                           # export policy 이름 매칭                         # 두조건 모두 일치할떄 해당 부서의 자원으로 태깅합니다.        
                   - name: "exportro_soc"
                   - name: "exportrw_soc"
-                xcp_option:
-                  match : "type == f and modified > 1*day and (fnm('*.fsdb') or fnm('*.tr') or fnm('*.wlf') or fnm('*.tr[0-9]'))"
+                xcp_option:                            # playbook을 통해 xcp 명령 실행 시 옵션 값 설정입니다.
+                  match : "type == f and modified > 1*day and fnm('*.fsdb') or fnm('*.tr') or fnm('*.wlf') or fnm('*.tr[0-9]')"
                   fmt: "'{} {}'.format(size, x)"
-              - name: "wy"
+              - name: "wy"                           
                 vol_name_regexp  : '.*wy.*'
                 exportpolicy:
                   - name: "exportro_wy"
                   - name: "exportrw_wy"
                 xcp_option:
-                  match : "type == f and modified > 1*day and (fnm('*.txt') or fnm('*.log') or fnm('*.json')"
+                  match : "type == f and fnm('*.txt') or fnm('*.log') or fnm('*.json')"
                   fmt: "'{} {}'.format(size, x)"
-            exclude:
+            exclude:                                   # 예외처리 할 볼륨이름입니다. 조건에 부합하더라도 예외에 이름이 있는경우 FLM 대상에 포함되지 않습니다.
               - name: "test"
         scripts_dir: '/opt/awx/projects'
         email_to: <<email>>
@@ -89,3 +89,4 @@ all:
         smtp_password: <<app_password>>
         ansible_user: root
         ansible_ssh_private_key_file: ~/.ssh/SeanP.pem
+---
