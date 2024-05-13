@@ -78,7 +78,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Inode Usage by Volume Report"
+        subject: "ONTAP Inode Usage by Volume Report {{ '%Y-%m-%d' | strftime }} "
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
