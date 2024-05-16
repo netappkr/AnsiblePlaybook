@@ -105,6 +105,7 @@
         loop_var: item
 
     - name: Send storage scan report via email
+      gather_facts: yes
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
