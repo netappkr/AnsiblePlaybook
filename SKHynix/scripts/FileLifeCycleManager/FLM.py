@@ -27,7 +27,7 @@ if not os.path.exists(log_dir):
 log_file_path = os.path.join(log_dir, "flm.log")
 
 # 로거 설정
-logger = logging.getLogger('generate_table_log')
+logger = logging.getLogger('flm')
 logger.setLevel(logging.INFO)  # 로그 레벨 설정
 
 # 로그 포맷 설정
