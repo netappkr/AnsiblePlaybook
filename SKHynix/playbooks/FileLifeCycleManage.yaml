@@ -111,7 +111,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "FLM list {{ now(utc=true,fmt='%Y-%m-%d %H:%M:%S') }} "
+        subject: "FLM list {{ now(fmt='%Y-%m-%d %H:%M:%S') }} "
         body: "{{ formatted_results | join('<br>') }}"
         from: "{{ email_from }}"
         secure: starttls
