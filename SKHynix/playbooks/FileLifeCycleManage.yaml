@@ -105,14 +105,13 @@
         loop_var: item
 
     - name: Send storage scan report via email
-      gather_facts: yes
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "FLM list {{ansible_date_time.date}} "
+        subject: "FLM list {{ now(utc=true,fmt='%Y-%m-%d %H:%M:%S') }} "
         body: "{{ formatted_results | join('<br>') }}"
         from: "{{ email_from }}"
         secure: starttls
