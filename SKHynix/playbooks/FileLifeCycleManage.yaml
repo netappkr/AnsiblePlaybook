@@ -111,7 +111,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "FLM list {{ansible_date_time.data}} "
+        subject: "FLM list {{ansible_date_time.date}} "
         body: "{{ formatted_results | join('<br>') }}"
         from: "{{ email_from }}"
         secure: starttls
