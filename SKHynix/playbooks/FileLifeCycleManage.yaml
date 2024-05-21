@@ -1,6 +1,6 @@
 ---
 - name: Distributed xcp scan
-  hosts: scan_hosts
+  hosts: task_server_DLC
   gather_facts: no
   strategy: free
   collections:
@@ -55,7 +55,7 @@
     - name: xcp scan
       command: xcp scan -match "{{volume.xcp_option.match}}" -fmt "{{volume.xcp_option.fmt}}" {{ volume.mount_path }}
       async: 600
-      poll: 0
+      poll: 2
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
