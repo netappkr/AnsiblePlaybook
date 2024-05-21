@@ -61,9 +61,6 @@
       loop_control:
         loop_var: volume
       register: scan_list
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['scan_hosts'] }}"
-      when: item is defined
 
     - name: Wait for all xcp scan tasks to complete
       async_status:
