@@ -1,9 +1,8 @@
 ---
-- name: Ontap File Lifecycle Managed
-  hosts: task_server_1_DLC
+- name: Distributed xcp scan
+  hosts: scan_hosts
   gather_facts: no
-  collections:
-    - netapp.ontap
+  strategy: free
   tasks:
     - name: Get rest data information
       na_ontap_rest_info:
@@ -23,9 +22,6 @@
       loop_control:
         loop_var: cluster
 
-    # - name: debug show
-    #   debug:
-    #     msg: "{{ ontap_volumes.results }}"
     - name: Write result data to a JSON file
       copy:
         dest: "/tmp/volume_path_info.json"
@@ -38,21 +34,6 @@
         content: "{{ DLC | to_nice_yaml }}"
       register: config
 
-    # - name: Apply json_query and debug result
-    #   debug:
-    #     msg: "{{ ontap_volumes.results | json_query('[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == `default`].name') }}"
-
-    # - name: Filter volumes where export_policy name is 'default'
-    #   set_fact:
-    #     default_volumes: "{{ default_volumes | default([]) + item }}"
-    #   loop: "{{ ontap_volumes.results | json_query(query) }}"
-    #   vars:
-    #     query: "[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == 'default'].name | [0]"
-    #     default_volumes: []
-
-    # - name: Display volumes with default export policy
-    #   debug:
-    #     msg: "{{ default_volumes }}"
     - name: Search for 'script' in all directories
       find:
         paths: "{{ scripts_dir }}"
@@ -60,10 +41,6 @@
         recurse: yes
         file_type: file
       register: files_matched
-
-    - name: Print the matched files
-      debug:
-        msg: "{{ files_matched.files[0].path }}"
 
     - name: Generate FLM list
       command: "python3 {{ files_matched.files[0].path }} -r get_scan_object --config {{ config.dest }} -f {{ datafile.dest }}"
@@ -73,37 +50,53 @@
       debug:
         msg: "{{ volume_list.stdout }}"
 
-    # - name: Execute ls -al for each mount path
-    #   command: "ls -al {{ item.mount_path.split(':')[1] }}"
-    #   loop: "{{ volume_list }}"
-    #   register: ls_result
-    #   changed_when: false
-    #   ignore_errors: true
-
-    # - name: Print ls -al results for each mount path
-    #   debug:
-    #     msg: "Result for {{ item.item.mount_path }}:\n{{ item.stdout }}"
-    #   loop: "{{ ls_result.results }}"
-
     - name: xcp scan
       command: xcp scan -match "{{volume.xcp_option.match}}" -fmt "{{volume.xcp_option.fmt}}" {{ volume.mount_path }}
+      async: 600
+      poll: 0
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
         loop_var: volume
       register: scan_list
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['scan_hosts'] }}"
+      when: item is defined
+
+    - name: Wait for all xcp scan tasks to complete
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 30
+      delay: 10
+      loop: "{{ scan_list.results }}"
+      loop_control:
+        loop_var: item
 
     - name: get auto path
       command: ssh chopin1 getauto auto.{{volume.autopath.automap}} | grep -w "{{volume.mount_path}}" | awk "'{print $1}'"
+      async: 600
+      poll: 0
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
         loop_var: volume
       register: auto_path_list
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['scan_hosts'] }}"
+      when: item is defined
 
-    # - name: Display scan list
-    #   debug:
-    #     msg: "{{scan_list}}"
+    - name: Wait for all get auto path tasks to complete
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 30
+      delay: 10
+      loop: "{{ auto_path_list.results }}"
+      loop_control:
+        loop_var: item
 
     - name: Format scan results
       set_fact:
@@ -130,8 +123,6 @@
       loop_control:
         loop_var: item
 
-      register: scan_list
-
     - name: Send storage scan report via email
       mail:
         host: "{{ smtp_server }}"
@@ -139,24 +130,10 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "FLM list {{ now(fmt='%Y-%m-%d %H:%M:%S') }} "
+        subject: "FLM list {{ ansible_date_time.date }} "
         body: "{{ formatted_results | join('<br>') }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
           - Content-Type="text/html"
-
-    # - name: Display scan list stdout
-    #   debug:
-    #     msg: "{{results.stdout_lines}}"
-    #   loop: "{{ scan_list.results }}"
-    #   loop_control:
-    #     loop_var: results
-
-    # - name: Display scan list stderr
-    #   debug:
-    #     msg: "{{ results.stderr_lines }}"
-    #   loop: "{{ scan_list.results }}"
-    #   loop_control:
-    #     loop_var: results
