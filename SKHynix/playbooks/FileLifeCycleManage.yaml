@@ -58,7 +58,7 @@
     - name: Split volume list into chunks for parallel processing
       set_fact:
         volumes_per_host: "{{ volume_list.stdout_lines | chunk_groups(item) }}"
-      loop: "{{ groups['scan_hosts'] }}"
+      loop: "{{ groups['task_server_DLC'] }}"
       loop_control:
         loop_var: item
 
@@ -72,7 +72,7 @@
         loop_var: volume
       register: scan_list
       delegate_to: "{{ item }}"
-      with_items: "{{ groups['scan_hosts'] }}"
+      with_items: "{{ groups['task_server_DLC'] }}"
 
     - name: Wait for all xcp scan tasks to complete
       async_status:
