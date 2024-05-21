@@ -1,6 +1,6 @@
 ---
 - name: Distributed xcp scan
-  hosts: task_server_DLC
+  hosts: task_server_1_DLC
   gather_facts: no
   strategy: free
   collections:
