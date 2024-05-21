@@ -1,10 +1,9 @@
 ---
-- name: Distributed xcp scan
+- name: Ontap File Lifecycle Managed
   hosts: task_server_1_DLC
   gather_facts: no
-  strategy: free
   collections:
-  - netapp.ontap
+    - netapp.ontap
   tasks:
     - name: Get rest data information
       na_ontap_rest_info:
@@ -44,6 +43,10 @@
         file_type: file
       register: files_matched
 
+    - name: Print the matched files
+      debug:
+        msg: "{{ files_matched.files[0].path }}"
+
     - name: Generate FLM list
       command: "python3 {{ files_matched.files[0].path }} -r get_scan_object --config {{ config.dest }} -f {{ datafile.dest }}"
       register: volume_list
@@ -52,15 +55,24 @@
       debug:
         msg: "{{ volume_list.stdout }}"
 
+    - name: Split volume list into chunks for parallel processing
+      set_fact:
+        volumes_per_host: "{{ volume_list.stdout_lines | chunk_groups(item) }}"
+      loop: "{{ groups['scan_hosts'] }}"
+      loop_control:
+        loop_var: item
+
     - name: xcp scan
-      command: xcp scan -match "{{volume.xcp_option.match}}" -fmt "{{volume.xcp_option.fmt}}" {{ volume.mount_path }}
+      command: xcp scan -match "{{ volume.xcp_option.match }}" -fmt "{{ volume.xcp_option.fmt }}" {{ volume.mount_path }}
       async: 600
-      poll: 2
+      poll: 0
       ignore_errors: true
-      loop: "{{ volume_list.stdout }}"
+      loop: "{{ volumes_per_host }}"
       loop_control:
         loop_var: volume
       register: scan_list
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['scan_hosts'] }}"
 
     - name: Wait for all xcp scan tasks to complete
       async_status:
@@ -74,14 +86,16 @@
         loop_var: item
 
     - name: get auto path
-      command: ssh chopin1 getauto auto.{{volume.autopath.automap}} | grep -w "{{volume.mount_path}}" | awk "'{print $1}'"
+      command: ssh chopin1 getauto auto.{{ volume.autopath.automap }} | grep -w "{{ volume.mount_path }}" | awk "'{print $1}'"
       async: 600
       poll: 0
       ignore_errors: true
-      loop: "{{ volume_list.stdout }}"
+      loop: "{{ volumes_per_host }}"
       loop_control:
         loop_var: volume
       register: auto_path_list
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['task_server_DLC'] }}"
 
     - name: Wait for all get auto path tasks to complete
       async_status:
@@ -105,17 +119,17 @@
     - name: Write result data to a scan_list file
       copy:
         dest: "/tmp/scan_list_file_results.list"
-        content: "{{ scan_list_file_results | join('\n')}}"
+        content: "{{ scan_list_file_results | join('\n') }}"
       register: scan_list_file
 
     - name: Display auto_path_list
       debug:
-        msg: "{{auto_path_list.results}}"
+        msg: "{{ auto_path_list.results }}"
 
     - name: change file
-      command: "cat {{scan_list_file.dest}} | awk -F'{{item.0.stdout_lines}}' '{print $1 \"/{{item.1.volume.autopath.automap}}/{{item.1.stdout_lines}}/\"$2}'"
+      command: "cat {{ scan_list_file.dest }} | awk -F'{{ item.0.stdout_lines }}' '{print $1 \"/{{ item.1.volume.autopath.automap }}/{{ item.1.stdout_lines }}/\"$2}'"
       ignore_errors: true
-      loop: "{{ scan_list.results | zip(auto_path_list.results)}}"
+      loop: "{{ scan_list.results | zip(auto_path_list.results) }}"
       loop_control:
         loop_var: item
 
@@ -131,5 +145,5 @@
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
-        headers: 
+        headers:
           - Content-Type="text/html"
