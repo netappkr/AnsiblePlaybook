@@ -3,6 +3,8 @@
   hosts: scan_hosts
   gather_facts: no
   strategy: free
+  collections:
+  - netapp.ontap
   tasks:
     - name: Get rest data information
       na_ontap_rest_info:
