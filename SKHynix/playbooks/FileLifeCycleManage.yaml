@@ -1,6 +1,6 @@
 ---
 - name: Ontap File Lifecycle Managed
-  hosts: task_server_1_flm
+  hosts: task_server_1_DLC
   gather_facts: no
   collections:
     - netapp.ontap
@@ -35,13 +35,13 @@
     - name: Write result data to a config file
       copy:
         dest: "/tmp/config.yaml"
-        content: "{{ flm | to_nice_yaml }}"
+        content: "{{ DLC | to_nice_yaml }}"
       register: config
 
     # - name: Apply json_query and debug result
     #   debug:
     #     msg: "{{ ontap_volumes.results | json_query('[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == `default`].name') }}"
-        
+
     # - name: Filter volumes where export_policy name is 'default'
     #   set_fact:
     #     default_volumes: "{{ default_volumes | default([]) + item }}"
@@ -56,7 +56,7 @@
     - name: Search for 'script' in all directories
       find:
         paths: "{{ scripts_dir }}"
-        patterns: "FLM.py"
+        patterns: "DLC.py"
         recurse: yes
         file_type: file
       register: files_matched
@@ -93,6 +93,14 @@
         loop_var: volume
       register: scan_list
 
+    - name: get auto path
+      command: ssh chopin1 getauto auto.{{volume.autopath.automap}} | grep -w "{{volume.mount_path}}" | awk "'{print $1}'"
+      ignore_errors: true
+      loop: "{{ volume_list.stdout }}"
+      loop_control:
+        loop_var: volume
+      register: auto_path_list
+
     # - name: Display scan list
     #   debug:
     #     msg: "{{scan_list}}"
@@ -100,9 +108,29 @@
     - name: Format scan results
       set_fact:
         formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
+        scan_list_file_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
       loop: "{{ scan_list.results }}"
       loop_control:
         loop_var: item
+
+    - name: Write result data to a scan_list file
+      copy:
+        dest: "/tmp/scan_list_file_results.list"
+        content: "{{ scan_list_file_results | join('\n')}}"
+      register: scan_list_file
+
+    - name: Display auto_path_list
+      debug:
+        msg: "{{auto_path_list.results}}"
+
+    - name: change file
+      command: "cat {{scan_list_file.dest}} | awk -F'{{item.0.stdout_lines}}' '{print $1 \"/{{item.1.volume.autopath.automap}}/{{item.1.stdout_lines}}/\"$2}'"
+      ignore_errors: true
+      loop: "{{ scan_list.results | zip(auto_path_list.results)}}"
+      loop_control:
+        loop_var: item
+
+      register: scan_list
 
     - name: Send storage scan report via email
       mail:

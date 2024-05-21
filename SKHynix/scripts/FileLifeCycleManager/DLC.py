@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# 2024 05 02
 import warnings
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
+import pandas
 import json
 import logging
 import traceback
@@ -24,10 +24,10 @@ if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
 # 로그 파일 경로 설정
-log_file_path = os.path.join(log_dir, "flm.log")
+log_file_path = os.path.join(log_dir, "DLC.log")
 
 # 로거 설정
-logger = logging.getLogger('flm')
+logger = logging.getLogger('generate_table_log')
 logger.setLevel(logging.INFO)  # 로그 레벨 설정
 
 # 로그 포맷 설정
@@ -56,7 +56,6 @@ def check_yaml_integrity(file_path):
             'division': [
                 {
                     'name': str,
-                    'vol_name_regexp': str,
                     'exportpolicy': [{'name': str}]
                 }
             ],
@@ -110,7 +109,10 @@ def check_yaml_integrity(file_path):
     if result != True:
         # 정규식 표현 검증
         for division in config['config']['division']:
-            vol_name_regexp = division['vol_name_regexp']
+            if 'vol_name_regexp' in division:
+                vol_name_regexp = division['vol_name_regexp']
+            else:
+                vol_name_regexp = ".*"
             if not check_regex(vol_name_regexp):
                 exit
 
@@ -147,18 +149,24 @@ def get_scan_objects(data,config):
                     continue
 
                 # Check if volume matches any division criteria
-                for div in division:
-                    vol_name_regexp = div['vol_name_regexp']
+                for div in division: 
+                    if 'vol_name_regexp' in div: 
+                        vol_name_regexp = div['vol_name_regexp']
+                    else:
+                        vol_name_regexp = ".*"
                     exportpolicy_names = [exp['name'] for exp in div['exportpolicy']]
-                    
+                    if not svm_name:
+                        logger.debug(f"{div['name']} 의 vol_name_regexp key가 비어 있습니다.")
+
                     # Check if volume name matches the regexp or export policy names
                     if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
-                        if datacenter == "aws":
+                        if datacenter == "test":
                             scan_objects.append({
                                 'mount_path': f"{svm_name}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option':div['xcp_option']
+                                'xcp_option':div['xcp_option'],
+                                'autopath': div['autopath']
                                 }
                             )
                         else:
@@ -166,7 +174,8 @@ def get_scan_objects(data,config):
                                 'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option':div['xcp_option']
+                                'xcp_option':div['xcp_option'],
+                                'autopath': div['autopath']
                                 }
                             )
         except KeyError as e:
