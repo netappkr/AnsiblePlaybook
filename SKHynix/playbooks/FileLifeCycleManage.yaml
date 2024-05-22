@@ -94,7 +94,7 @@
       register: scan_list
 
     - name: get auto path
-      command: getauto auto.{{volume.autopath.automap}} | grep -w "{{volume.mount_path}}" | awk "'{print $1}'"
+      command: /opt/getauto/getauto auto.{{volume.autopath.automap}} | grep -w "{{volume.mount_path}}" | awk "'{print $1}'"
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
