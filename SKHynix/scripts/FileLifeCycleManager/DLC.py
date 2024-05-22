@@ -169,6 +169,15 @@ def get_scan_objects(data,config):
                                 'autopath': div['autopath']
                                 }
                             )
+                        elif datacenter == "aws":
+                            scan_objects.append({
+                                'mount_path': f"{svm_name}.{domain}:{path}",
+                                'div' : f"{div['name']}",
+                                'export_policy': f"{export_policy}",
+                                'xcp_option':div['xcp_option'],
+                                'autopath': div['autopath']
+                                }
+                            )
                         else:
                             scan_objects.append({
                                 'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
