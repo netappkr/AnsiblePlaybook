@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# 2024 05 02
 import warnings
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
@@ -137,6 +138,7 @@ def get_scan_objects(data,config):
                 export_policy = volume["nas"]["export_policy"]["name"] if "export_policy" in volume["nas"] and "name" in volume["nas"]["export_policy"] else ""
                 path = volume["nas"]["path"] if "path" in volume["nas"] else ""
                 name = volume["name"]
+                cluster_name = cluster['cluster']['name']
                 if not svm_name:
                     logger.debug(f"{cluster['cluster']['name']} {name} 볼룸의 svm.name key가 비어 있습니다.")
                 if not export_policy:
@@ -162,15 +164,7 @@ def get_scan_objects(data,config):
                     if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
                         if datacenter == "test":
                             scan_objects.append({
-                                'mount_path': f"{svm_name}.{domain}:{path}",
-                                'div' : f"{div['name']}",
-                                'export_policy': f"{export_policy}",
-                                'xcp_option':div['xcp_option'],
-                                'autopath': div['autopath']
-                                }
-                            )
-                        elif datacenter == "aws":
-                            scan_objects.append({
+                                'volume' : name,
                                 'mount_path': f"{svm_name}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
@@ -180,10 +174,11 @@ def get_scan_objects(data,config):
                             )
                         else:
                             scan_objects.append({
-                                'mount_path': f"{svm_name}.{datacenter}.{domain}:{path}",
+                                'volume' : name,
+                                'mount_path': f"{cluster_name}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option':div['xcp_option'],
+                                'xcp_option': div['xcp_option'],
                                 'autopath': div['autopath']
                                 }
                             )

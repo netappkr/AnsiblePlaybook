@@ -1,0 +1,88 @@
+---
+- name: Ontap File Lifecycle Managed
+  hosts: task_server_1_DLC
+  gather_facts: no
+  collections:
+    - netapp.ontap
+  tasks:
+    - name: Get rest data information
+      na_ontap_rest_info:
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+        https: true
+        validate_certs: false
+        gather_subset:
+          - volume_info
+        fields:
+          - 'svm.name'
+          - 'nas'
+          - 'name'
+      register: ontap_volumes
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/volume_path_info.json"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
+      register: datafile
+
+    - name: Write result data to a config file
+      copy:
+        dest: "/tmp/config.yaml"
+        content: "{{ DLC | to_nice_yaml }}"
+      register: config
+
+    - name: Search for 'script' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "DLC.py"
+        recurse: yes
+        file_type: file
+      register: files_matched
+
+    - name: Print the matched files
+      debug:
+        msg: "{{ files_matched.files[0].path }}"
+
+    - name: Generate FLM list
+      command: "python3 {{ files_matched.files[0].path }} -r get_scan_object --config {{ config.dest }} -f {{ datafile.dest }}"
+      register: volume_list
+
+    - name: Display volume_list
+      debug:
+        msg: "{{ volume_list.stdout }}"
+
+    - name: mkdir
+      shell: | 
+        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}
+      ignore_errors: true
+      loop: "{{ DLC.config.division }}"
+      loop_control:
+        loop_var: division
+
+    - name: xcp scan
+      shell: |
+        . /sw/LSF/conf/profile.lsf
+        bsub -q STORAGE -o /data/vine/Ansible_XCP/xcp_result/{{volume.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volume.volume}}_result -e /data/vine/Ansible_XCP/xcp_result/{{volume.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volume.volume}}_info /opt/NetApp/xFiles/xcp/linux/xcp scan -match "{{volume.xcp_option.match}}" -fmt "{{volume.xcp_option.fmt}}" {{ volume.mount_path }}
+      ignore_errors: true
+      loop: "{{ volume_list.stdout }}"
+      loop_control:
+        loop_var: volume
+      register: scan_list
+
+    - name: Format scan results
+      set_fact:
+        formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
+        scan_list_file_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
+      loop: "{{ scan_list.results }}"
+      loop_control:
+        loop_var: item
+
+    - name: Write result data to a scan_list file
+      copy:
+        dest: "/tmp/scan_list_file_results.list"
+        content: "{{ scan_list_file_results | join('\n')}}"
+      register: scan_list_file

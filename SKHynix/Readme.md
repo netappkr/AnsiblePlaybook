@@ -69,6 +69,10 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
 | Capacity Report by Volume Playbook  | Playbook 적용 Test          |2024-04-03|2024-04-05| 안우영,유한민 | done | --- | --- |
 | Capacity Report by Volume Playbook  | Playbook 수정               |2024-04-08|2024-04-09| 안우영 | done | --- | --- |
 | Snapmirror/vault Check status Playbook     | Playbook 수정               |2024-04-22|2024-04-27| 안우영 | active | [Snapmirror/vault Check status Playbook ](./playbooks/GetSnapmirrorStatus.yaml) | --- |
+| Capacity Report by Aggregate & volume Playbook | Sample Playbook 작성         |2024-04-08|2024-03-22| 안우영 | done | [Capacity Report by cluster Playbook](./playbooks/GetSpaceUsagebyCluster.yaml) | --- |
+| Capacity Report by Aggregate & volume Playbook  | Sample python script 작성   |2024-03-18|2024-03-22| 안우영 | done | [generate_table.py](./script/generate_table.py) | --- |
+| Capacity Report by Aggregate & volume Playbook  | Playbook 적용 Test          |2024-04-03|2024-04-05| 안우영,유한민 | done | --- | --- |
+| Capacity Report by Aggregate & volume Playbook  | Playbook 수정               |2024-04-08|2024-04-09| 안우영 | done | --- | --- |
 
 
 </details>
@@ -173,11 +177,15 @@ gantt
     section check the Data Life Cycle Playbook
     Sample Playbook 작성                : done, p7-1, 2024-05-06, 5d
     Sample Python Script 작성           : done, p7-2, 2024-05-06, 5d
-    Playbook 적용 Test                  : p7-3, after p7-2,  2d
-    Playbook 수정                       : p7-4, after p7-3 , 3d
+    Playbook 적용 Test                  : done, p7-3, 2024-05-16, 2d
+    Inventory 값 수정 및 스크립트 수정    : done, p7-4, 2024-05-16, 2d
+    Playbook 적용 Test                  : done, p7-5, 2024-05-23, 2d
+    Playbook 수정 LSM job manager 활용   : done, p7-6, 2024-05-23, 2d
+    Playbook 적용 Test                  : done, p7-7, 2024-05-23, 2d
+    AutoPath 리포트를 위한 서브 Playbook 작성 : active, p7-8, 2024-05-28, 3d
 
     section Check usage by Directory Playbook
-    Sample Playbook 작성                : p8-1, after p7-4, 2d
+    Sample Playbook 작성                : p8-1, after p7-8, 2d
     Playbook 적용 Test                  : p8-2, after p8-1, 3d
     Playbook 수정                       : p8-3, after p8-2, 3d
 
