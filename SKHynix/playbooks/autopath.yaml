@@ -1,0 +1,36 @@
+---
+- name: Modify mount.path in file based on get.auto output
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Run get.auto command
+      command: /path/to/get.auto auto.sim
+      register: getauto_output
+
+    - name: Parse get.auto output into dictionary
+      set_fact:
+        mount_mappings: >-
+          {{
+            dict(
+              getauto_output.stdout.split()[i], 
+              getauto_output.stdout.split()[i + 1]
+            )
+            for i in range(3, len(getauto_output.stdout.split()), 2)
+          )}
+
+    - name: Read the file content
+      slurp:
+        path: /path/to/your/data.txt
+      register: file_content
+
+    - name: Decode file content
+      set_fact:
+        decoded_content: "{{ file_content.content | b64decode }}"
+
+    - name: Replace mount paths in file content using Jinja template
+      template:
+        src: /path/to/your/template.j2
+        dest: /path/to/your/modified_data.txt
+      vars:
+        data: "{{ decoded_content.splitlines() }}"
+        mount_mappings: "{{ mount_mappings }}"
