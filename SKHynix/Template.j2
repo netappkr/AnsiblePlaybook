@@ -1,0 +1,8 @@
+{% for line in data %}
+{% set parts = line.split() %}
+{% set count = parts[0] %}
+{% set old_path = parts[1] %}
+{% set new_mount_path = old_path.split(':')[1] %}
+{% set new_path = old_path.split(':')[0] ~ ':' ~ (mount_mappings.get(new_mount_path.split('/')[2], new_mount_path)) %}
+{{ count }} {{ new_path }}
+{% endfor %}
