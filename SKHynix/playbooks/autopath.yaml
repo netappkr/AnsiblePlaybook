@@ -1,6 +1,5 @@
----
 - name: Modify mount.path in file based on get.auto output
-  hosts: localhost
+  hosts: task_server_1_DLC
   gather_facts: no
   tasks:
     - name: Run get.auto command
