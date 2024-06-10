@@ -15,12 +15,12 @@
       debug:
         msg: "{{ config_mapping }}"
     
-    - name: create command
-      set_fact:
-        grep_command: "{{volumes.volumename}}/{{ volumes.scan_info.searchdir}}/USER | join('|')"
-      loop: "{{config_mapping.scan_info}}"
-      loop_control:
-        loop_var: volumes
+    # - name: create command
+    #   set_fact:
+    #     grep_command: "{{volumes.volumename}}/{{ volumes.scan_info.searchdir}}/USER | join('|')"
+    #   loop: "{{config_mapping.scan_info}}"
+    #   loop_control:
+    #     loop_var: volumes
 
     - name: Run get.auto command
       shell: | 
