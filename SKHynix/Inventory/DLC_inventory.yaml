@@ -12,23 +12,27 @@ DLC:
   config:
     domain: "chopincad.com"
     division:
-      - name: "dram"
+      - name: "DRAM"
         exportpolicy:
-          - name: "default_rw_test"
+          - name: "sim_dram_rg16ghbmtv_ro"
         xcp_option:
           match : "type == f and modified > 60*day and (fnm('*.fsdb') or fnm('*.db') or fnm('*.wdf') or fnm('*.tr[0-9]') or fnm('*.tr[0-9][0-9]') or fnm('*.tr[0-9][0-9][0-9]'))"
           fmt: "'{} {}'.format(size, x)"
         autopath:
           automap: sim
-      - name: "nand"
+        searchdir: [LAY, SCH, ESD , CAE, LDR, CORE, DV]
+        
+      - name: "NAND"
         exportpolicy:
-          - name: "default_rw_test"
+          - name: "sim_nand_qs4gslc_ro"
         xcp_option:
           match : "type == f and modified > 60*day and (fnm('*.fsdb') or fnm('*.db') or fnm('*.wdf') or fnm('*.wlf') or fnm('*.tr[0-9]') or fnm('*.tr[0-9][0-9]') or fnm('*.tr[0-9][0-9][0-9]'))"
           fmt: "'{} {}'.format(size, x)"
         autopath:
           automap: sim
-      - name: "cis"
+        searchdir: [LAY, SCH, PNR, DV, ESD , CAE, IA]
+
+      - name: "CIS"
         exportpolicy:
           - name: "default_rw_test"
         xcp_option:
@@ -36,7 +40,9 @@ DLC:
           fmt: "'{} {}'.format(size, x)"
         autopath:
           automap: sim
-      - name: "soc"
+        searchdir: [ANALOG, DIGITAL, BACKEND, ESD , CAE, FE, BE, LAYPXL]
+
+      - name: "SOC"
         exportpolicy:
           - name: "default_rw_test"
         xcp_option:
@@ -44,6 +50,8 @@ DLC:
           fmt: "'{} {}'.format(size, x)"
         autopath:
           automap: library
+        searchdir: [ANALOG, DIGITAL, BACKEND, ESD , CAE, IMPLE]
+
     exclude:
       - name: "test"
 scripts_dir: '/opt/awx/projects'

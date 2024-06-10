@@ -54,9 +54,10 @@
     - name: Display volume_list
       debug:
         msg: "{{ volume_list.stdout }}"
+      register: config_mapping
 
     - name: mkdir
-      shell: | 
+      shell: |
         mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}
       ignore_errors: true
       loop: "{{ DLC.config.division }}"
@@ -66,23 +67,43 @@
     - name: xcp scan
       shell: |
         . /sw/LSF/conf/profile.lsf
-        bsub -q STORAGE -o /data/vine/Ansible_XCP/xcp_result/{{volume.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volume.volume}}_result -e /data/vine/Ansible_XCP/xcp_result/{{volume.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volume.volume}}_info /opt/NetApp/xFiles/xcp/linux/xcp scan -match "{{volume.xcp_option.match}}" -fmt "{{volume.xcp_option.fmt}}" {{ volume.mount_path }}
+        bsub -q STORAGE -oo /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_result -e /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_info /opt/NetApp/xFiles/xcp/linux/xcp scan -match "{{volumes.xcp_option.match}}" -fmt "{{volumes.xcp_option.fmt}}" {{ volumes.mount_path }}
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
-        loop_var: volume
+        loop_var: volumes
       register: scan_list
 
-    - name: Format scan results
-      set_fact:
-        formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
-        scan_list_file_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
-      loop: "{{ scan_list.results }}"
-      loop_control:
-        loop_var: item
+    - name: Search for 'project' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "DLCXcpscan.j2"
+        recurse: yes
+        file_type: file
+      register: files_matched
 
-    - name: Write result data to a scan_list file
-      copy:
-        dest: "/tmp/scan_list_file_results.list"
-        content: "{{ scan_list_file_results | join('\n')}}"
-      register: scan_list_file
+    - name: Print the matched files
+      debug:
+        msg: "{{ files_matched.files[0].path }}"
+
+
+    - name: write result.yaml using jinia2
+      template:
+        src: DLCXcpscan.j2
+        dest: /tmp/scan_list_file_results.yaml
+
+      
+    # - name: Format scan results
+    #   set_fact:
+    #     formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
+    #     scan_list_file_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
+    #   loop: "{{ scan_list.results }}"
+    #   loop_control:
+    #     loop_var: item
+
+    # - name: Write result data to a scan_list file
+    #   copy:
+    #     dest: "/tmp/scan_list_file_results.list"
+    #     content: "{{ scan_list_file_results | join('\n')}}"
+    #   register: scan_list_file
+

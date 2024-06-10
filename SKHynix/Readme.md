@@ -182,7 +182,7 @@ gantt
     Playbook 적용 Test                  : done, p7-5, 2024-05-23, 2d
     Playbook 수정 LSM job manager 활용   : done, p7-6, 2024-05-23, 2d
     Playbook 적용 Test                  : done, p7-7, 2024-05-23, 2d
-    AutoPath 리포트를 위한 서브 Playbook 작성 : active, p7-8, 2024-05-28, 3d
+    AutoPath 리포트를 위한 서브 Playbook 작성 : active, p7-8, 2024-05-28, 7d
 
     section Check usage by Directory Playbook
     Sample Playbook 작성                : p8-1, after p7-8, 2d

@@ -169,7 +169,8 @@ def get_scan_objects(data,config):
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
                                 'xcp_option':div['xcp_option'],
-                                'autopath': div['autopath']
+                                'autopath': div['autopath'],
+                                'searchdir': div['searchdir']
                                 }
                             )
                         else:
@@ -179,7 +180,8 @@ def get_scan_objects(data,config):
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
                                 'xcp_option': div['xcp_option'],
-                                'autopath': div['autopath']
+                                'autopath': div['autopath'],
+                                'searchdir': div['searchdir']
                                 }
                             )
         except KeyError as e:
@@ -209,3 +211,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

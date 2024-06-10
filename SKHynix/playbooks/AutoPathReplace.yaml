@@ -1,0 +1,75 @@
+- name: Modify mount.path in file based on get.auto output
+  hosts: task_server_1_DLC
+  gather_facts: no
+  tasks:
+    - name: Read the scan_list_file_results.yaml
+      ansible.builtin.slurp:
+        src: /tmp/scan_list_file_results.yaml
+      register: result
+      
+    - name: "Parse yaml into variable"
+      set_fact:
+        config_mapping: "{{ result.content | b64decode | from_yaml }}"
+
+    - name: Display getauto_output
+      debug:
+        msg: "{{ config_mapping }}"
+    
+    - name: create command
+      set_fact:
+        grep_command: "{{volumes.volumename}}/{{ volumes.scan_info.searchdir}}/USER | join('|')"
+      loop: "{{config_mapping.scan_info}}"
+      loop_control:
+        loop_var: volumes
+
+    - name: Run get.auto command
+      shell: | 
+        getauto auto.{{volumes.automap}} | grep -w {{volumes.volumename}}
+      loop: "{{config_mapping.scan_info}}"
+      loop_control:
+        loop_var: volumes
+      register: getauto_output
+
+    - name: Display getauto_output
+      debug:
+        msg: "{{ output.stdout_lines }}"
+      loop: "{{ getauto_output.result }}"
+      loop_control:
+        loop_var: output
+
+    - name: Display getauto_output
+      shell: |
+        cat {{ volumes }} | grep -E {{grep_command}}
+      loop: "{{config_mapping.scan_info}}"
+      loop_control:
+        loop_var: volumes
+
+
+    # - name: Parse get.auto output into dictionary
+    #   set_fact:
+    #     mount_mappings: >-
+    #       {{
+    #         dict(
+    #           getauto_output.stdout.split()[i], 
+    #           getauto_output.stdout.split()[i + 1]
+    #         )
+    #         for i in range(3, len(getauto_output.stdout.split()), 2)
+    #       )}
+
+
+    # - name: Read the file content
+    #   slurp:
+    #     path: /data/vine/Ansible_XCP/xcp_result/{{volume.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volume.volume}}_result
+    #   register: file_content
+
+    # - name: Decode file content
+    #   set_fact:
+    #     decoded_content: "{{ file_content.content | b64decode }}"
+
+    # - name: Replace mount paths in file content using Jinja template
+    #   template:
+    #     src: /path/to/your/template.j2
+    #     dest: /path/to/your/modified_data.txt
+    #   vars:
+    #     data: "{{ decoded_content.splitlines() }}"
+    #     mount_mappings: "{{ mount_mappings }}"
