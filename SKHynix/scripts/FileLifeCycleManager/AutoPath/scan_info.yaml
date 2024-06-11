@@ -1,0 +1,6 @@
+scan_info:
+- volumename: data 
+  result: /data/vine/Ansible_XCP
+  division: DRAM
+  automap: sim
+  searchdir: [test]

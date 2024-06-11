@@ -1,0 +1,11 @@
+0 /20240110/dhmin_fg_capa_test_20240110/asd.tr0
+0 /20240110/dhmin_fg_capa_test_20240110/asd.tr1
+0 /20240110/dhmin_fg_capa_test_20240110/asd.tr2
+0 /20240110/dhmin_fg_capa_test_20240110/asd.tr3
+0 /20240110/dhmin_fg_capa_test_20240110/asd.tr4
+0 /20240110/dhmin_fg_capa_test_20240110/asd.trn.tr1
+4 /20240110/dhmin_fg_capa_test_20240110/Test/asd.fsdb
+0 /20240110/dhmin_fg_capa_test_20240110/Test/asd.sp.fsdb
+0 /20240110/dhmin_fg_capa_test_20240110/Test/a.tr
+0 /20240110/dhmin_fg_capa_test_20240110/Test/a.tr0
+0 /20240110/dhmin_fg_capa_test_20240110/Test/qqq.wlf
