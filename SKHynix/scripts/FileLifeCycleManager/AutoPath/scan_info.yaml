@@ -1,6 +1,11 @@
 scan_info:
-- volumename: data 
-  result: /data/vine/Ansible_XCP
+- volumename: sim_cis_hil013h 
+  result: xcpsample/dhmin_fg_capa_test_20240110_result.txt
+  division: DRAM
+  automap: sim
+  searchdir: [test]
+- volumename: dhmin_fg_capa_test_20240110 
+  result: xcpsample/sim_cis_hil013h_result.txt
   division: DRAM
   automap: sim
   searchdir: [test]
