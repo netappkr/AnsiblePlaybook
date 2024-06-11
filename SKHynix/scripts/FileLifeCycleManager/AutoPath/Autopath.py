@@ -37,7 +37,7 @@ def main(data_file_path, auto_sim_file_path, config_file_path, searchdirs):
     replacement_dict = read_auto_sim(auto_sim_file_path)
     data_lines = read_data_file(data_file_path)
     modified_lines = modify_lines(data_lines, replacement_dict)
-    config = read_yaml_config(config_file_path)
+    # config = read_yaml_config(config_file_path)
     
     # 필요한 데이터만 출력
     for line in modified_lines:
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
     parser.add_argument("-f", "--file", type=str, required=True, help="Path to the data file")
     parser.add_argument("-a", "--auto", type=str, required=True, help="Path to the auto.sim file")
-    parser.add_argument("--config", type=str, required=True, help="Path to the config YAML file")
+    parser.add_argument("--config", type=str, required=False, help="Path to the config YAML file")
     parser.add_argument("--searchdir", type=str, nargs='+', required=True, help="List of search directories")
     args = parser.parse_args()
 
