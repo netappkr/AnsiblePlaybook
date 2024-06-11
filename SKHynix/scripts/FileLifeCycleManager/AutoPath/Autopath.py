@@ -33,7 +33,7 @@ def read_yaml_config(config_file_path):
     with open(config_file_path, 'r', encoding='utf-8') as config_file:
         return yaml.safe_load(config_file)
 
-def main(data_file_path, auto_sim_file_path, config_file_path):
+def main(data_file_path, auto_sim_file_path, config_file_path, searchdirs):
     replacement_dict = read_auto_sim(auto_sim_file_path)
     data_lines = read_data_file(data_file_path)
     modified_lines = modify_lines(data_lines, replacement_dict)
@@ -41,14 +41,14 @@ def main(data_file_path, auto_sim_file_path, config_file_path):
     
     # 필요한 데이터만 출력
     for line in modified_lines:
-        if re.match(r'^\d+ \S+/\S+', line):
+        if re.match(r'^\d+ \S+/\S+', line) and any(searchdir in line for searchdir in searchdirs):
             print(line, end='')
 
     # 결과를 파일로 저장하려면 아래 코드 사용
     output_file_path = 'outputfile.txt'
     with open(output_file_path, 'w', encoding='utf-8') as output_file:
         for line in modified_lines:
-            if re.match(r'^\d+ \S+/\S+', line):
+            if re.match(r'^\d+ \S+/\S+', line) and any(searchdir in line for searchdir in searchdirs):
                 output_file.write(line)
 
 if __name__ == "__main__":
@@ -56,6 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--file", type=str, required=True, help="Path to the data file")
     parser.add_argument("-a", "--auto", type=str, required=True, help="Path to the auto.sim file")
     parser.add_argument("--config", type=str, required=True, help="Path to the config YAML file")
+    parser.add_argument("--searchdir", type=str, nargs='+', required=True, help="List of search directories")
     args = parser.parse_args()
 
-    main(args.file, args.auto, args.config)
+    main(args.file, args.auto, args.config, args.searchdir)
