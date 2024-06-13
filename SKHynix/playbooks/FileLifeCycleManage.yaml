@@ -23,9 +23,6 @@
       loop_control:
         loop_var: cluster
 
-    # - name: debug show
-    #   debug:
-    #     msg: "{{ ontap_volumes.results }}"
     - name: Write result data to a JSON file
       copy:
         dest: "/tmp/volume_path_info.json"
@@ -38,21 +35,6 @@
         content: "{{ DLC | to_nice_yaml }}"
       register: config
 
-    # - name: Apply json_query and debug result
-    #   debug:
-    #     msg: "{{ ontap_volumes.results | json_query('[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == `default`].name') }}"
-
-    # - name: Filter volumes where export_policy name is 'default'
-    #   set_fact:
-    #     default_volumes: "{{ default_volumes | default([]) + item }}"
-    #   loop: "{{ ontap_volumes.results | json_query(query) }}"
-    #   vars:
-    #     query: "[].ontap_info.\"storage/volumes\".records[?nas.export_policy.name == 'default'].name | [0]"
-    #     default_volumes: []
-
-    # - name: Display volumes with default export policy
-    #   debug:
-    #     msg: "{{ default_volumes }}"
     - name: Search for 'script' in all directories
       find:
         paths: "{{ scripts_dir }}"
@@ -72,91 +54,55 @@
     - name: Display volume_list
       debug:
         msg: "{{ volume_list.stdout }}"
+      register: config_mapping
 
-    # - name: Execute ls -al for each mount path
-    #   command: "ls -al {{ item.mount_path.split(':')[1] }}"
-    #   loop: "{{ volume_list }}"
-    #   register: ls_result
-    #   changed_when: false
-    #   ignore_errors: true
-
-    # - name: Print ls -al results for each mount path
-    #   debug:
-    #     msg: "Result for {{ item.item.mount_path }}:\n{{ item.stdout }}"
-    #   loop: "{{ ls_result.results }}"
+    - name: mkdir
+      shell: |
+        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}
+      ignore_errors: true
+      loop: "{{ DLC.config.division }}"
+      loop_control:
+        loop_var: division
 
     - name: xcp scan
-      command: xcp scan -match "{{volume.xcp_option.match}}" -fmt "{{volume.xcp_option.fmt}}" {{ volume.mount_path }}
+      shell: |
+        /opt/NetApp/xFiles/xcp/linux/xcp scan -match "{{volumes.xcp_option.match}}" -fmt "{{volumes.xcp_option.fmt}}" {{ volumes.mount_path }} > /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_result 2> /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_info 
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
-        loop_var: volume
+        loop_var: volumes
       register: scan_list
 
-    - name: get auto path
-      command: /opt/getauto/getauto auto.{{volume.autopath.automap}} | grep -w "{{volume.mount_path}}" | awk "'{print $1}'"
-      ignore_errors: true
-      loop: "{{ volume_list.stdout }}"
-      loop_control:
-        loop_var: volume
-      register: auto_path_list
+    - name: Search for 'project' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "DLCXcpscan.j2"
+        recurse: yes
+        file_type: file
+      register: files_matched
 
-    # - name: Display scan list
-    #   debug:
-    #     msg: "{{scan_list}}"
-
-    - name: Format scan results
-      set_fact:
-        formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
-        scan_list_file_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
-      loop: "{{ scan_list.results }}"
-      loop_control:
-        loop_var: item
-
-    - name: Write result data to a scan_list file
-      copy:
-        dest: "/tmp/scan_list_file_results.list"
-        content: "{{ scan_list_file_results | join('\n')}}"
-      register: scan_list_file
-
-    - name: Display auto_path_list
+    - name: Print the matched files
       debug:
-        msg: "{{auto_path_list.results}}"
+        msg: "{{ files_matched.files[0].path }}"
 
-    - name: change file
-      command: "cat {{scan_list_file.dest}} | awk -F'{{item.0.stdout_lines}}' '{print $1 \"/{{item.1.volume.autopath.automap}}/{{item.1.stdout_lines}}/\"$2}'"
-      ignore_errors: true
-      loop: "{{ scan_list.results | zip(auto_path_list.results)}}"
-      loop_control:
-        loop_var: item
 
-      register: scan_list
+    - name: write result.yaml using jinia2
+      template:
+        src: DLCXcpscan.j2
+        dest: /tmp/scan_list_file_results.yaml
 
-    - name: Send storage scan report via email
-      mail:
-        host: "{{ smtp_server }}"
-        port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
-        to: "{{ email_to }}"
-        subject: "FLM list"
-        body: "{{ formatted_results | join('<br>') }}"
-        from: "{{ email_from }}"
-        secure: never
-        subtype: html
-        headers:
-          - Content-Type="text/html"
-
-    # - name: Display scan list stdout
-    #   debug:
-    #     msg: "{{results.stdout_lines}}"
+      
+    # - name: Format scan results
+    #   set_fact:
+    #     formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
+    #     scan_list_file_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
     #   loop: "{{ scan_list.results }}"
     #   loop_control:
-    #     loop_var: results
+    #     loop_var: item
 
-    # - name: Display scan list stderr
-    #   debug:
-    #     msg: "{{ results.stderr_lines }}"
-    #   loop: "{{ scan_list.results }}"
-    #   loop_control:
-    #     loop_var: results
+    # - name: Write result data to a scan_list file
+    #   copy:
+    #     dest: "/tmp/scan_list_file_results.list"
+    #     content: "{{ scan_list_file_results | join('\n')}}"
+    #   register: scan_list_file
+
