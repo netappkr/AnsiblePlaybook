@@ -1,4 +1,5 @@
 # AutoPath
+![FLM](./Images/FLM.png)
 
 ```powershell
 python3 Autopath.py -f .\xcpsample\sim_cis_hil013h_result.txt -a autopath.txt --searchdir Test
