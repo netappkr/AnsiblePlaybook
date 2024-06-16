@@ -43,41 +43,52 @@
       debug:
         msg: "{{ scan_info_datas }}"
 
-    - name: Check if status is not PASSED
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/xcp_scan_info_datas.json"
+        content: "{{ scan_info_datas.results | to_nice_json }}"
+      register: datafile
+  
+    # - name: Check if status is not PASSED
+    #   debug:
+    #     msg: "STATUS is not PASSED. File: {{ scan_info_data.ansible_facts.file_name }}, Log Path: {{ scan_info_data.ansible_facts.log_path[0] }}"
+    #   loop: "{{ scan_info_datas.results }}"
+    #   loop_control:
+    #     loop_var: scan_info_data
+    #   when: scan_info_data.ansible_facts.status[0] != "PASSED"
+
+    - name: Search for 'script' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "generate_table.py"
+        recurse: yes
+        file_type: file
+      register: files_matched
+
+    - name: Print the matched files
       debug:
-        msg: "STATUS is not PASSED. File: {{ scan_info_data.ansible_facts.file_name }}, Log Path: {{ scan_info_data.ansible_facts.log_path[0] }}"
-      loop: "{{ scan_info_datas.results }}"
-      loop_control:
-        loop_var: scan_info_data
-      when: scan_info_data.ansible_facts.status[0] != "PASSED"
+        msg: "{{ files_matched.files[0].path }}"
 
+    - name: Generate HTML table from inode information using a Python script
+      command: "python3 {{ files_matched.files[0].path }} -r check_xcp_scan_status -f {{ datafile.dest }}"
+      register: html_table
 
-    - name: Send email if status is not PASSED
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ html_tables.results }}"
+
+    - name: Send inode usage report via email
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "XCP Scan Failed: {{ file_name }}"
-        body: |
-          The XCP scan for the file {{ file_name }} did not pass.
-          Log Path: {{ log_path }}
+        subject: "check xcp scan status {{ '%Y-%m-%d' | strftime }} "
+        body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
-      when: status[0] != "PASSED"
-
-    # - name: Send inode usage report via email
-    #   mail:
-    #     host: "{{ smtp_server }}"
-    #     port: "{{ smtp_port }}"
-    #     username: "{{ smtp_username }}"
-    #     password: "{{ smtp_password }}"
-    #     to: "{{ email_to }}"
-    #     subject: "ONTAP Inode Usage by Volume Report {{ '%Y-%m-%d' | strftime }} "
-    #     body: "{{ html_table.stdout }}"
-    #     from: "{{ email_from }}"
-    #     secure: starttls
-    #     subtype: html
-    #     headers: 
-    #     - Content-Type="text/html"
+        subtype: html
+        headers: 
+        - Content-Type="text/html"
+      when: html_table.stdout is defined

@@ -454,6 +454,43 @@ def storage_Big_snapshot_report_by_volume(data):
     })
     return tables
 
+
+def check_xcp_scan_status(data):
+    tables = []
+    for scaninfo in data:
+        datatable = pandas.DataFrame()
+        try:
+            # scan_contents=scaninfo["ansible_facts"]["scan_contents"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
+            log_path=scaninfo["ansible_facts"]["log_path"][0]
+            status=scaninfo["ansible_facts"]["status"][0]
+            file_name = scaninfo["ansible_facts"]['file_name']
+            add=pandas.DataFrame.from_records([{
+                'log_path': log_path,
+                'status': status,
+                'file_name': file_name
+            }])
+            datatable=datatable._append(add,ignore_index = True)
+        except KeyError as e:
+            # KeyError 발생시 처리 로직
+            logger.error(f"KeyError: {e} - {scaninfo['config']['volumename']}",traceback.format_exc())
+        except Exception as e:
+            logger.error(traceback.format_exc())
+            print("Error:" ,traceback.format_exc())
+                
+
+        tables.append({
+            'datatable': datatable,
+            'report_config': {
+                'report_name': "check xcp scan status",
+                'sorting_rules': [
+                    {'column': 'status', 'order': 'desc'}
+                ]
+            }
+        })
+    return tables
+
+
+
 def align_right():
     return 'text-align: right;'
 
@@ -552,6 +589,11 @@ def main():
         elif args.request == "clusters_snapmirror_info":
             tables = storage_snapmirror_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(tables)
+        
+        elif args.request == "check_xcp_scan_status":
+            tables = storage_snapmirror_report_by_cluster(data[args.file[0]])
+            html_tables = format_html_style(tables)
+
                 
         
         else:
