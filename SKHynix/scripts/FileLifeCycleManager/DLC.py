@@ -148,6 +148,7 @@ def get_scan_objects(data,config):
 
                 # Check if the volume should be excluded
                 if any(ex['name'] == name for ex in exclude):
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸을 목록에서 제외합니다.")
                     continue
 
                 # Check if volume matches any division criteria
@@ -173,6 +174,7 @@ def get_scan_objects(data,config):
                                 'searchdir': div['searchdir']
                                 }
                             )
+                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
                         elif datacenter == "nkic":
                             scan_objects.append({
                                 'volume' : name,
@@ -184,6 +186,7 @@ def get_scan_objects(data,config):
                                 'searchdir': div['searchdir']
                                 }
                             )
+                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
                         else:
                             scan_objects.append({
                                 'volume' : name,
@@ -195,6 +198,10 @@ def get_scan_objects(data,config):
                                 'searchdir': div['searchdir']
                                 }
                             )
+                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
+                    else:
+                        logger.debug(f"datacenter: {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}, vol_name_regexp: {vol_name_regexp}, export_policy: {export_policy}")
+
         except KeyError as e:
             # KeyError 발생시 처리 로직
             logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
