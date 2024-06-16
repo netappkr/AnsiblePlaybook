@@ -63,6 +63,7 @@ def main(data_file_path, auto_sim_file_path, searchdirs):
         with open(output_file_path, 'w', encoding='utf-8') as output_file:
             for line in result:
                 output_file.write(line)
+        logger.info(f"{output_file_path}: 파일 출력 설공 ")
     except Exception as e:
         logger.error(traceback.format_exc())
         print("Error:" ,traceback.format_exc())
