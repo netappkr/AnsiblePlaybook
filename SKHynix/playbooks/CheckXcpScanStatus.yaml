@@ -28,6 +28,10 @@
       set_fact:
         scan_content: "{{ scan_info_result.content | b64decode | decode }}"
 
+    - name: Display scan_content
+      debug:
+        msg: "{{ scan_content }}"
+
     - name: Parse the scan content
       set_fact:
         log_path: "{{ scan_content | regex_search('Log Path : (.+)', '\\1') }}"
