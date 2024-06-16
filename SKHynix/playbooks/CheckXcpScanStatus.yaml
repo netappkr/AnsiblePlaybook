@@ -31,8 +31,8 @@
     - name: Parse the scan content
       set_fact:
         scan_contents: "{{ scan_info_result.content | b64decode }}"
-        log_path: "{{ (item.content | b64decode | regex_search('Log Path\\s*:\\s*(\\/\\S+)', '\\1')) }}"
-        status: "{{ (item.content | b64decode | regex_search('STATUS\\s*:\\s*(\\w+)', '\\1')) }}"
+        log_path: "{{ (scan_info_result.content | b64decode | regex_search('Log Path\\s*:\\s*(\\/\\S+)', '\\1')) }}"
+        status: "{{ (scan_info_result.content | b64decode | regex_search('STATUS\\s*:\\s*(\\w+)', '\\1')) }}"
         file_name: "{{ scan_info_result.config.result }}_info"
       loop: "{{ scan_info_results.results }}"
       loop_control:
