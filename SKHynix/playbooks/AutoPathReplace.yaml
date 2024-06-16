@@ -59,6 +59,5 @@
       loop_control:
         loop_var: config
       register: volume_list
-                python3 Autopath.py -f .\xcpsample\sim_cis_hil013h_result.txt -a auto.{{config.automap}} --searchdir Test
 
 
