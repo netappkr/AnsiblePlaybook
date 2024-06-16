@@ -35,15 +35,13 @@
         loop_var: automap
       register: getauto_output
 
-
-    - name: Write result data to a JSON file
+    - name: Write result data to a automap file
       copy:
         dest: "/tmp/auto.{{volumes.automap}}"
         content: "{{ getauto_output.results }}"
-      loop: "{{config_mapping.scan_info}}"
+      loop: "{{unique_automap_values}}"
       loop_control:
-        loop_var: volumes
-      register: datafile
+        loop_var: automap
 
 
     # - name: Parse get.auto output into dictionary
