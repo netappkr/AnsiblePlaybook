@@ -26,7 +26,7 @@
 
     - name: Decode the file content
       set_fact:
-        scan_content: "{{ scan_info_result.content | b64decode }}"
+        scan_contents: "{{ scan_info_result.content | b64decode }}"
       loop: "{{ scan_info_results.results }}"
       loop_control:
         loop_var: scan_info_result
