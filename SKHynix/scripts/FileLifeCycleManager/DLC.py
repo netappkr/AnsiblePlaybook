@@ -173,6 +173,17 @@ def get_scan_objects(data,config):
                                 'searchdir': div['searchdir']
                                 }
                             )
+                        elif datacenter == "NKIC":
+                            scan_objects.append({
+                                'volume' : name,
+                                'mount_path': f"{svm_name}.nkic.{domain}:{path}",
+                                'div' : f"{div['name']}",
+                                'export_policy': f"{export_policy}",
+                                'xcp_option':div['xcp_option'],
+                                'autopath': div['autopath'],
+                                'searchdir': div['searchdir']
+                                }
+                            )
                         else:
                             scan_objects.append({
                                 'volume' : name,
