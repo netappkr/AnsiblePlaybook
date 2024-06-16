@@ -14,35 +14,20 @@
     - name: Display getauto_output
       debug:
         msg: "{{ config_mapping }}"
-    
-    # - name: create command
-    #   set_fact:
-    #     grep_command: "{{volumes.volumename}}/{{ volumes.scan_info.searchdir}}/USER | join('|')"
-    #   loop: "{{config_mapping.scan_info}}"
-    #   loop_control:
-    #     loop_var: volumes
 
     - name: Run get.auto command
       shell: | 
-        getauto auto.{{volumes.automap}} | grep -w {{volumes.volumename}}
+        getauto auto.{{volumes.automap}} > 
       loop: "{{config_mapping.scan_info}}"
       loop_control:
         loop_var: volumes
       register: getauto_output
 
-    - name: Display getauto_output
-      debug:
-        msg: "{{ output.stdout_lines }}"
-      loop: "{{ getauto_output.result }}"
-      loop_control:
-        loop_var: output
-
-    - name: Display getauto_output
-      shell: |
-        cat {{ volumes }} | grep -E {{grep_command}}
-      loop: "{{config_mapping.scan_info}}"
-      loop_control:
-        loop_var: volumes
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/auto.{{volumes.automap}}"
+        content: "{{ getauto_output.results }}"
+      register: datafile
 
 
     # - name: Parse get.auto output into dictionary
