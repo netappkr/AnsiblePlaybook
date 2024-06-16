@@ -58,6 +58,5 @@
       loop: "{{ config_mapping.scan_info }}"
       loop_control:
         loop_var: config
-      register: volume_list
 
 

@@ -1,0 +1,55 @@
+---
+- name: Check XCP Scan Result and Send Email if Failed
+  hosts: task_server_1_DLC
+  gather_facts: no
+  tasks:
+    - name: Read the scan_list_file_results.yaml
+      ansible.builtin.slurp:
+        src: /tmp/scan_list_file_results.yaml
+      register: result
+
+    - name: "Parse yaml into variable"
+      set_fact:
+        config_mapping: "{{ result.content | b64decode | from_yaml }}"
+
+    - name: Display config
+      debug:
+        msg: "{{ config_mapping }}"
+
+    - name: Read the xcp scan info result file
+      slurp:
+        src: "{{ config.result }}_info"
+      loop: "{{ config_mapping.scan_info }}"
+      loop_control:
+        loop_var: config
+      register: scan_info_result
+
+    - name: Decode the file content
+      set_fact:
+        scan_content: "{{ scan_info_result.content | b64decode | decode }}"
+
+    - name: Parse the scan content
+      set_fact:
+        log_path: "{{ scan_content | regex_search('Log Path : (.+)', '\\1') }}"
+        status: "{{ scan_content | regex_search('STATUS : (.+)', '\\1') }}"
+        file_name: "/data/vine/Ansible_XCP/xcp_result/SOC/20240616/wy_vol_info"
+
+    - name: Check if status is not PASSED
+      debug:
+        msg: "STATUS is not PASSED. File: {{ file_name }}, Log Path: {{ log_path }}"
+      when: status != "PASSED"
+
+    - name: Send email if status is not PASSED
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        subject: "XCP Scan Failed: {{ file_name }}"
+        body: |
+          The XCP scan for the file {{ file_name }} did not pass.
+          Log Path: {{ log_path }}
+        from: "{{ email_from }}"
+        secure: starttls
+      when: status != "PASSED"
