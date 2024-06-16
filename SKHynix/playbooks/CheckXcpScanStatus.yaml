@@ -22,12 +22,14 @@
       loop: "{{ config_mapping.scan_info }}"
       loop_control:
         loop_var: config
-      register: scan_info_result
+      register: scan_info_results
 
     - name: Decode the file content
       set_fact:
-        scan_content: "{{ scan_info_result.content | b64decode }}"
-      loop: "{{ scan_info_result.results }}"
+        scan_content: "{{ scan_info_result.content | b64decode | decode }}"
+      loop: "{{ scan_info_results.results }}"
+      loop_control:
+        loop_var: scan_info_result
 
     - name: Display scan_contents
       debug:
