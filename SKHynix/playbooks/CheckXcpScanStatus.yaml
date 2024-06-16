@@ -45,7 +45,7 @@
 
     - name: Check if status is not PASSED
       debug:
-        msg: "STATUS is not PASSED. File: {{ scan_info_data.file_name }}, Log Path: {{ scan_info_data.log_path }}"
+        msg: "STATUS is not PASSED. File: {{ scan_info_data.ansible_facts.file_name }}, Log Path: {{ scan_info_data.ansible_facts.log_path[0] }}"
       loop: "{{ scan_info_datas.results }}"
       loop_control:
         loop_var: scan_info_data
