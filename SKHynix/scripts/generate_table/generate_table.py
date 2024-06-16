@@ -477,16 +477,15 @@ def check_xcp_scan_status(data):
             logger.error(traceback.format_exc())
             print("Error:" ,traceback.format_exc())
                 
-
-        tables.append({
-            'datatable': datatable,
-            'report_config': {
-                'report_name': "check xcp scan status",
-                'sorting_rules': [
-                    {'column': 'status', 'order': 'desc'}
-                ]
-            }
-        })
+    tables.append({
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "check xcp scan status",
+            'sorting_rules': [
+                {'column': 'status', 'order': 'desc'}
+            ]
+        }
+    })
     return tables
 
 
