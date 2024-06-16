@@ -200,7 +200,8 @@ def get_scan_objects(data,config):
                             )
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
                     else:
-                        logger.debug(f"datacenter: {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}, vol_name_regexp: {vol_name_regexp}, export_policy: {export_policy}")
+                        logger.debug(f"allow exportpolicy list: {exportpolicy_names}")
+                        logger.debug(f"정규식 && exportpolicy 가 일치하지 않습니다. datacenter : {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}, vol_name_regexp: {vol_name_regexp}, export_policy: {export_policy}")
 
         except KeyError as e:
             # KeyError 발생시 처리 로직
