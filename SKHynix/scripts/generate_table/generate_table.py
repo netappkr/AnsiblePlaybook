@@ -591,7 +591,7 @@ def main():
             html_tables = format_html_style(tables)
         
         elif args.request == "check_xcp_scan_status":
-            tables = storage_snapmirror_report_by_cluster(data[args.file[0]])
+            tables = check_xcp_scan_status(data[args.file[0]])
             html_tables = format_html_style(tables)
 
                 
