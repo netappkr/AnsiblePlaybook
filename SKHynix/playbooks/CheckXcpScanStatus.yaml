@@ -24,13 +24,6 @@
         loop_var: config
       register: scan_info_results
 
-    # - name: Decode the file content
-    #   set_fact:
-    #     scan_contents: "{{ scan_info_result.content | b64decode }}"
-    #   loop: "{{ scan_info_results.results }}"
-    #   loop_control:
-    #     loop_var: scan_info_result
-
     - name: Display scan_contents
       debug:
         msg: "{{ scan_info_results }}"
@@ -38,8 +31,8 @@
     - name: Parse the scan content
       set_fact:
         scan_contents: "{{ scan_info_result.content | b64decode }}"
-        log_path: "{{ scan_contents | regex_search('Log Path : (.+)', '\\1') }}"
-        status: "{{ scan_contents | regex_search('STATUS : (.+)', '\\1') }}"
+        log_path: "{{ scan_info_result.content | b64decode | regex_search('Log Path : (.+)', '\\1') }}"
+        status: "{{ scan_info_result.content | b64decode | regex_search('STATUS : (.+)', '\\1') }}"
         file_name: "{{ scan_info_result.config.result }}_info"
       loop: "{{ scan_info_results.results }}"
       loop_control:
@@ -50,17 +43,17 @@
         msg: "STATUS is not PASSED. File: {{ file_name }}, Log Path: {{ log_path }}"
       when: status != "PASSED"
 
-    # - name: Send email if status is not PASSED
-    #   mail:
-    #     host: "{{ smtp_server }}"
-    #     port: "{{ smtp_port }}"
-    #     username: "{{ smtp_username }}"
-    #     password: "{{ smtp_password }}"
-    #     to: "{{ email_to }}"
-    #     subject: "XCP Scan Failed: {{ file_name }}"
-    #     body: |
-    #       The XCP scan for the file {{ file_name }} did not pass.
-    #       Log Path: {{ log_path }}
-    #     from: "{{ email_from }}"
-    #     secure: starttls
-    #   when: status != "PASSED"
+    - name: Send email if status is not PASSED
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        subject: "XCP Scan Failed: {{ file_name }}"
+        body: |
+          The XCP scan for the file {{ file_name }} did not pass.
+          Log Path: {{ log_path }}
+        from: "{{ email_from }}"
+        secure: starttls
+      when: status != "PASSED"
