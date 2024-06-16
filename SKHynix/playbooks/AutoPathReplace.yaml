@@ -38,7 +38,7 @@
     - name: Write result data to a automap file
       copy:
         dest: "/tmp/auto.{{automap}}"
-        content: "{{ getauto_output.stdout_lines }}"
+        content: "{{ getauto_output }}"
       loop: "{{unique_automap_values}}"
       loop_control:
         loop_var: automap
