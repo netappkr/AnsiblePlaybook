@@ -37,7 +37,7 @@
 
     - name: Write result data to a automap file
       copy:
-        dest: "/tmp/auto.{{volumes.automap}}"
+        dest: "/tmp/auto.{{automap}}"
         content: "{{ getauto_output.stdout_lines }}"
       loop: "{{unique_automap_values}}"
       loop_control:
