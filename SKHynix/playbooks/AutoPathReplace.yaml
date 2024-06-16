@@ -15,6 +15,18 @@
       debug:
         msg: "{{ config_mapping }}"
 
+    - name: Extract automap values
+      set_fact:
+        automap_values: "{{ config_mapping.scan_info | map(attribute='automap') | list }}"
+
+    - name: Remove duplicate automap values
+      set_fact:
+        unique_automap_values: "{{ automap_values | unique }}"
+
+    - name: Display unique automap values
+      debug:
+        msg: "{{ unique_automap_values }}"
+
     - name: Run get.auto command
       shell: | 
         getauto auto.{{volumes.automap}}
@@ -23,10 +35,14 @@
         loop_var: volumes
       register: getauto_output
 
+
     - name: Write result data to a JSON file
       copy:
         dest: "/tmp/auto.{{volumes.automap}}"
         content: "{{ getauto_output.results }}"
+      loop: "{{config_mapping.scan_info}}"
+      loop_control:
+        loop_var: volumes
       register: datafile
 
 
