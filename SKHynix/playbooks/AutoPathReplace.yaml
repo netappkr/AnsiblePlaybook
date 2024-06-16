@@ -35,9 +35,9 @@
 
     - name: Write result data to a automap file
       copy:
-        dest: "/tmp/auto.{{item}}"
+        dest: "/tmp/auto.{{automap.1}}"
         content: "{{ automap.stdout_lines }}"
-      loop: "{{getauto_output.results}}"
+      loop: "{{ getauto_output.results | zip(unique_automap_values) | list }}"
       loop_control:
         loop_var: automap
 
