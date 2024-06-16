@@ -36,29 +36,36 @@ def read_yaml_config(config_file_path):
         return yaml.safe_load(config_file)
 
 def main(data_file_path, auto_sim_file_path, searchdirs):
-    replacement_dict = read_auto_sim(auto_sim_file_path)
-    data_lines = read_data_file(data_file_path)
-    modified_lines = modify_lines(data_lines, replacement_dict)
-    # config = read_yaml_config(config_file_path)
-    result= []
-    # 필요한 데이터만 출력
-    if searchdirs is not None:
-        for line in modified_lines:
-            if re.match(r'^\d+ \S+/\S+', line) and any(searchdir in line for searchdir in searchdirs):
-                result.append(line)
-                print(line, end='')
-    else:
-        for line in modified_lines:
-            if re.match(r'^\d+ \S+/\S+', line):
-                result.append(line)
-                print(line, end='')
+    try:
+        replacement_dict = read_auto_sim(auto_sim_file_path)
+        data_lines = read_data_file(data_file_path)
+        modified_lines = modify_lines(data_lines, replacement_dict)
+        # config = read_yaml_config(config_file_path)
+        result= []
+        # 필요한 데이터만 출력
+        logger.debug(f"function: main | searchdirs: {searchdirs}, autopath: {auto_sim_file_path}, datafile: {data_file_path}")
+        if searchdirs is not None:
+            for line in modified_lines:
+                if re.match(r'^\d+ \S+/\S+', line) and any(searchdir in line for searchdir in searchdirs):
+                    result.append(line)
+                    print(line, end='')
+                    logger.debug(f"function: main | filter message : {line}")
+        else:
+            for line in modified_lines:
+                if re.match(r'^\d+ \S+/\S+', line):
+                    result.append(line)
+                    print(line, end='')
+                    logger.debug(f"function: main | message : {line}")
 
 
-    # 결과를 파일로 저장하려면 아래 코드 사용
-    output_file_path = f"{data_file_path}.auto"
-    with open(output_file_path, 'w', encoding='utf-8') as output_file:
-        for line in result:
-            output_file.write(line)
+        # 결과를 파일로 저장하려면 아래 코드 사용
+        output_file_path = f"{data_file_path}.auto"
+        with open(output_file_path, 'w', encoding='utf-8') as output_file:
+            for line in result:
+                output_file.write(line)
+    except Exception as e:
+        logger.error(traceback.format_exc())
+        print("Error:" ,traceback.format_exc())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
