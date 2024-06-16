@@ -28,7 +28,7 @@ if not os.path.exists(log_dir):
 log_file_path = os.path.join(log_dir, "DLC.log")
 
 # 로거 설정
-logger = logging.getLogger('generate_table_log')
+logger = logging.getLogger('DLC')
 logger.setLevel(logging.INFO)  # 로그 레벨 설정
 
 # 로그 포맷 설정
@@ -173,7 +173,7 @@ def get_scan_objects(data,config):
                                 'searchdir': div['searchdir']
                                 }
                             )
-                        elif datacenter == "NKIC":
+                        elif datacenter == "nkic":
                             scan_objects.append({
                                 'volume' : name,
                                 'mount_path': f"{svm_name}.nkic.{domain}:{path}",
@@ -211,7 +211,7 @@ def main():
         if args.request == "get_scan_object":
             config = check_yaml_integrity(args.config)
             print(get_scan_objects(data[args.file[0]],config))
-            logger.info("print success the HTML")        
+            logger.info("print success")        
         else:
             logger.error(args.request+" request is not matched")
             print(args.request+" request is not matched")
