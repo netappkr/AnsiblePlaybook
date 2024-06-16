@@ -54,7 +54,7 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Run the Autopath.py script
-      command: "python3 {{ files_matched.files[0].path }} -f {{ config.result }} -a auto.{{config.automap}} --searchdir {{ config.searchdir }}"
+      command: "python3 {{ files_matched.files[0].path }} -f {{ config.result }}_result -a auto.{{config.automap}} --searchdir {{ config.searchdir }}"
       loop: "{{ config_mapping.scan_info }}"
       loop_control:
         loop_var: config
