@@ -45,7 +45,7 @@
       loop: "{{ scan_info_datas.results }}"
       loop_control:
         loop_var: scan_info_data
-      when: status != "PASSED"
+      when: status[0] != "PASSED"
 
 
     - name: Send email if status is not PASSED
@@ -61,7 +61,7 @@
           Log Path: {{ log_path }}
         from: "{{ email_from }}"
         secure: starttls
-      when: status != "PASSED"
+      when: status[0] != "PASSED"
 
     # - name: Send inode usage report via email
     #   mail:
