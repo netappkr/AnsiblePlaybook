@@ -3,7 +3,6 @@
 import warnings
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
-import pandas
 import json
 import logging
 import traceback
@@ -163,6 +162,12 @@ def get_scan_objects(data,config):
                     exportpolicy_names = [exp['name'] for exp in div['exportpolicy']]
                     if not svm_name:
                         logger.debug(f"{div['name']} 의 vol_name_regexp key가 비어 있습니다.")
+
+                    if 'searchdir' in div:
+                        for string in div['searchdir']:
+                            searchdir =  searchdir+" "+string
+                    else:
+                        searchdir = None
 
                     # Check if volume name matches the regexp or export policy names
                     if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
