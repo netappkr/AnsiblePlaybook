@@ -45,7 +45,7 @@ def main(data_file_path, auto_sim_file_path, searchdirs):
             print(line, end='')
 
     # 결과를 파일로 저장하려면 아래 코드 사용
-    output_file_path = 'outputfile.txt'
+    output_file_path = f"{{data_file_path}}.auto"
     with open(output_file_path, 'w', encoding='utf-8') as output_file:
         for line in modified_lines:
             if re.match(r'^\d+ \S+/\S+', line) and any(searchdir in line for searchdir in searchdirs):
