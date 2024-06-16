@@ -28,32 +28,35 @@
       set_fact:
         scan_content: "{{ scan_info_result.content | b64decode | decode }}"
 
-    - name: Display scan_content
+    - name: Display scan_contents
       debug:
-        msg: "{{ scan_content }}"
+        msg: "{{ scan_contents }}"
 
     - name: Parse the scan content
       set_fact:
         log_path: "{{ scan_content | regex_search('Log Path : (.+)', '\\1') }}"
         status: "{{ scan_content | regex_search('STATUS : (.+)', '\\1') }}"
-        file_name: "/data/vine/Ansible_XCP/xcp_result/SOC/20240616/wy_vol_info"
+        file_name: "{{ scan_info_result.config.result }}_info"
+      loop: "{{ scan_contents.results }}"
+      loop_control:
+        loop_var: scan_content
 
     - name: Check if status is not PASSED
       debug:
         msg: "STATUS is not PASSED. File: {{ file_name }}, Log Path: {{ log_path }}"
       when: status != "PASSED"
 
-    - name: Send email if status is not PASSED
-      mail:
-        host: "{{ smtp_server }}"
-        port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
-        to: "{{ email_to }}"
-        subject: "XCP Scan Failed: {{ file_name }}"
-        body: |
-          The XCP scan for the file {{ file_name }} did not pass.
-          Log Path: {{ log_path }}
-        from: "{{ email_from }}"
-        secure: starttls
-      when: status != "PASSED"
+    # - name: Send email if status is not PASSED
+    #   mail:
+    #     host: "{{ smtp_server }}"
+    #     port: "{{ smtp_port }}"
+    #     username: "{{ smtp_username }}"
+    #     password: "{{ smtp_password }}"
+    #     to: "{{ email_to }}"
+    #     subject: "XCP Scan Failed: {{ file_name }}"
+    #     body: |
+    #       The XCP scan for the file {{ file_name }} did not pass.
+    #       Log Path: {{ log_path }}
+    #     from: "{{ email_from }}"
+    #     secure: starttls
+    #   when: status != "PASSED"
