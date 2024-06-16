@@ -164,10 +164,9 @@ def get_scan_objects(data,config):
                         logger.debug(f"{div['name']} 의 vol_name_regexp key가 비어 있습니다.")
 
                     if 'searchdir' in div:
-                        for string in div['searchdir']:
-                            searchdir =  searchdir+" "+string
+                        search_dirs_str = ' '.join(div['searchdir'])
                     else:
-                        searchdir = None
+                        search_dirs_str = None
 
                     # Check if volume name matches the regexp or export policy names
                     if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
@@ -179,7 +178,7 @@ def get_scan_objects(data,config):
                                 'export_policy': f"{export_policy}",
                                 'xcp_option':div['xcp_option'],
                                 'autopath': div['autopath'],
-                                'searchdir': div['searchdir']
+                                'searchdir': search_dirs_str
                                 }
                             )
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
@@ -191,7 +190,7 @@ def get_scan_objects(data,config):
                                 'export_policy': f"{export_policy}",
                                 'xcp_option':div['xcp_option'],
                                 'autopath': div['autopath'],
-                                'searchdir': div['searchdir']
+                                'searchdir': search_dirs_str
                                 }
                             )
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
@@ -203,7 +202,7 @@ def get_scan_objects(data,config):
                                 'export_policy': f"{export_policy}",
                                 'xcp_option': div['xcp_option'],
                                 'autopath': div['autopath'],
-                                'searchdir': div['searchdir']
+                                'searchdir': search_dirs_str
                                 }
                             )
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
