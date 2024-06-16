@@ -150,6 +150,9 @@ def get_scan_objects(data,config):
                 if any(ex['name'] == name for ex in exclude):
                     logger.debug(f"{cluster['cluster']['name']} {name} 볼룸을 목록에서 제외합니다.")
                     continue
+                elif path == "":
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸을 목록에서 제외합니다.")
+                    continue            
 
                 # Check if volume matches any division criteria
                 for div in division: 
