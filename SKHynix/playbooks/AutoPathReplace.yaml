@@ -29,17 +29,15 @@
 
     - name: Run get.auto command
       shell: | 
-        getauto auto.{{automap}}
+        getauto auto.{{ item }}
       loop: "{{unique_automap_values}}"
-      loop_control:
-        loop_var: automap
       register: getauto_output
 
     - name: Write result data to a automap file
       copy:
-        dest: "/tmp/auto.{{automap}}"
-        content: "{{ getauto_output }}"
-      loop: "{{unique_automap_values}}"
+        dest: "/tmp/auto.{{item}}"
+        content: "{{ automap.stdout_lines }}"
+      loop: "{{getauto_output.results}}"
       loop_control:
         loop_var: automap
 
