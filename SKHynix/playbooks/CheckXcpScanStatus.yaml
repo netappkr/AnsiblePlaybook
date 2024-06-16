@@ -24,25 +24,25 @@
         loop_var: config
       register: scan_info_results
 
-    - name: Decode the file content
-      set_fact:
-        scan_contents: "{{ scan_info_result.content | b64decode }}"
-      loop: "{{ scan_info_results.results }}"
-      loop_control:
-        loop_var: scan_info_result
+    # - name: Decode the file content
+    #   set_fact:
+    #     scan_contents: "{{ scan_info_result.content | b64decode }}"
+    #   loop: "{{ scan_info_results.results }}"
+    #   loop_control:
+    #     loop_var: scan_info_result
 
     - name: Display scan_contents
       debug:
-        msg: "{{ scan_contents }}"
+        msg: "{{ scan_info_results }}"
 
     - name: Parse the scan content
       set_fact:
-        log_path: "{{ scan_content | regex_search('Log Path : (.+)', '\\1') }}"
-        status: "{{ scan_content | regex_search('STATUS : (.+)', '\\1') }}"
+        log_path: "{{ scan_info_result.content | b64decode | regex_search('Log Path : (.+)', '\\1') }}"
+        status: "{{ scan_info_result.content | b64decode | regex_search('STATUS : (.+)', '\\1') }}"
         file_name: "{{ scan_info_result.config.result }}_info"
-      loop: "{{ scan_contents.results }}"
+      loop: "{{ scan_info_results.results }}"
       loop_control:
-        loop_var: scan_content
+        loop_var: scan_info_result
 
     - name: Check if status is not PASSED
       debug:
