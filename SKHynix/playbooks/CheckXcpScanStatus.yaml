@@ -37,11 +37,16 @@
       loop: "{{ scan_info_results.results }}"
       loop_control:
         loop_var: scan_info_result
+      register: scan_info_datas
 
     - name: Check if status is not PASSED
       debug:
-        msg: "STATUS is not PASSED. File: {{ file_name }}, Log Path: {{ log_path }}"
+        msg: "STATUS is not PASSED. File: {{ scan_info_data.file_name }}, Log Path: {{ scan_info_data.log_path }}"
+      loop: "{{ scan_info_datas.results }}"
+      loop_control:
+        loop_var: scan_info_data
       when: status != "PASSED"
+
 
     - name: Send email if status is not PASSED
       mail:
