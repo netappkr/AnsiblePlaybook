@@ -457,8 +457,8 @@ def storage_Big_snapshot_report_by_volume(data):
 
 def check_xcp_scan_status(data):
     tables = []
+    datatable = pandas.DataFrame()
     for scaninfo in data:
-        datatable = pandas.DataFrame()
         try:
             # scan_contents=scaninfo["ansible_facts"]["scan_contents"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
             log_path=scaninfo["ansible_facts"]["log_path"][0]
