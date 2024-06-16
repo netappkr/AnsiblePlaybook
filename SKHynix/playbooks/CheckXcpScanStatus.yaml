@@ -41,7 +41,7 @@
     - name: Check if status is not PASSED
       debug:
         msg: "STATUS is not PASSED. File: {{ file_name }}, Log Path: {{ log_path }}"
-      when: status != "PASSED"
+      when: "{{status}}" != "PASSED"
 
     - name: Send email if status is not PASSED
       mail:
@@ -56,4 +56,19 @@
           Log Path: {{ log_path }}
         from: "{{ email_from }}"
         secure: starttls
-      when: status != "PASSED"
+      when: "{{status}}" != "PASSED"
+
+    # - name: Send inode usage report via email
+    #   mail:
+    #     host: "{{ smtp_server }}"
+    #     port: "{{ smtp_port }}"
+    #     username: "{{ smtp_username }}"
+    #     password: "{{ smtp_password }}"
+    #     to: "{{ email_to }}"
+    #     subject: "ONTAP Inode Usage by Volume Report {{ '%Y-%m-%d' | strftime }} "
+    #     body: "{{ html_table.stdout }}"
+    #     from: "{{ email_from }}"
+    #     secure: starttls
+    #     subtype: html
+    #     headers: 
+    #     - Content-Type="text/html"
