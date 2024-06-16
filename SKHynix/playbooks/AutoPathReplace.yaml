@@ -29,8 +29,10 @@
 
     - name: Run get.auto command
       shell: | 
-        getauto auto.{{unique_automap_values}}
+        getauto auto.{{automap}}
       loop: "{{unique_automap_values}}"
+      loop_control:
+        loop_var: automap
       register: getauto_output
 
 
