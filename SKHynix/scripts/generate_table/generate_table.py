@@ -461,12 +461,12 @@ def check_xcp_scan_status(data):
     for scaninfo in data:
         try:
             # scan_contents=scaninfo["ansible_facts"]["scan_contents"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
-            log_path=scaninfo["ansible_facts"]["log_path"][0]
             status=scaninfo["ansible_facts"]["status"][0]
             file_name = scaninfo["ansible_facts"]['file_name']
+            volumename = scaninfo["ansible_facts"]['volumename']
             add=pandas.DataFrame.from_records([{
-                'log_path': log_path,
                 'status': status,
+                'volumename': volumename,
                 'file_name': file_name
             }])
             datatable=datatable._append(add,ignore_index = True)
@@ -486,6 +486,8 @@ def check_xcp_scan_status(data):
             ]
         }
     })
+    logger.debug(f"func : check_xcp_scan_status | datatable:")
+    logger.debug(print(datatable))
     return tables
 
 
@@ -510,6 +512,7 @@ def format_html_style(tables=[]):
         #         ]
         #     }
         # }
+        logger.debug(f"func : format_html_style | table: {table}")
         datatable = table["datatable"]
         if "sorting_rules" in table["report_config"]:
             sort_columns = [rule['column'] for rule in table["report_config"]["sorting_rules"]]

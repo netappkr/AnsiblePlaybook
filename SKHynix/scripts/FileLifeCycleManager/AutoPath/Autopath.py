@@ -20,13 +20,17 @@ def read_data_file(data_file_path):
     with open(data_file_path, 'r', encoding='utf-8') as data_file:
         return data_file.readlines()
 
-def modify_lines(data_lines, replacement_dict):
+def modify_lines(data_lines, replacement_dict, automap):
+# nsimtc.chopincad.com:/sim_nand_ptissptv/CAE/USER -> /sim/ptissptv/CAE/USER
+# 
     modified_lines = []
     for line in data_lines:
         modified_line = line
         for key, value in replacement_dict.items():
+            # logger.debug(f"function: modify_lines | key : {key}, value : {value}")
             if key in line:
-                modified_line = line.replace(key, f"/{value}/{key.split('/')[-1]}")
+                modified_line = line.replace(key, f"/{automap}/{value}")
+                logger.debug(f"function: modify_lines | modified_line : {modified_line}")
                 break
         modified_lines.append(modified_line)
     return modified_lines
@@ -35,21 +39,23 @@ def read_yaml_config(config_file_path):
     with open(config_file_path, 'r', encoding='utf-8') as config_file:
         return yaml.safe_load(config_file)
 
-def main(data_file_path, auto_sim_file_path, searchdirs):
+def main(data_file_path, auto_sim_file_path, searchdirs ,automap, volumename):
     try:
         replacement_dict = read_auto_sim(auto_sim_file_path)
         data_lines = read_data_file(data_file_path)
-        modified_lines = modify_lines(data_lines, replacement_dict)
+        modified_lines = modify_lines(data_lines, replacement_dict, automap)
         # config = read_yaml_config(config_file_path)
         result= []
         # 필요한 데이터만 출력
         logger.debug(f"function: main | searchdirs: {searchdirs}, autopath: {auto_sim_file_path}, datafile: {data_file_path}")
         if searchdirs is not None:
             for line in modified_lines:
-                if re.match(r'^\d+ \S+/\S+', line) and any(searchdir in line for searchdir in searchdirs):
+                logger.debug(f"function: main | filter volumename : {volumename}")
+                if re.match(r'^\d+ \S+/\S+', line) and any({searchdir} in line for searchdir in searchdirs):
                     result.append(line)
                     print(line, end='')
                     logger.debug(f"function: main | filter message : {line}")
+                    
         else:
             for line in modified_lines:
                 if re.match(r'^\d+ \S+/\S+', line):
@@ -74,6 +80,8 @@ if __name__ == "__main__":
     parser.add_argument("-a", "--auto", type=str, required=True, help="Path to the auto.sim file")
     # parser.add_argument("--config", type=str, required=False, help="Path to the config YAML file")
     parser.add_argument("--searchdir", type=str, nargs='+', required=True, help="List of search directories")
+    parser.add_argument("--automap", type=str, required=True, help="automap valuse")
+    parser.add_argument("--volumename", type=str, required=True, help="volumename valuse")
     args = parser.parse_args()
 
     # 사용자 홈 디렉토리 경로 얻기
@@ -89,7 +97,7 @@ if __name__ == "__main__":
 
     # 로거 설정
     logger = logging.getLogger('autopath')
-    logger.setLevel(logging.DEBUG)  # 로그 레벨 설정
+    logger.setLevel(logging.INFO)  # 로그 레벨 설정
 
     # 로그 포맷 설정
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -100,6 +108,6 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
 
     # main(args.file, args.auto, args.config, args.searchdir)
-    main(args.file, args.auto, args.searchdir)
+    main(args.file, args.auto, args.searchdir, args.automap, args.volumename)
 
     
