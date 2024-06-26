@@ -1,7 +1,7 @@
 xcp_result:
 {% for data in scan_info_datas.results %}
 - file_name: {{ data.ansible_facts.file_name }}
-  scan_contents: {{ data.ansible_facts.scan_contents }}
+  scan_contents: "{{ data.ansible_facts.scan_contents }}"
   status: {{ data.ansible_facts.status[0] }}
   config:
     volumename: {{data.scan_info_result.config.volumename}}
