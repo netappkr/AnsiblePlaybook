@@ -70,10 +70,10 @@ def storage_inode_report_by_cluster(data):
             datatable=datatable._append(add,ignore_index = True)
         except KeyError as e:
             # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
+            logger.error(f"function: storage_inode_report_by_volume | KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
         except Exception as e:
-            logger.error(traceback.format_exc())
-            print("Error:" ,traceback.format_exc())
+            logger.error(f"function: storage_inode_report_by_volume | ",traceback.format_exc())
+            print("function: storage_inode_report_by_volume | Error:" ,traceback.format_exc())
     tables.append({
         'datatable': datatable,
         'report_config': {
@@ -112,10 +112,10 @@ def storage_inode_report_by_volume(data):
                 }])
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {Cluster['cluster']['name']}/{Volume['name']}",traceback.format_exc())
+                logger.error(f"function: storage_inode_report_by_volume | KeyError: {e} - {Cluster['cluster']['name']}/{Volume['name']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
-                print("Error:" ,traceback.format_exc())
+                print("function: storage_inode_report_by_volume | Error:" ,traceback.format_exc())
 
             datatable=datatable._append(add,ignore_index = True)
         tables.append({
@@ -158,10 +158,10 @@ def storage_space_report_by_cluster(data):
             datatable=datatable._append(add,ignore_index = True)
         except KeyError as e:
             # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
+            logger.error(f"function: storage_space_report_by_cluster | KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
         except Exception as e:
             logger.error(traceback.format_exc())
-            print("Error:" ,traceback.format_exc())
+            print("function: storage_space_report_by_cluster | Error:" ,traceback.format_exc())
             
     tables.append({
         'datatable': datatable,
@@ -199,10 +199,10 @@ def storage_space_report_by_aggr(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
+                logger.error(f"function: storage_space_report_by_aggr | KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
-                print("Error:" ,traceback.format_exc())
+                print("function: storage_space_report_by_aggr | Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
@@ -242,10 +242,10 @@ def storage_space_report_by_volume(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
+                logger.error(f"function: storage_space_report_by_volume | KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
-                print("Error:" ,traceback.format_exc())
+                print("function: storage_space_report_by_volume | Error:" ,traceback.format_exc())
                 
 
         tables.append({
@@ -286,10 +286,10 @@ def storage_space_report_by_aggr_in_SoC(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
+                logger.error(f"function: storage_space_report_by_aggr_in_SoC | KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
-                print("Error:" ,traceback.format_exc())
+                print("function: storage_space_report_by_aggr_in_SoC | Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
@@ -332,10 +332,10 @@ def storage_space_report_by_volume_in_SoC(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
+                logger.error(f"function: storage_space_report_by_volume_in_SoC | KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
-                print("Error:" ,traceback.format_exc())
+                print("function: storage_space_report_by_volume_in_SoC | Error:" ,traceback.format_exc())
                 
 
         tables.append({
@@ -386,10 +386,10 @@ def storage_snapmirror_report_by_cluster(data):
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{snapmirror['uuid']}",traceback.format_exc())
+                logger.error(f"function: storage_snapmirror_report_by_cluster | KeyError: {e} - {cluster['cluster']['name']}/{snapmirror['uuid']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
-                print("Error:" ,traceback.format_exc())
+                print("function: storage_snapmirror_report_by_cluster | Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
@@ -434,7 +434,7 @@ def storage_Big_snapshot_report_by_volume(data):
             logger.error(f"function: storage_Big_snapshot_report_by_volume | KeyError: {e} - {cluster['svm']['name']}/{volume['name']}",traceback.format_exc())
         except Exception as e:
             logger.error(f"function: storage_Big_snapshot_report_by_volume | ", traceback.format_exc())
-            print("Error:" ,traceback.format_exc())
+            print("function: storage_Big_snapshot_report_by_volume | Error:" ,traceback.format_exc())
             
 
     tables.append({
