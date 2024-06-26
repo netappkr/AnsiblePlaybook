@@ -41,7 +41,7 @@
 
     - name: Display scan_info_datas
       debug:
-        msg: "{{ debug.scan_info_result.config }}"
+        msg: "{{ debug }}"
       loop: "{{ scan_info_datas.results }}"
       loop_control:
         loop_var: debug
