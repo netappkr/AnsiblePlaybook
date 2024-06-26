@@ -18,7 +18,7 @@
 
     - name: Read the xcp scan info result file
       slurp:
-        src: "{{ config.result }}_info"
+        src: "{{ config.xcp_info }}"
       loop: "{{ config_mapping.scan_info }}"
       loop_control:
         loop_var: config
