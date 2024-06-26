@@ -43,12 +43,16 @@
       debug:
         msg: "{{ scan_info_datas }}"
 
-    - name: Write result data to a JSON file
-      copy:
-        dest: "/tmp/xcp_scan_info_datas.json"
-        content: "{{ scan_info_datas.results | to_nice_json }}"
-      register: datafile
-  
+    # - name: Write result data to a JSON file
+    #   copy:
+    #     dest: "/tmp/xcp_scan_info_datas.json"
+    #     content: "{{ scan_info_datas.results | to_nice_json }}"
+    #   register: datafile
+
+    - name: write result.yaml using jinia2
+      template:
+        src: scan_results.j2
+        dest: /tmp/xcp_scan_info_datas.yaml
     # - name: Check if status is not PASSED
     #   debug:
     #     msg: "STATUS is not PASSED. File: {{ scan_info_data.ansible_facts.file_name }}, Log Path: {{ scan_info_data.ansible_facts.log_path[0] }}"
