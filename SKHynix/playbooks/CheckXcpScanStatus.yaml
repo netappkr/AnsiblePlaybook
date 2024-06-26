@@ -41,7 +41,10 @@
 
     - name: Display scan_info_datas
       debug:
-        msg: "{{ scan_info_datas.scan_info_result.config }}"
+        msg: "{{ debug.scan_info_result.config }}"
+      loop: "{{ scan_info_datas }}"
+      loop_control:
+        loop_var: debug
 
     # - name: Write result data to a JSON file
     #   copy:
