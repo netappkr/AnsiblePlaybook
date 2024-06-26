@@ -431,9 +431,9 @@ def storage_Big_snapshot_report_by_volume(data):
                         datatable = datatable._append(add,ignore_index = True)
         except KeyError as e:
             # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {cluster['svm']['name']}/{volume['name']}",traceback.format_exc())
+            logger.error(f"function: storage_Big_snapshot_report_by_volume | KeyError: {e} - {cluster['svm']['name']}/{volume['name']}",traceback.format_exc())
         except Exception as e:
-            logger.error(traceback.format_exc())
+            logger.error(f"function: storage_Big_snapshot_report_by_volume | ", traceback.format_exc())
             print("Error:" ,traceback.format_exc())
             
 
@@ -472,7 +472,7 @@ def check_xcp_scan_status(data):
             datatable=datatable._append(add,ignore_index = True)
         except KeyError as e:
             # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {scaninfo['config']['volumename']}",traceback.format_exc())
+            logger.error(f"function: check_xcp_scan_status | KeyError : {e} - {scaninfo['config']['volumename']}",traceback.format_exc())
         except Exception as e:
             logger.error(traceback.format_exc())
             print("Error:" ,traceback.format_exc())
