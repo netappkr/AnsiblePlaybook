@@ -1,6 +1,6 @@
 xcp_result:
 {% for data in scan_info_datas.results %}
-  status: {{ data.ansible_facts.status[0] }}
+- status: {{ data.ansible_facts.status[0] }}
   config:
     xcp_result: {{data.scan_info_result.config.xcp_result}}
     xcp_info: {{data.scan_info_result.config.xcp_info}}
