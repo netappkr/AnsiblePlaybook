@@ -72,7 +72,7 @@ def main(data_file_path, auto_sim_file_path, searchdirs ,automap, volumename, st
                     output_file.write(line)
             logger.info(f"{output_file_path}: 파일 출력 설공 ")
         else:
-            logger.info(f"{volumename} XCP scan 상태는 {status} 입니다. PASSED가 아니면 작업을 생략합니다.")
+            logger.info(f"{volumename} 볼륨의 XCP scan 상태는 {status} 입니다. PASSED가 아니면 작업을 생략합니다.")
     except Exception as e:
         logger.error(traceback.format_exc())
         print("Error:" ,traceback.format_exc())
