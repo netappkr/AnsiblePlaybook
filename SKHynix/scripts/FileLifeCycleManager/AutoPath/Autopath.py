@@ -53,7 +53,7 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status):
             if searchdirs is not None:
                 for line in modified_lines:
                     logger.debug(f"function: main | filter volumename : {volumename}")
-                    if re.match(r'^\d+ \S+/\S+', line) and any({searchdir} in line for searchdir in searchdirs):
+                    if re.match(r'^\d+ \S+/\S+', line) and any(searchdir in line for searchdir in searchdirs):
                         result.append(line)
                         print(line, end='')
                         logger.debug(f"function: main | filter message : {line}")
