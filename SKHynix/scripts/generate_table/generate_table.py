@@ -462,12 +462,12 @@ def check_xcp_scan_status(data):
         try:
             # scan_contents=scaninfo["ansible_facts"]["scan_contents"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
             status=scaninfo["ansible_facts"]["status"][0]
-            file_name = scaninfo["ansible_facts"]['file_name']
+            xcp_info = scaninfo["scan_info_result"]['config']['xcp_info']
             volumename = scaninfo["ansible_facts"]['volumename']
             add=pandas.DataFrame.from_records([{
                 'status': status,
                 'volumename': volumename,
-                'file_name': file_name
+                'xcp_run_info': xcp_info
             }])
             datatable=datatable._append(add,ignore_index = True)
         except KeyError as e:
