@@ -39,16 +39,16 @@ def read_yaml_config(config_file_path):
     with open(config_file_path, 'r', encoding='utf-8') as config_file:
         return yaml.safe_load(config_file)
 
-def main(data_file_path, auto_sim_file_path, searchdirs ,automap, volumename, status):
+def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status):
     try:
         if status == "PASSED":
-            replacement_dict = read_auto_sim(auto_sim_file_path)
-            data_lines = read_data_file(data_file_path)
+            replacement_dict = read_auto_sim(f"/tmp/auto.{automap}")
+            data_lines = read_data_file(xcpresult)
             modified_lines = modify_lines(data_lines, replacement_dict, automap)
             # config = read_yaml_config(config_file_path)
             result= []
             # 필요한 데이터만 출력
-            logger.debug(f"function: main | searchdirs: {searchdirs}, autopath: {auto_sim_file_path}, datafile: {data_file_path}, status: {status}")
+            logger.debug(f"function: main | searchdirs: {searchdirs}, autopath: /tmp/auto.{automap}, datafile: {xcpresult}, status: {status}")
             if searchdirs is not None:
                 for line in modified_lines:
                     logger.debug(f"function: main | filter volumename : {volumename}")
@@ -66,11 +66,10 @@ def main(data_file_path, auto_sim_file_path, searchdirs ,automap, volumename, st
 
 
             # 결과를 파일로 저장하려면 아래 코드 사용
-            output_file_path = f"{data_file_path}.auto"
-            with open(output_file_path, 'w', encoding='utf-8') as output_file:
+            with open(replace, 'w', encoding='utf-8') as output_file:
                 for line in result:
                     output_file.write(line)
-            logger.info(f"{output_file_path}: 파일 출력 설공 ")
+            logger.info(f"파일 수정 성공, xcp_info: {xcpinfo}, xcp_result: {xcpresult}, replase: {replace}")
         else:
             logger.info(f"{volumename} 볼륨의 XCP scan 상태는 {status} 입니다. PASSED가 아니면 작업을 생략합니다.")
     except Exception as e:
@@ -79,15 +78,15 @@ def main(data_file_path, auto_sim_file_path, searchdirs ,automap, volumename, st
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
-    parser.add_argument("-f", "--file", type=str, required=True, help="Path to the data file")
-    parser.add_argument("-a", "--auto", type=str, required=True, help="Path to the auto.sim file")
+    parser.add_argument("--xcpresult", type=str, required=True, help="Path to the xcp_result data file")
+    parser.add_argument("--xcpinfo", type=str, required=True, help="Path to the xcp_info data file")
+    parser.add_argument("--replace", type=str, required=True, help="Path to the replace file")
+    parser.add_argument("--automap", type=str, required=True, help="automap valuse")
     # parser.add_argument("--config", type=str, required=False, help="Path to the config YAML file")
     parser.add_argument("--searchdir", type=str, nargs='+', required=True, help="List of search directories")
-    parser.add_argument("--automap", type=str, required=True, help="automap valuse")
     parser.add_argument("--volumename", type=str, required=True, help="volumename valuse")
     parser.add_argument("--status", type=str, required=True, help="xcp scan status")
     args = parser.parse_args()
-
     # 사용자 홈 디렉토리 경로 얻기
     home_dir = os.path.expanduser("~")
     log_dir = os.path.join(home_dir, "logs")
@@ -112,6 +111,6 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
 
     # main(args.file, args.auto, args.config, args.searchdir)
-    main(args.file, args.auto, args.searchdir, args.automap, args.volumename, args.status)
+    main(args.xcpresult, args.xcpinfo, args.replace, args.automap, args.searchdir, args.volumename, args.status)
 
     

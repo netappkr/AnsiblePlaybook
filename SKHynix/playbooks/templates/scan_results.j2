@@ -1,10 +1,11 @@
 xcp_result:
 {% for data in scan_info_datas.results %}
-- file_name: {{ data.ansible_facts.file_name }}
   status: {{ data.ansible_facts.status[0] }}
   config:
+    xcp_result: {{data.scan_info_result.config.xcp_result}}
+    xcp_info: {{data.scan_info_result.config.xcp_info}}
+    replace: {{data.scan_info_result.config.replace}}
     volumename: {{data.scan_info_result.config.volumename}}
-    result: {{data.scan_info_result.config.result}}
     division: {{data.scan_info_result.config.division}}
     automap: {{data.scan_info_result.config.automap}}
     searchdir: {{data.scan_info_result.config.searchdir}}

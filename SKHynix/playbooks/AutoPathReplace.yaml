@@ -54,7 +54,15 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Run the Autopath.py script
-      command: "python3 {{ files_matched.files[0].path }} -f {{ xcp_result.config.result }}_result -a auto.{{xcp_result.config.automap}} --searchdir {{ xcp_result.config.searchdir }} --automap {{xcp_result.config.automap}} --volumename {{ xcp_result.config.volumename }} --status {{ xcp_result.status }}"
+      shell: | 
+        "python3 {{ files_matched.files[0].path }} \
+        --xcpresult {{ xcp_result.config.xcp_result }} \
+        --xcpinfo {{ xcp_result.config.xcp_info }} \
+        --replace {{ xcp_result.config.replace }} \
+        --automap {{xcp_result.config.automap}} \
+        --searchdir {{ xcp_result.config.searchdir }} \
+        --volumename {{ xcp_result.config.volumename }} \
+        --status {{ xcp_result.status }}"
       loop: "{{ config_mapping.xcp_result }}"
       loop_control:
         loop_var: xcp_result

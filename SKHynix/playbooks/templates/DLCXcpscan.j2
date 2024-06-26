@@ -1,7 +1,9 @@
 scan_info:
 {% for vol in config_mapping.msg %}
 - volumename: {{vol.volume}}
-  result: /data/vine/Ansible_XCP/xcp_result/{{vol.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{vol.volume}}
+  xcp_result: /data/vine/Ansible_XCP/xcp_result/{{vol.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/result/{{vol.volume}}.result
+  xcp_info: /data/vine/Ansible_XCP/xcp_result/{{vol.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/info/{{vol.volume}}.info
+  replace: /data/vine/Ansible_XCP/xcp_result/{{vol.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/replace/{{vol.volume}}.replace
   division: {{vol.div}}
   automap: {{vol.autopath.automap}}
   searchdir: {{vol.searchdir}}
