@@ -46,11 +46,11 @@
       loop_control:
         loop_var: debug
 
-    # - name: Write result data to a JSON file
-    #   copy:
-    #     dest: "/tmp/xcp_scan_info_datas.json"
-    #     content: "{{ scan_info_datas.results | to_nice_json }}"
-    #   register: datafile
+    - name: Write result data to a JSON file
+      copy:
+        dest: "/tmp/xcp_scan_info_datas.json"
+        content: "{{ scan_info_datas.results | to_nice_json }}"
+      register: datafile
 
     - name: write result.yaml using jinia2
       template:
