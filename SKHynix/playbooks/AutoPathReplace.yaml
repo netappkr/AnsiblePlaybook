@@ -17,7 +17,7 @@
 
     - name: Extract automap values
       set_fact:
-        automap_values: "{{ config_mapping.xcp_result | map(attribute='automap') | list }}"
+        automap_values: "{{ config_mapping.xcp_result | map(attribute='config') | flatten | map(attribute='automap') | list }}"
 
     - name: Remove duplicate automap values
       set_fact:
