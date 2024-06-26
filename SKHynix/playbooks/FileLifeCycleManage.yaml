@@ -57,10 +57,22 @@
       register: config_mapping
 
     - name: mkdir
-      shell: |
-        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/result
-        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/info
-        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/replace
+      rescue:
+        - name: make directory when not found result directory
+          ansible.builtin.file:
+            path: "{{ /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/result }}"
+            state: directory
+            mode: '0755'
+        - name: make directory when not found info directory
+          ansible.builtin.file:
+            path: "{{ /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/info }}"
+            state: directory
+            mode: '0755'
+        - name: make directory when not found replace directory
+          ansible.builtin.file:
+            path: "{{ /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/replace }}"
+            state: directory
+            mode: '0755'
       ignore_errors: true
       loop: "{{ DLC.config.division }}"
       loop_control:
