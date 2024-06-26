@@ -4,7 +4,7 @@
   tasks:
     - name: Read the scan_list_file_results.yaml
       ansible.builtin.slurp:
-        src: /tmp/scan_list_file_results.yaml
+        src: /tmp/xcp_scan_info_datas.yaml
       register: result
       
     - name: "Parse yaml into variable"
@@ -17,7 +17,7 @@
 
     - name: Extract automap values
       set_fact:
-        automap_values: "{{ config_mapping.scan_info | map(attribute='automap') | list }}"
+        automap_values: "{{ config_mapping.xcp_result | map(attribute='config.automap') | list }}"
 
     - name: Remove duplicate automap values
       set_fact:
@@ -54,9 +54,9 @@
         msg: "{{ files_matched.files[0].path }}"
 
     - name: Run the Autopath.py script
-      command: "python3 {{ files_matched.files[0].path }} -f {{ config.result }}_result -a auto.{{config.automap}} --searchdir {{ config.searchdir }}"
-      loop: "{{ config_mapping.scan_info }}"
+      command: "python3 {{ files_matched.files[0].path }} -f {{ xcp_result.config.result }}_result -a auto.{{xcp_result.config.automap}} --searchdir {{ xcp_result.config.searchdir }} --status {{ xcp_result.status }}"
+      loop: "{{ config_mapping.xcp_result }}"
       loop_control:
-        loop_var: config
+        loop_var: xcp_result
 
 
