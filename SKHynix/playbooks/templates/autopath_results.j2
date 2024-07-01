@@ -1,13 +1,14 @@
 autopath_result:
-{% for data in autopath_result.results %}
-- status: {{data.stdout.status}}
-  message: {{data.stdout.message}}
+{% for data in jobs_info.results %}
+- status: {{data.ansible_facts.job_info.status}}
+  message: {{data.ansible_facts.job_info.message}}
+  xcp_scan_status: {{data.autopath_result.xcp_result.status}}
   config:
-    xcp_result: {{data.xcp_result.config.xcp_result}}
-    xcp_info: {{data.xcp_result.config.xcp_info}}
-    replace: {{data.xcp_result.config.replace}}
-    volumename: {{data.xcp_result.config.volumename}}
-    division: {{data.xcp_result.config.division}}
-    automap: {{data.xcp_result.config.automap}}
-    searchdir: {{data.xcp_result.config.searchdir}}
+    xcp_result: {{data.autopath_result.xcp_result.config.xcp_result}}
+    xcp_info: {{data.autopath_result.xcp_result.config.xcp_info}}
+    replace: {{data.autopath_result.xcp_result.config.replace}}
+    volumename: {{data.autopath_result.xcp_result.config.volumename}}
+    division: {{data.autopath_result.xcp_result.config.division}}
+    automap: {{data.autopath_result.xcp_result.config.automap}}
+    searchdir: {{data.autopath_result.xcp_result.config.searchdir}}
 {% endfor %}
