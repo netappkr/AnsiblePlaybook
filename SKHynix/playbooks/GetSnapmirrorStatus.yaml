@@ -80,11 +80,11 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Cluster space Usage Report"
-        body: "{{ html_table.stdout }}"
+        subject: "ONTAP Clusters Snapmirror status Report"
+        body: "{{ html_tables.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
-      when: html_table.stdout is defined
+      when: html_tables.stdout is defined

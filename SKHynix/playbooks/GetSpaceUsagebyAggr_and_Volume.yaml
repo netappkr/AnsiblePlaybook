@@ -128,7 +128,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Cluster space Usage Report"
+        subject: "NetApp Storage Capacity Report - {{ now(utc=false,fmt='%Y.%m.%d') }}"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls

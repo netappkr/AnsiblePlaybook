@@ -96,17 +96,17 @@
     #  ansible.builtin.debug:
     #    msg: "{{ html_tables.results }}"
 
-    - name: Send inode usage report via email
+    - name: Send storage usage report via email
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
-        #username: "{{ smtp_username }}"
-        #password: "{{ smtp_password }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "check xcp scan status {{ '%Y-%m-%d' | strftime }} "
+        subject: "ONTAP Cluster space Usage Report"
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
-        secure: never
+        secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
