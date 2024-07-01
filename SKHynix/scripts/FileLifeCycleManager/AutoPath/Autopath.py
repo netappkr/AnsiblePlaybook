@@ -49,7 +49,7 @@ def result_data(jobstatus,message,xcpinfo,xcpresult,replace):
         "xcp_result": xcpresult,
         "replace": replace
     }
-    return json.dump(result,ensure_ascii=False)
+    return result
 
 def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, skipdedup):
     try:
@@ -102,7 +102,7 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, s
     except Exception as e:
         message = traceback.format_exc()
         jobstatus = "error"
-        logger.error(json.dumps(result_data(jobstatus,message,xcpinfo,xcpresult,replace)))
+        logger.error(result_data(jobstatus,message,xcpinfo,xcpresult,replace))
         return result_data(jobstatus,message,xcpinfo,xcpresult,replace)
 
 if __name__ == "__main__":
