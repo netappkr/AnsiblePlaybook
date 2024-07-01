@@ -58,9 +58,7 @@
 
     - name: mkdir
       shell: |
-        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/result
-        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/info
-        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/replace
+        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}
       ignore_errors: true
       loop: "{{ DLC.config.division }}"
       loop_control:
@@ -68,7 +66,7 @@
 
     - name: xcp scan
       shell: |
-        xcp scan -match "{{volumes.xcp_option.match}}" -fmt "{{volumes.xcp_option.fmt}}" {{ volumes.mount_path }} > /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/result/{{volumes.volume}}.result 2> /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/info/{{volumes.volume}}.info 
+        xcp scan -match "{{volumes.xcp_option.match}}" -fmt "{{volumes.xcp_option.fmt}}" {{ volumes.mount_path }} > /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_result 2> /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_info 
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:

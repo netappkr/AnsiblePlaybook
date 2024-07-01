@@ -487,7 +487,7 @@ def check_xcp_scan_status(data):
         }
     })
     logger.debug(f"func : check_xcp_scan_status | datatable:")
-    logger.debug(print(datatable))
+    logger.debug(datatable)
     return tables
 
 

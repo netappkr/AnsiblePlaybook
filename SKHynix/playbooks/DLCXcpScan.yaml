@@ -58,7 +58,9 @@
 
     - name: mkdir
       shell: |
-        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}
+        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/result
+        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/info
+        mkdir -p /data/vine/Ansible_XCP/xcp_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/replace
       ignore_errors: true
       loop: "{{ DLC.config.division }}"
       loop_control:
@@ -67,7 +69,7 @@
     - name: xcp scan
       shell: |
         . /sw/LSF/conf/profile.lsf
-        bsub -q STORAGE -oo /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_result -e /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/{{volumes.volume}}_info /opt/NetApp/xFiles/xcp/linux/xcp scan -match "{{volumes.xcp_option.match}}" -fmt "{{volumes.xcp_option.fmt}}" {{ volumes.mount_path }}
+        bsub -q STORAGE -oo /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/result/{{volumes.volume}}.result -eo /data/vine/Ansible_XCP/xcp_result/{{volumes.div}}/{{ now(utc=false,fmt='%Y%m%d') }}/info/{{volumes.volume}}.info /opt/NetApp/xFiles/xcp/linux/xcp scan -match "{{volumes.xcp_option.match}}" -fmt "{{volumes.xcp_option.fmt}}" {{ volumes.mount_path }}
       ignore_errors: true
       loop: "{{ volume_list.stdout }}"
       loop_control:
@@ -106,4 +108,5 @@
     #     dest: "/tmp/scan_list_file_results.list"
     #     content: "{{ scan_list_file_results | join('\n')}}"
     #   register: scan_list_file
+
 

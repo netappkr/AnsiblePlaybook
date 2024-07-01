@@ -16,15 +16,30 @@
       debug:
         msg: "{{ config_mapping }}"
 
+    # - name: file status check
+    #   ansible.builtin.file:
+    #     path: "{{ config.xcp_info }}"
+    #     state: file
+    #   loop: "{{ config_mapping.scan_info }}"
+    #   ignore_errors: true
+    #   loop_control:
+    #     loop_var: config
+    #   register: file_list
+
+    # - name: Display file list
+    #   debug:
+    #     msg: "{{ file_list }}"
+
     - name: Read the xcp scan info result file
       slurp:
         src: "{{ config.xcp_info }}"
       loop: "{{ config_mapping.scan_info }}"
+      ignore_errors: true
       loop_control:
         loop_var: config
       register: scan_info_results
 
-    - name: Display scan_contents
+    - name: Display scan_info_results
       debug:
         msg: "{{ scan_info_results }}"
 
@@ -37,13 +52,11 @@
       loop_control:
         loop_var: scan_info_result
       register: scan_info_datas
+      when: scan_info_result.failed == false
 
     - name: Display scan_info_datas
       debug:
-        msg: "{{ debug }}"
-      loop: "{{ scan_info_datas.results }}"
-      loop_control:
-        loop_var: debug
+        msg: "{{ scan_info_datas.results }}"
 
     - name: Write result data to a JSON file
       copy:
@@ -87,13 +100,13 @@
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
+        #username: "{{ smtp_username }}"
+        #password: "{{ smtp_password }}"
         to: "{{ email_to }}"
         subject: "check xcp scan status {{ '%Y-%m-%d' | strftime }} "
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
-        secure: starttls
+        secure: never
         subtype: html
         headers: 
         - Content-Type="text/html"

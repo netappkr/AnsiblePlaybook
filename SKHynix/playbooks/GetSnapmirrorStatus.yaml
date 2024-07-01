@@ -4,18 +4,18 @@
   collections:
     - netapp.ontap
   tasks:
-    # - name: install the package, force upgrade
-    #   pip:
-    #     name: pip
-    #     executable: pip3
-    #     state: latest
+    - name: install the package, force upgrade
+      pip:
+        name: pip
+        executable: pip3
+        state: latest
 
-    # - name: Install Docker SDK for Python
-    #   ansible.builtin.pip:
-    #     name:
-    #     - "pip>=24.0"
-    #     - "pandas>2.0"
-    #     executable: pip3
+    - name: Install Docker SDK for Python
+      ansible.builtin.pip:
+        name:
+        - "pip>=24.0"
+        - "pandas>2.0"
+        executable: pip3
 
     - name: Get rest data information
       na_ontap_rest_info:
@@ -80,11 +80,11 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "ONTAP Clusters Snapmirror status Report"
-        body: "{{ html_tables.stdout }}"
+        subject: "ONTAP Cluster space Usage Report"
+        body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
         headers: 
         - Content-Type="text/html"
-      when: html_tables.stdout is defined
+      when: html_table.stdout is defined

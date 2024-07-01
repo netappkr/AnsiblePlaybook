@@ -1,6 +1,11 @@
 xcp_result:
 {% for data in scan_info_datas.results %}
+{% if data.scan_info_result.failed == false %}
+{% if data.ansible_facts.status is string %}
+- status: PENDING
+{% else %}
 - status: {{ data.ansible_facts.status[0] }}
+{% endif %}
   config:
     xcp_result: {{data.scan_info_result.config.xcp_result}}
     xcp_info: {{data.scan_info_result.config.xcp_info}}
@@ -9,4 +14,5 @@ xcp_result:
     division: {{data.scan_info_result.config.division}}
     automap: {{data.scan_info_result.config.automap}}
     searchdir: {{data.scan_info_result.config.searchdir}}
+{% endif %}
 {% endfor %}
