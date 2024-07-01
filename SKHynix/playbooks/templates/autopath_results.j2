@@ -1,0 +1,13 @@
+autopath_result:
+{% for data in autopath_result.results %}
+- status: {{data.xcp_result.stdout.status}}
+  message: {{data.xcp_result.stdout.message}}
+  config:
+    xcp_result: {{data.xcp_result.config.xcp_result}}
+    xcp_info: {{data.xcp_result.config.xcp_info}}
+    replace: {{data.xcp_result.config.replace}}
+    volumename: {{data.xcp_result.config.volumename}}
+    division: {{data.xcp_result.config.division}}
+    automap: {{data.xcp_result.config.automap}}
+    searchdir: {{data.xcp_result.config.searchdir}}
+{% endfor %}

@@ -62,7 +62,28 @@
 
     - name: Display autopath_result
       debug:
-        msg: "{{ autopath_result }}"
+        msg: "{{ autopath_result.results }}"
+
+    - name: write result.yaml using jinia2
+      template:
+        src: autopath_results.j2
+        dest: /tmp/autopath_results.yaml
+
+    # - name: Send Autopath replace report via email
+    #   mail:
+    #     host: "{{ smtp_server }}"
+    #     port: "{{ smtp_port }}"
+    #     username: "{{ smtp_username }}"
+    #     password: "{{ smtp_password }}"
+    #     to: "{{ email_to }}"
+    #     subject: "Autopath replace report - {{ now(utc=false,fmt='%Y.%m.%d') }}"
+    #     body: "{{ html_table.stdout }}"
+    #     from: "{{ email_from }}"
+    #     secure: starttls
+    #     subtype: html
+    #     headers: 
+    #     - Content-Type="text/html"
+    #   when: html_table.stdout is defined
 
 
 
