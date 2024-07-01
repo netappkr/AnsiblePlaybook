@@ -1,7 +1,7 @@
 autopath_result:
 {% for data in autopath_result.results %}
-- status: {{data.xcp_result.stdout.status}}
-  message: {{data.xcp_result.stdout.message}}
+- status: {{data.stdout.status}}
+  message: {{data.stdout.message}}
   config:
     xcp_result: {{data.xcp_result.config.xcp_result}}
     xcp_info: {{data.xcp_result.config.xcp_info}}
