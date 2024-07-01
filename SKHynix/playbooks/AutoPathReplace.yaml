@@ -63,14 +63,14 @@
     - name: Display autopath_result
       debug:
         msg: "{{ autopath_result.stdout }}"
-      loop: "{{ autopath_result.results }}"
+      loop: "{{ autopath_results.results }}"
       loop_control:
         loop_var: autopath_result
 
     - name: register 
       set_fact:
         job_info: "{{ autopath_result.stdout | from_json }}"
-      loop: "{{ autopath_result.results }}"
+      loop: "{{ autopath_results.results }}"
       loop_control:
         loop_var: autopath_result
       register: jobs_info
