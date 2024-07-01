@@ -142,5 +142,5 @@ if __name__ == "__main__":
 
     # main(args.file, args.auto, args.config, args.searchdir)
     result = main(args.xcpresult, args.xcpinfo, args.replace, args.automap, args.searchdir, args.volumename, args.status, args.skipdedup)
-    print(json.dump(result,ensure_ascii=False))
+    print(json.dumps(result,ensure_ascii=False))
 
