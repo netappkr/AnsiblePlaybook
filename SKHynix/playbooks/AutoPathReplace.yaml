@@ -62,7 +62,16 @@
 
     - name: Display autopath_result
       debug:
-        msg: "{{ autopath_result.results }}"
+        msg: "{{ autopath_result.results.stdout }}"
+
+    - name: register 
+      set_fact:
+        job_info: "{{ autopath_result.stdout | from_json }}"
+      loop_control:
+        loop_var: xcp_result
+      register: jobs_info
+
+
 
     - name: write result.yaml using jinia2
       template:
