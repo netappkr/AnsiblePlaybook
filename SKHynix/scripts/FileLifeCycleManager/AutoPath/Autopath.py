@@ -49,8 +49,7 @@ def result_data(jobstatus,message,xcpinfo,xcpresult,replace):
         "xcp_result": xcpresult,
         "replace": replace
     }
-    json.dump(result,ensure_ascii = False)
-    return result
+    return json.dump(result,ensure_ascii = False)
 
 def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, skipdedup):
     try:
