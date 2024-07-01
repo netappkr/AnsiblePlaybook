@@ -58,6 +58,11 @@
       loop: "{{ config_mapping.xcp_result }}"
       loop_control:
         loop_var: xcp_result
+      register: autopath_result
+
+    - name: Display autopath_result
+      debug:
+        msg: "{{ autopath_result }}"
 
 
 

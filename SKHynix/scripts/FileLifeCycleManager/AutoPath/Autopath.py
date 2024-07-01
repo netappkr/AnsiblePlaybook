@@ -3,7 +3,6 @@ import re
 import os
 import argparse
 import yaml
-import json
 import logging
 import traceback
 
