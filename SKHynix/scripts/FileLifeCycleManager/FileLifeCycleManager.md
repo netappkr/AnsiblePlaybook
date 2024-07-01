@@ -204,19 +204,3 @@ Speed       : 1.16 MiB in (1.27 MiB/s), 22.0 KiB out (24.1 KiB/s)
 Total Time  : 0s.
 STATUS      : PASSED
 ```
-
-## AutoPath 출력 예시 
-=== auto.sim ===
-pl8gmd3nnew nsimtc.chopincad.com:/sim_dram_pl8gmd3nnew
-de8ggd6new nsimtc.chopincad.com:/sim_dram_de8ggd6new
-ld512gtlctv nsimtc.chopincad.com:/sim_nand_ld512gtlctv
-da8gd4new nsimtc.chopincad.com:/sim_dram_da8gd4new
-spiecomputing1 nsimtc.chopincad.com:/sim_dram_spiecomputing1
-lc32gd5 nsim2m14.chopincad.com:/sim_dram_lc32gd5
-hiptvrg2pd100pixel nsim2m14.chopincad.com:/sim_cis_hiptvrg2pd100pixel
-hil013h nsim2m14.chopincad.com:/sim_cis_hil013h
-sp24gd5 nsim3tc.chopincad.com:/sim_dram_sp24gd5
-lc24ghbm4b nsim3tc.chopincad.com:/sim_dram_lc24ghbm4b
-lc24ghbm4c nsim3tc.chopincad.com:/sim_dram_lc24ghbm4c
-t5hbm4tv nsim3tc.chopincad.com:/sim_dram_t5hbm4tv
-sp32gmdd5 nsim3tc.chopincad.com:/sim_dram_sp32gmdd5

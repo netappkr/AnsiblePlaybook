@@ -174,6 +174,45 @@ def storage_space_report_by_cluster(data):
     })
     return tables
 
+def storage_space_report_by_cluster(data):
+    tables = []
+    datatable = pandas.DataFrame()
+    for cluster in data:
+        total_size=0
+        used_size=0
+        try:
+            for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+                total_size= total_size+aggr["space"]["block_storage"]["size"]
+                used_size= used_size+aggr["space"]["block_storage"]["used"]
+
+            add=pandas.DataFrame.from_records([{
+                'No': cluster["cluster"]["tier"],
+                'Cluster name': cluster["cluster"]["name"],
+                '업무 구분': cluster["cluster"]["description"],
+                'Total Size(TB)': round(total_size/1024/1024/1024/1024),
+                'Used Size(TB)': round(used_size/1024/1024/1024/1024),
+                'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
+                'Used Rate(%)': round(used_size / total_size * 100)
+            }])
+            datatable=datatable._append(add,ignore_index = True)
+        except KeyError as e:
+            # KeyError 발생시 처리 로직
+            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
+        except Exception as e:
+            logger.error(traceback.format_exc())
+            print("Error:" ,traceback.format_exc())
+
+    tables.append({
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "CAD Storage Cluster Capacity Summary",
+            'sorting_rules': [
+                {'column': 'No', 'order': 'asc'}
+            ]
+        }
+    })
+    return tables
+
 def storage_space_report_by_aggr(data):
     tables = []
     datatable = pandas.DataFrame()
@@ -183,7 +222,7 @@ def storage_space_report_by_aggr(data):
                 total_size=aggr["space"]["block_storage"]["size"]
                 used_size=aggr["space"]["block_storage"]["used"]
                 logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
-                ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
+                ratio=round(logical_used_size/used_size,2)
                 add=pandas.DataFrame.from_records([{
                     'No': cluster["cluster"]["tier"],
                     'Cluster Name': cluster["cluster"]["name"],
@@ -194,21 +233,21 @@ def storage_space_report_by_aggr(data):
                     'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
                     'Used Rate(%)': round(used_size / total_size * 100),
                     'logical_used_size(TB)': round(logical_used_size/1024/1024/1024/1024,1),
-                    'Total_Logical_size(TB)': round((logical_used_size*ratio)/1024/1024/1024/1024,1)
+                    'Total_Logical_size(TB)': round((total_size*ratio)/1024/1024/1024/1024,1)
                 }])
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
                 # KeyError 발생시 처리 로직
-                logger.error(f"function: storage_space_report_by_aggr | KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
+                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
             except Exception as e:
                 logger.error(traceback.format_exc())
-                print("function: storage_space_report_by_aggr | Error:" ,traceback.format_exc())
+                print("Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
         'report_config': {
             'report_name': "------ Aggregates Capacity Report ------",
-            'sorting_rules': 
+            'sorting_rules':
             [
                 {'column': 'No', 'order': 'asc'},
                 {'column': 'Node Name', 'order': 'asc'}
@@ -461,9 +500,19 @@ def check_xcp_scan_status(data):
     for scaninfo in data:
         try:
             # scan_contents=scaninfo["ansible_facts"]["scan_contents"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
-            status=scaninfo["ansible_facts"]["status"][0]
-            xcp_info = scaninfo["scan_info_result"]['config']['xcp_info']
-            volumename = scaninfo["ansible_facts"]['volumename']
+            if "ansible_facts" not in scaninfo:
+                status="PENDING"
+                volumename = "None"
+                xcp_info = "None"
+            elif type(scaninfo["ansible_facts"]["status"]) != list:
+                status="PENDING"
+                volumename = "None"
+                xcp_info = "None"
+            else:    
+                status=scaninfo["ansible_facts"]["status"][0]
+                volumename = scaninfo["ansible_facts"]['volumename']
+                xcp_info = scaninfo["scan_info_result"]['config']['xcp_info']
+
             add=pandas.DataFrame.from_records([{
                 'status': status,
                 'volumename': volumename,
@@ -487,10 +536,7 @@ def check_xcp_scan_status(data):
         }
     })
     logger.debug(f"func : check_xcp_scan_status | datatable:")
-    logger.debug(datatable)
     return tables
-
-
 
 def align_right():
     return 'text-align: right;'
@@ -634,7 +680,7 @@ def main():
         """
         html = f"""\
 <html>
-<head>{args.request} Playbook</head>
+
 <style>
 {css}
 </style>
@@ -653,6 +699,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 

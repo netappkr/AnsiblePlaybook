@@ -23,7 +23,7 @@ def read_data_file(data_file_path):
 
 def modify_lines(data_lines, replacement_dict, automap):
 # nsimtc.chopincad.com:/sim_nand_ptissptv/CAE/USER -> /sim/ptissptv/CAE/USER
-# 
+#
     modified_lines = []
     for line in data_lines:
         modified_line = line
@@ -40,8 +40,13 @@ def read_yaml_config(config_file_path):
     with open(config_file_path, 'r', encoding='utf-8') as config_file:
         return yaml.safe_load(config_file)
 
-def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status):
+def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, skipdedup):
     try:
+        if os.path.isfile(replace) and (skipdedup == "on"):
+            print(f"Skip replcae, 이미 수정된 파일이 존재합니다. xcp_info: {xcpinfo}, xcp_result: {xcpresult}, replase: {replace}")
+            logger.info(f"Skip replcae, 이미 수정된 파일이 존재합니다. xcp_info: {xcpinfo}, xcp_result: {xcpresult}, replase: {replace}")
+            return "file already exists"
+
         if status == "PASSED":
             replacement_dict = read_auto_sim(f"/tmp/auto.{automap}")
             data_lines = read_data_file(xcpresult)
@@ -57,7 +62,7 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status):
                         result.append(line)
                         print(line, end='')
                         logger.debug(f"function: main | filter message : {line}")
-                        
+
             else:
                 for line in modified_lines:
                     if re.match(r'^\d+ \S+/\S+', line):
@@ -71,8 +76,12 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status):
                 for line in result:
                     output_file.write(line)
             logger.info(f"파일 수정 성공, xcp_info: {xcpinfo}, xcp_result: {xcpresult}, replase: {replace}")
+            print(f"파일 수정 성공 xcp_info: {xcpinfo}, xcp_result: {xcpresult}, replase: {replace}")
         else:
             logger.info(f"{volumename} 볼륨의 XCP scan 상태는 {status} 입니다. PASSED가 아니면 작업을 생략합니다.")
+            print(f"{volumename} 볼륨의 XCP scan 상태는 {status} 입니다. PASSED가 아니면 작업을 생략합니다.")
+        
+        return "success"
     except Exception as e:
         logger.error(traceback.format_exc())
         print("Error:" ,traceback.format_exc())
@@ -87,6 +96,7 @@ if __name__ == "__main__":
     parser.add_argument("--searchdir", type=str, nargs='+', required=True, help="List of search directories")
     parser.add_argument("--volumename", type=str, required=True, help="volumename valuse")
     parser.add_argument("--status", type=str, required=True, help="xcp scan status")
+    parser.add_argument("--skipdedup", type=str, required=False, default="off", help="skip duplicate job.")
     args = parser.parse_args()
     # 사용자 홈 디렉토리 경로 얻기
     home_dir = os.path.expanduser("~")
@@ -112,6 +122,5 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
 
     # main(args.file, args.auto, args.config, args.searchdir)
-    main(args.xcpresult, args.xcpinfo, args.replace, args.automap, args.searchdir, args.volumename, args.status)
+    main(args.xcpresult, args.xcpinfo, args.replace, args.automap, args.searchdir, args.volumename, args.status, args.skipdedup)
 
-    
