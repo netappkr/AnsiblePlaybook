@@ -49,6 +49,7 @@ def result_data(jobstatus,message,xcpinfo,xcpresult,replace):
         "xcp_result": xcpresult,
         "replace": replace
     }
+    json.dump(result,ensure_ascii = False)
     return result
 
 def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, skipdedup):
@@ -58,7 +59,7 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, s
         if os.path.isfile(replace) and (skipdedup == "on"):
             message = "이미 수정된 파일이 존재합니다."
             jobstatus = "skip"
-            logger.info(json.dumps(result_data(jobstatus,message,xcpinfo,xcpresult,replace)))
+            logger.info(result_data(jobstatus,message,xcpinfo,xcpresult,replace))
             return result_data(jobstatus,message,xcpinfo,xcpresult,replace)
 
         if status == "PASSED":
@@ -91,12 +92,12 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, s
                     output_file.write(line)
             message = "파일 수정 성공"
             status = "success"
-            logger.info(json.dumps(result_data(jobstatus,message,xcpinfo,xcpresult,replace)))
+            logger.info(result_data(jobstatus,message,xcpinfo,xcpresult,replace))
             return result_data(jobstatus,message,xcpinfo,xcpresult,replace)
         else:
             message = f"{volumename} 볼륨의 XCP scan 상태는 {status} 입니다. PASSED가 아니면 작업을 생략합니다."
             jobstatus = "skip"
-            logger.info(json.dumps(result_data(jobstatus,message,xcpinfo,xcpresult,replace)))
+            logger.info(result_data(jobstatus,message,xcpinfo,xcpresult,replace))
             return result_data(jobstatus,message,xcpinfo,xcpresult,replace)
         
     except Exception as e:
@@ -142,5 +143,5 @@ if __name__ == "__main__":
 
     # main(args.file, args.auto, args.config, args.searchdir)
     result = main(args.xcpresult, args.xcpinfo, args.replace, args.automap, args.searchdir, args.volumename, args.status, args.skipdedup)
-    print(json.dumps(result))
+    print(result)
 
