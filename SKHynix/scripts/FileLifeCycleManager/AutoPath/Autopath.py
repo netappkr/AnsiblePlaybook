@@ -3,6 +3,7 @@ import re
 import os
 import argparse
 import yaml
+import json
 import logging
 import traceback
 
@@ -141,5 +142,5 @@ if __name__ == "__main__":
 
     # main(args.file, args.auto, args.config, args.searchdir)
     result = main(args.xcpresult, args.xcpinfo, args.replace, args.automap, args.searchdir, args.volumename, args.status, args.skipdedup)
-    print(result)
+    print(json.dump(result,ensure_ascii=False))
 
