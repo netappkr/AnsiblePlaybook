@@ -1,0 +1,34 @@
+autopath_result:
+- status: skip
+  message: "a"
+  xcp_scan_status: PASSED
+  config:
+    xcp_result: /data/vine/Ansible_XCP/xcp_result/DRAM/20240703/result/wooyoung.result
+    xcp_info: /data/vine/Ansible_XCP/xcp_result/DRAM/20240703/info/wooyoung.info
+    replace: /data/vine/Ansible_XCP/xcp_result/DRAM/20240703/replace/wooyoung.replace
+    volumename: wooyoung
+    division: DRAM
+    automap: sim
+    searchdir: LAY SCH ESD CAE LDR CORE DV
+- status: skip
+  message: "a"
+  xcp_scan_status: PASSED
+  config:
+    xcp_result: /data/vine/Ansible_XCP/xcp_result/NAND/20240703/result/wy_vol2.result
+    xcp_info: /data/vine/Ansible_XCP/xcp_result/NAND/20240703/info/wy_vol2.info
+    replace: /data/vine/Ansible_XCP/xcp_result/NAND/20240703/replace/wy_vol2.replace
+    volumename: wy_vol2
+    division: NAND
+    automap: sim
+    searchdir: LAY SCH PNR DV ESD CAE IA
+- status: skip
+  message: "a"
+  xcp_scan_status: PASSED
+  config:
+    xcp_result: /data/vine/Ansible_XCP/xcp_result/SOC/20240703/result/wy_vol.result
+    xcp_info: /data/vine/Ansible_XCP/xcp_result/SOC/20240703/info/wy_vol.info
+    replace: /data/vine/Ansible_XCP/xcp_result/SOC/20240703/replace/wy_vol.replace
+    volumename: wy_vol
+    division: SOC
+    automap: library
+    searchdir: ANALOG DIGITAL BACKEND ESD CAE IMPLE
