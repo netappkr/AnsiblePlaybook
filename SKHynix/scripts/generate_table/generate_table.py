@@ -615,7 +615,7 @@ def autopath_replace_status(data):
     })
     # data report table
     datatable=pandas.DataFrame.from_dict(divisions_sum, orient='index')
-    logger.debug(f"func : check_xcp_scan_status | divisions_sum: {divisions_sum}")
+    logger.debug(f"func : autopath_replace_status | divisions_sum: {divisions_sum}")
     tables.append({
         'datatable': datatable,
         'report_config': {
