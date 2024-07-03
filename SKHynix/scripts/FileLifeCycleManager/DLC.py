@@ -5,6 +5,7 @@ warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
 import json
 import logging
+import pandas
 import traceback
 import yaml
 import re
@@ -12,7 +13,7 @@ import os
 parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
-parser.add_argument("--config", type=str, help="config.yaml",required=True)
+parser.add_argument("--config", type=str, help="config.yaml",required=False)
 args= parser.parse_args()
 
 # 사용자 홈 디렉토리 경로 얻기
@@ -44,10 +45,21 @@ logger.addHandler(file_handler)
 # logger.addHandler(stream_handler)
 
 # JSON 파일로부터 데이터를 읽어옵니다.
-data={}
-for json_file in args.file:
-    with open(json_file, 'r') as file:
-        data[json_file] = json.load(file)
+
+def read_json(filelist):
+    data={}
+    for json_file in filelist:
+        with open(json_file, 'r') as file:
+            data[json_file] = json.load(file)
+    return data
+
+def read_yaml(filelist):
+    data={}
+    for yaml_file in filelist:
+        with open(yaml_file, 'r') as file:
+            data[yaml_file] = yaml.load(file)
+    return data
+
 
 def check_yaml_integrity(file_path):
     required_structure = {
@@ -218,15 +230,21 @@ def get_scan_objects(data,config):
             print("Error:" ,traceback.format_exc())
     return scan_objects
 
+
+
+
+
 def main():
     # cURL command's target URL
     # url = 'http://10.10.242.101:12993/metrics'  # Replace with your actual URL
     # 무결성 검사 실행
     try:
         if args.request == "get_scan_object":
+            data = read_json(args.file)
             config = check_yaml_integrity(args.config)
             print(get_scan_objects(data[args.file[0]],config))
-            logger.info("print success")        
+            logger.info("print success")
+
         else:
             logger.error(args.request+" request is not matched")
             print(args.request+" request is not matched")

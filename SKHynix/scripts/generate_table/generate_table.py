@@ -7,6 +7,7 @@ import pandas
 import json
 import logging
 import traceback
+import yaml
 import os
 parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
@@ -42,10 +43,19 @@ logger.addHandler(file_handler)
 # logger.addHandler(stream_handler)
 
 # JSON 파일로부터 데이터를 읽어옵니다.
-data={}
-for json_file in args.file:
-    with open(json_file, 'r') as file:
-        data[json_file] = json.load(file)
+def read_json(filelist):
+    data={}
+    for json_file in filelist:
+        with open(json_file, 'r') as file:
+            data[json_file] = json.load(file)
+    return data
+
+def read_yaml(filelist):
+    data={}
+    for yaml_file in filelist:
+        with open(yaml_file, 'r') as file:
+            data[yaml_file] = yaml.load(file)
+    return data
 
 def storage_inode_report_by_cluster(data):
     tables=[]
@@ -538,6 +548,56 @@ def check_xcp_scan_status(data):
     logger.debug(f"func : check_xcp_scan_status | datatable:")
     return tables
 
+def get_sumdata_from_csv(filepath):
+    total_file_size = 0
+    with open(filepath, 'r') as file:
+        for line in file:
+            # 라인을 공백으로 분리
+            items = line.split()
+            # 첫 번째 항목을 정수로 변환하여 합계에 추가
+            total_file_size += int(items[0])
+    return total_file_size
+
+def autopath_replace_status(data):
+# autopath_result:
+# - status: skip
+#   message: 이미 수정된 파일이 존재합니다.
+#   xcp_scan_status: PASSED
+#   config:
+#     xcp_result: /data/vine/Ansible_XCP/xcp_result/DRAM/20240701/result/wooyoung.result
+#     xcp_info: /data/vine/Ansible_XCP/xcp_result/DRAM/20240701/info/wooyoung.info
+#     replace: /data/vine/Ansible_XCP/xcp_result/DRAM/20240701/replace/wooyoung.replace
+#     volumename: wooyoung
+#     division: DRAM
+#     automap: sim
+#     searchdir: LAY SCH ESD CAE LDR CORE DV
+
+    ok_count = 0
+    skip_count = 0
+    fail_count = 0
+    unknown_count = 0
+    # autopath_result 리스트에서 모든 division을 수집하고 중복을 제거한다.
+    # 예상 동작 divisions = [ DRAM, NAND, SOC ] 
+    divisions = list({result['config']['division'] for result in data['autopath_result']})
+    divisions_sum = {}
+    for division in divisions:
+        divisions_sum[division] = {'filesize': 0}
+
+    for autopath_result in data['autopath_result']:
+        if autopath_result.status == "skip":
+            skip_count = skip_count +1
+            if autopath_result['config']['division'] in divisions:
+                division = autopath_result['config']['division']
+                divisions_sum[division] = {'filesize': autopath_result['division1'].get('filesize', 0) + get_sumdata_from_csv(autopath_result.config.replace)}
+
+        elif autopath_result.status == "success":
+            ok_count = ok_count + 1
+        elif fail_count.status == "error":
+            fail_count = fail_count + 1
+        else:
+            unknown_count = unknown_count + 1
+
+
 def align_right():
     return 'text-align: right;'
 
@@ -598,15 +658,19 @@ def format_html_style(tables=[]):
 def main():
     try:
         if args.request == "clusters_inode_info":
+            data=read_json(args.file)
             tables = storage_inode_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(tables)
         elif args.request == "volume_inode_info":
+            data=read_json(args.file)
             tables = storage_inode_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(tables)
         elif args.request == "clusters_space_info":
+            data=read_json(args.file)
             tables = storage_space_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(tables)
         elif args.request == "aggr_volume_space_info":
+            data=read_json(args.file)
             tables = []
             aggr_tables = storage_space_report_by_aggr(data[args.file[0]]) 
             for table in aggr_tables:
@@ -617,15 +681,19 @@ def main():
             
             html_tables = format_html_style(tables)
         elif args.request == "aggrs_space_info":
+            data=read_json(args.file)
             tables = storage_space_report_by_aggr(data[args.file[0]])
             html_tables = format_html_style(tables)
         elif args.request == "volume_space_info":
+            data=read_json(args.file)
             tables = storage_space_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(tables)
         elif args.request == "big_snapshot_info":
+            data=read_json(args.file)
             tables = storage_Big_snapshot_report_by_volume(data[args.file[0]])
             html_tables = format_html_style(tables)
         elif args.request == "aggr_volume_space_info_in_soc":
+            data=read_json(args.file)
             tables = []
             aggr_tables = storage_space_report_by_aggr_in_SoC(data[args.file[0]]) 
             for table in aggr_tables:
@@ -635,15 +703,20 @@ def main():
                 tables.append(table)
             html_tables = format_html_style(tables)
         elif args.request == "clusters_snapmirror_info":
+            data=read_json(args.file)
             tables = storage_snapmirror_report_by_cluster(data[args.file[0]])
             html_tables = format_html_style(tables)
         
         elif args.request == "check_xcp_scan_status":
+            data=read_json(args.file)
             tables = check_xcp_scan_status(data[args.file[0]])
             html_tables = format_html_style(tables)
 
-                
-        
+        elif args.request == "autopath_replace_status":
+            data=read_yaml(args.file)
+            tables = autopath_replace_status(data[args.file[0]])
+            html_tables = format_html_style(tables)
+
         else:
             logger.error(args.request+" request is not matched")
             html_tables = [args.request+" request is not matched"]

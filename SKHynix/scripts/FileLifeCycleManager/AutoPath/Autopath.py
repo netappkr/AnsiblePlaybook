@@ -90,7 +90,7 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, s
                 for line in result:
                     output_file.write(line)
             message = "파일 수정 성공"
-            status = "success"
+            jobstatus = "success"
             logger.info(result_data(jobstatus,message,xcpinfo,xcpresult,replace))
             return result_data(jobstatus,message,xcpinfo,xcpresult,replace)
         else:
