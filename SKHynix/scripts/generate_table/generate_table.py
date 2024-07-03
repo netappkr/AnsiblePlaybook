@@ -605,7 +605,7 @@ def autopath_replace_status(data):
         'fail_count': fail_count,
         'unknown_count': unknown_count
     }])
-    datatable=datatable._append(add,ignore_index = True)
+    datatable=datatable._append(add,ignore_index = False)
 
     tables.append({
         'datatable': datatable,
@@ -659,7 +659,7 @@ def format_html_style(tables=[]):
 
         # 여기서 부터 스타일 객체로 변환됨
         datatable = datatable.style.set_caption(table["report_config"]["report_name"])
-        datatable = datatable.set_table_attributes('class="mystyle"').hide()
+        datatable = datatable.set_table_attributes('class="mystyle"')
         # Css 클래스를 정의 해서 사용하기로함
         # styles = [
         #     {"selector": ".mystyle", "props": [("font-size", "11pt"), 
