@@ -596,7 +596,7 @@ def autopath_replace_status(data):
 
         if autopath_result['config']['division'] in divisions:
             division = autopath_result['config']['division']
-            divisions_sum[division] = {'filesize': divisions_sum[division].get('filesize', 0) + get_sumdata_from_csv(autopath_result['config']['replace'])}
+            divisions_sum[division] = {'filesize': divisions_sum[division].get('filesize', 0) + get_sumdata_from_csv(autopath_result['config']['replace']), 'filetype': 'txt'}
 
     # job report table
     add=pandas.DataFrame.from_records([{
@@ -615,7 +615,7 @@ def autopath_replace_status(data):
     })
     # data report table
     datatable=pandas.DataFrame(divisions_sum)
-
+    log(divisions_sum)
     tables.append({
         'datatable': datatable,
         'report_config': {

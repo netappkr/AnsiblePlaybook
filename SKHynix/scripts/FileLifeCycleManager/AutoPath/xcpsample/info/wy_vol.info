@@ -1,0 +1,12 @@
+XCP 1.9.3; (c) 2024 NetApp, Inc.; Licensed to Wooyoung Ahn [Network Appliance, Inc] until Wed Feb 26 03:43:49 2025
+
+
+Filtered: 4 matched, 259 did not match
+
+Xcp command : xcp scan -match type == f and modified > 0*day and fnm('*.fsdb') or fnm('*.tr') or fnm('*.wlf') or fnm('*.tr[0-9]') -fmt '{} {}'.format(size, x) astra-svm.nkic.netappkr.com:/wy_vol
+Stats       : 263 scanned, 4 matched
+Speed       : 82.2 KiB in (27.8 KiB/s), 1.08 KiB out (373/s)
+Total Time  : 2s.
+Job ID      : Job_2024-07-01_03.38.46.827372_scan
+Log Path    : /opt/NetApp/xFiles/xcp/xcplogs/Job_2024-07-01_03.38.46.827372_scan.log
+STATUS      : PASSED

@@ -1,0 +1,8 @@
+xcp: WARNING: CPU count is only 2!
+xcp: WARNING: XCP catalog volume is low on disk space: 99.91% used, 912 KiB free space.
+Job ID: Job_2024-07-01_03.38.46.827372_scan
+0 astra-svm.nkic.netappkr.com:/wy_vol/sample.wlf
+0 astra-svm.nkic.netappkr.com:/wy_vol/ANALOG/sample.fsdb
+0 astra-svm.nkic.netappkr.com:/wy_vol/ANALOG/sample.tr
+0 astra-svm.nkic.netappkr.com:/wy_vol/ANALOG/sample.wlf
+xcp: WARNING: XCP catalog volume is low on disk space: 99.91% used, 912 KiB free space.
