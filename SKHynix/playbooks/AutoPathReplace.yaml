@@ -72,22 +72,43 @@
       template:
         src: autopath_results.j2
         dest: /tmp/autopath_results.yaml
+      register: datafile
 
-    # - name: Send Autopath replace report via email
-    #   mail:
-    #     host: "{{ smtp_server }}"
-    #     port: "{{ smtp_port }}"
-    #     username: "{{ smtp_username }}"
-    #     password: "{{ smtp_password }}"
-    #     to: "{{ email_to }}"
-    #     subject: "Autopath replace report - {{ now(utc=false,fmt='%Y.%m.%d') }}"
-    #     body: "{{ html_table.stdout }}"
-    #     from: "{{ email_from }}"
-    #     secure: starttls
-    #     subtype: html
-    #     headers: 
-    #     - Content-Type="text/html"
-    #   when: html_table.stdout is defined
+    - name: Search for 'script' in all directories
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "generate_table.py"
+        recurse: yes
+        file_type: file
+      register: files_matched
+
+    - name: Print the matched files
+      debug:
+        msg: "{{ files_matched.files[0].path }}"
+
+    - name: Generate HTML table from inode information using a Python script
+      command: "python3 {{ files_matched.files[0].path }} -r autopath_replace_status -f {{ datafile.dest }}"
+      register: html_table
+
+    #- name: debug show
+    #  ansible.builtin.debug:
+    #    msg: "{{ html_table.results }}"
+
+    - name: Send DLC report via email
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        subject: "NetApp Storage Capacity Report - {{ now(utc=false,fmt='%Y.%m.%d') }}"
+        body: "{{ html_table.stdout }}"
+        from: "{{ email_from }}"
+        secure: starttls
+        subtype: html
+        headers: 
+        - Content-Type="text/html"
+      when: html_table.stdout is defined
 
 
 
