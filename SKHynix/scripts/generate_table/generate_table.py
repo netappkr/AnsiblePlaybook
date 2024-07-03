@@ -585,11 +585,11 @@ def autopath_replace_status(data):
         divisions_sum[division] = {'filesize': 0}
 
     for autopath_result in data['autopath_result']:
-        if autopath_result.status == "skip":
+        if autopath_result['status'] == "skip":
             skip_count = skip_count +1
-        elif autopath_result.status == "success":
+        elif autopath_result['status'] == "success":
             ok_count = ok_count + 1
-        elif autopath_result.status == "error":
+        elif autopath_result['status'] == "error":
             fail_count = fail_count + 1
         else:
             unknown_count = unknown_count + 1
