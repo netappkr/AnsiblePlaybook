@@ -582,7 +582,7 @@ def autopath_replace_status(data):
     divisions = list({result['config']['division'] for result in data['autopath_result']})
     divisions_sum = {}
     for division in divisions:
-        divisions_sum[division] = {'filesize': 0}
+        divisions_sum[division] = {'filesize': 0 , 'filetype': 'txt'}
 
     for autopath_result in data['autopath_result']:
         if autopath_result['status'] == "skip":
