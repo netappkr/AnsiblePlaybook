@@ -610,7 +610,8 @@ def autopath_replace_status(data):
     tables.append({
         'datatable': datatable,
         'report_config': {
-            'report_name': "autopath job report table"
+            'report_name': "autopath job report table",
+            'index': True
         }
     })
     # data report table
@@ -619,7 +620,8 @@ def autopath_replace_status(data):
     tables.append({
         'datatable': datatable,
         'report_config': {
-            'report_name': "autopath data report table"
+            'report_name': "autopath data report table",
+            'index': True
         }
     })
     logger.debug(f"func : autopath_replace_status | datatable:")
@@ -635,6 +637,7 @@ def format_html_style(tables=[]):
         #     'datatable': datatable,
         #     'report_config': {
         #         'report_name': "CAD Storage Cluster INODE 사용량 Summary",
+        #         'index: True',
         #         'custom_col_styles': [
         #             'INODE Total', 
         #             'INODE Used', 
@@ -678,8 +681,12 @@ def format_html_style(tables=[]):
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         if "custom_col_styles" in table["report_config"]:
             datatable = datatable.set_properties(subset=table["report_config"]["custom_col_styles"], **{'text-align': 'right'})
+        # 튜플 값 표시 여부 
+        if "index" in table["report_config"]:
+            html_tables.append(datatable.to_html(index=table["report_config"]["index"]))
+        else:
+            html_tables.append(datatable.to_html())
 
-        html_tables.append(datatable.to_html())
     return html_tables
 
 def main():
