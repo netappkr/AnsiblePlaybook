@@ -55,7 +55,6 @@ def read_yaml(filelist):
     for yaml_file in filelist:
         with open(yaml_file, 'r') as file:
             data[yaml_file] = yaml.load(file, Loader=yaml.FullLoader)
-            print(data[yaml_file])
     return data
 
 def storage_inode_report_by_cluster(data):
