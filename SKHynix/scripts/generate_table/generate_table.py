@@ -571,7 +571,8 @@ def autopath_replace_status(data):
 #     division: DRAM
 #     automap: sim
 #     searchdir: LAY SCH ESD CAE LDR CORE DV
-
+    tables = []
+    datatable = pandas.DataFrame()
     ok_count = 0
     skip_count = 0
     fail_count = 0
@@ -586,17 +587,43 @@ def autopath_replace_status(data):
     for autopath_result in data['autopath_result']:
         if autopath_result.status == "skip":
             skip_count = skip_count +1
-            if autopath_result['config']['division'] in divisions:
-                division = autopath_result['config']['division']
-                divisions_sum[division] = {'filesize': autopath_result['division1'].get('filesize', 0) + get_sumdata_from_csv(autopath_result.config.replace)}
-
         elif autopath_result.status == "success":
             ok_count = ok_count + 1
-        elif fail_count.status == "error":
+        elif autopath_result.status == "error":
             fail_count = fail_count + 1
         else:
             unknown_count = unknown_count + 1
 
+        if autopath_result['config']['division'] in divisions:
+            division = autopath_result['config']['division']
+            divisions_sum[division] = {'filesize': autopath_result['division1'].get('filesize', 0) + get_sumdata_from_csv(autopath_result.config.replace)}
+
+    # job report table
+    add=pandas.DataFrame.from_records([{
+        'ok_count': ok_count,
+        'skip_count': skip_count,
+        'fail_count': fail_count,
+        'unknown_count': unknown_count
+    }])
+    datatable=datatable._append(add,ignore_index = True)
+
+    tables.append({
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "autopath job report table"
+        }
+    })
+    # data report table
+    datatable=pandas.DataFrame(divisions_sum)
+
+    tables.append({
+        'datatable': datatable,
+        'report_config': {
+            'report_name': "autopath data report table"
+        }
+    })
+    logger.debug(f"func : autopath_replace_status | datatable:")
+    return tables
 
 def align_right():
     return 'text-align: right;'
