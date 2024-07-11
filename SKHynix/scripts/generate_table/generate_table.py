@@ -574,13 +574,13 @@ def autopath_replace_status(data):
 #     automap: sim
 #     searchdir: LAY SCH ESD CAE LDR CORE DV
     tables = []
-    datatable = pandas.DataFrame()
+    fail_table = pandas.DataFrame()
     ok_count = 0
     skip_count = 0
     fail_count = 0
     ignore_count = 0
     unknown_count = 0
-    
+
     # autopath_result 리스트에서 모든 division을 수집하고 중복을 제거한다.
     # 예상 동작 divisions = [ DRAM, NAND, SOC ] 
     divisions = list({result['config']['division'] for result in data['autopath_result']})
@@ -605,10 +605,22 @@ def autopath_replace_status(data):
                 division = autopath_result['config']['division']
                 total_file_size, file_count = get_sumdata_from_csv(autopath_result['config']['replace'])
                 divisions_sum[division] = {'filesize': divisions_sum[division].get('filesize', 0) + total_file_size, 'filecount': divisions_sum[division].get('filecount', 0) + file_count}
+            else:
+                add=pandas.DataFrame.from_records([{
+                    'status': autopath_result['status'],
+                    'volumename': autopath_result['config']['volumename'],
+                    'xcp_run_info': autopath_result['config']['xcp_info']
+                }])
+                fail_table=fail_table._append(add,ignore_index = False)
+        else:
+            logger.error(f"func : autopath_replace_status | {autopath_result['config']['division']} not in divisions")
+
+
     # 출력 전 데이터 다듬기
     for division in divisions:
         divisions_sum[division] = {'file size(byte)': divisions_sum[division].get('filesize', 0) , 'file size(Gib)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024,2), 'file count': divisions_sum[division].get('filecount', 0)}
-        
+    
+    datatable = pandas.DataFrame()
     # job report table
     add=pandas.DataFrame.from_records([{
         'ok_count': ok_count,
@@ -641,6 +653,16 @@ def autopath_replace_status(data):
         },
     })
     logger.debug(f"func : autopath_replace_status | datatable:")
+
+    # 실패한 작업 목록 후열 추가
+    if not fail_table.empty:
+        tables.append({
+            'datatable': fail_table,
+            'report_config': {
+                'report_name': "autopath job fail list",
+                'index': True
+            }
+        })
     return tables
 
 def align_right():
