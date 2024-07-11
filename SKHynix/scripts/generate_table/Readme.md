@@ -1,8 +1,8 @@
-# Ansible 보조 스크립트
+ Ansible 보조 스크립트
 Ansible 모듈이 제공하는 기능만으로는 디테일한 설정이 불가능하거나 외부 시스템과 연동이 필요한 상황에 어려움이 있을 수 있습니다.</br>
 이를 보조하기위한 파이썬 스크립트를 작성하여 활용합니다.
 
-## requirement
+ requirement
 이 부분은 엔서블 플레이북이 스크립트 실행에 필요한 패키지를 다운로드 받도록 설정하고 있습니다.</br>
 하지만 repo에 접근하지못하는 환경의 경우 패키지를 수동설치해야 합니다.
 
@@ -11,14 +11,14 @@ pip를 이용한 요구사항 설치 명령
 pip install -r requirements.txt
 ```
 
-# install
+ install
 프로젝트 진행에 따라 필요 시 스크립트를 업데이트할 예정입니다.
 ```git clone``` 명령을 통해 소스를 다운로드 받습니다.
 
-## generate_table.py
+ generate_table.py
 스크립트 사용법을 소개합니다.
 
-### help 명령
+ help 명령
 ```--help``` 옵션을 통해 스크립트에 필요한 인수를 확인합니다.
 ```PS
 PS \AnsiblePlaybook> python .\SKHynics\scripts\generate_table.py --help
@@ -32,7 +32,7 @@ options:
   -r REQUEST, --request REQUEST
                         request type
 ```
-### request 항목
+ request 항목
 - clusters_inode_info: 
   - descrption : 클러스터별 Inode 정보 출력 
   - playbook: [GetInodebyCluster.yaml](../playbooks/GetInodebyCluster.yaml)
@@ -57,7 +57,7 @@ options:
   - Test data: : [volume_space_info.json](./testdata/volume_space_info.json)
 - big_snapshot_info:
 
-### 실행 예제
+ 실행 예제
 ```ps
 python generate_table.py -r <<request type>> -f <<file>>
 ```
@@ -124,9 +124,42 @@ python generate_table.py -r clusters_inode_info -f ./testdata/get_inode_info_by_
 ```ps
 python generate_table.py -r aggr_volume_space_info -f ./testdata/aggr_space_info.json ./testdata/volume_space_info.json
 ```
-### 스크립트 동작로그
+4. table style 속성 변수
+format_html_style 함수로 전달 전에 각 테이블의 속성을 정의합니다.
+- report_config.report_name : 테이블 제목입니다.
+- index : 좌측 index 값을 출력할 지 여부 입니다.
+- custom_col_styles c: ustom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
+- format: 
+   - precision: 테이블 숫자데이터에 소숫점 자리수 표현 값입니다.
+   - thousands: 천자리마다 어떤 기호로 표기 할지 정합니다.
+- sorting_rules 정렬 룰을 정합니다.
+  - column: 적용할 컬럼 이름
+  - order: 오름차순(asc),또는 내림차순(desc)
+```json
+{
+    "datatable": "datatable 객체",
+    "report_config": {
+        "report_name": "테이블 제목입니다.",
+        "index": True,
+        "custom_col_styles": [
+            "컬럼 이름1", 
+            "컬럼 이름2", 
+            "컬럼 이름3"
+        ],
+        "format" : {
+            "precision": 0,
+            "thousands": ","
+        },
+        "sorting_rules": [
+            {"column": "tier", "order": "asc"}
+        ]
+    }
+}
+```
+
+ 스크립트 동작로그
 ```generate_table.log``` 파일에 실행로그를 남기고 있습니다. 에러 발생 시 이 로그파일을 참조합니다.
 
-# 참조
+ 참조
 - [Python Pandas.style doc]()
 - [SMTP Html 양식]()

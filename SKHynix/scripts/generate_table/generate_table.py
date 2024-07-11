@@ -616,7 +616,7 @@ def autopath_replace_status(data):
             logger.error(f"func : autopath_replace_status | {autopath_result['config']['division']} not in divisions")
 
 
-    # 출력 전 데이터 다듬기
+    # 출력 전 데이터 단위 계산 추가
     for division in divisions:
         divisions_sum[division] = {'file size(byte)': divisions_sum[division].get('filesize', 0) , 'file size(Gib)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024,2), 'file count': divisions_sum[division].get('filecount', 0)}
     
