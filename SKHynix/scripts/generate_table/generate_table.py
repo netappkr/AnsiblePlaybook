@@ -550,13 +550,15 @@ def check_xcp_scan_status(data):
 
 def get_sumdata_from_csv(filepath):
     total_file_size = 0
+    file_count = 0
     with open(filepath, 'r') as file:
         for line in file:
+            file_count += 1
             # 라인을 공백으로 분리
             items = line.split()
             # 첫 번째 항목을 정수로 변환하여 합계에 추가
             total_file_size += int(items[0])
-    return total_file_size
+    return total_file_size, file_count
 
 def autopath_replace_status(data):
 # autopath_result:
@@ -576,32 +578,41 @@ def autopath_replace_status(data):
     ok_count = 0
     skip_count = 0
     fail_count = 0
+    ignore_count = 0
     unknown_count = 0
+    
     # autopath_result 리스트에서 모든 division을 수집하고 중복을 제거한다.
     # 예상 동작 divisions = [ DRAM, NAND, SOC ] 
     divisions = list({result['config']['division'] for result in data['autopath_result']})
     divisions_sum = {}
     for division in divisions:
-        divisions_sum[division] = {'filesize': 0 , 'filetype': 'txt'}
+        divisions_sum[division] = {'filesize': 0 , 'filecount': 0}
 
     for autopath_result in data['autopath_result']:
         if autopath_result['status'] == "skip":
             skip_count = skip_count +1
         elif autopath_result['status'] == "success":
             ok_count = ok_count + 1
+        elif autopath_result['status'] == "ignore":
+            ignore_count = ignore_count + 1
         elif autopath_result['status'] == "error":
             fail_count = fail_count + 1
         else:
             unknown_count = unknown_count + 1
-
-        if autopath_result['config']['division'] in divisions:
+    
+        if autopath_result['config']['division'] in divisions and autopath_result['status'] == "skip" and autopath_result['status'] == "success":
             division = autopath_result['config']['division']
-            divisions_sum[division] = {'filesize': divisions_sum[division].get('filesize', 0) + get_sumdata_from_csv(autopath_result['config']['replace']), 'filetype': 'txt'}
-
+            total_file_size, file_count = get_sumdata_from_csv(autopath_result['config']['replace'])
+            divisions_sum[division] = {'filesize': divisions_sum[division].get('filesize', 0) + total_file_size, 'filecount': divisions_sum[division].get('filecount', 0) + file_count}
+    # 출력 전 데이터 다듬기
+    for division in divisions:
+        divisions_sum[division] = {'file size(byte)': divisions_sum[division].get('filesize', 0) , 'file size(Gib)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024,2), 'file count': divisions_sum[division].get('filecount', 0)}
+        
     # job report table
     add=pandas.DataFrame.from_records([{
         'ok_count': ok_count,
         'skip_count': skip_count,
+        'ignore_count' : ignore_count,
         'fail_count': fail_count,
         'unknown_count': unknown_count
     }])
@@ -622,7 +633,11 @@ def autopath_replace_status(data):
         'report_config': {
             'report_name': "autopath data report table",
             'index': True
-        }
+        },
+        format : {
+            'precision': 2,
+            'thousands': ","
+        },
     })
     logger.debug(f"func : autopath_replace_status | datatable:")
     return tables
@@ -643,6 +658,10 @@ def format_html_style(tables=[]):
         #             'INODE Used', 
         #             'INODE Free'
         #         ],
+        #         format : {
+        #             'precision': 0,
+        #             'thousands': ","
+        #         },
         #         'sorting_rules': [
         #             {'column': 'tier', 'order': 'asc'}
         #         ]
@@ -659,7 +678,11 @@ def format_html_style(tables=[]):
 
         # 여기서 부터 스타일 객체로 변환됨
         datatable = datatable.style.set_caption(table["report_config"]["report_name"])
-        datatable = datatable.set_table_attributes('class="mystyle"')
+        # 튜플 값 표시 여부 
+        if "index" in table["report_config"] and table["report_config"]["index"] == True:
+            datatable = datatable.set_table_attributes('class="mystyle"')
+        else:
+            datatable = datatable.set_table_attributes('class="mystyle"').hide()
         # Css 클래스를 정의 해서 사용하기로함
         # styles = [
         #     {"selector": ".mystyle", "props": [("font-size", "11pt"), 
@@ -676,16 +699,16 @@ def format_html_style(tables=[]):
         # ]
         # datatable = datatable.set_table_styles(styles)
         # datatable = datatable.format('{:,.0f}', subset=custom_col_style_list)
-        datatable = datatable.format(precision=0, thousands=",")
+        if "format" in table["report_config"]:
+            datatable = datatable.format(precision=table["report_config"]["precision"], thousands=table["report_config"]["thousands"])
+        else:
+            datatable = datatable.format(precision=0, thousands=",")
 
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         if "custom_col_styles" in table["report_config"]:
             datatable = datatable.set_properties(subset=table["report_config"]["custom_col_styles"], **{'text-align': 'right'})
-        # 튜플 값 표시 여부 
-        if "index" in table["report_config"]:
-            html_tables.append(datatable.to_html(index=table["report_config"]["index"]))
-        else:
-            html_tables.append(datatable.to_html())
+
+        html_tables.append(datatable.to_html())
 
     return html_tables
 

@@ -26,6 +26,7 @@ def modify_lines(data_lines, replacement_dict, automap):
 # nsimtc.chopincad.com:/sim_nand_ptissptv/CAE/USER -> /sim/ptissptv/CAE/USER
 #
     modified_lines = []
+    file_count = 0
     for line in data_lines:
         modified_line = line
         for key, value in replacement_dict.items():
@@ -95,7 +96,7 @@ def main(xcpresult, xcpinfo, replace, automap, searchdirs, volumename, status, s
             return result_data(jobstatus,message,xcpinfo,xcpresult,replace)
         else:
             message = f"{volumename} 볼륨의 XCP scan 상태는 {status} 입니다. PASSED가 아니면 작업을 생략합니다."
-            jobstatus = "skip"
+            jobstatus = "ignore"
             logger.info(result_data(jobstatus,message,xcpinfo,xcpresult,replace))
             return result_data(jobstatus,message,xcpinfo,xcpresult,replace)
         
