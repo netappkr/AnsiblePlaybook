@@ -600,10 +600,11 @@ def autopath_replace_status(data):
         else:
             unknown_count = unknown_count + 1
     
-        if autopath_result['config']['division'] in divisions and autopath_result['status'] == "skip" and autopath_result['status'] == "success":
-            division = autopath_result['config']['division']
-            total_file_size, file_count = get_sumdata_from_csv(autopath_result['config']['replace'])
-            divisions_sum[division] = {'filesize': divisions_sum[division].get('filesize', 0) + total_file_size, 'filecount': divisions_sum[division].get('filecount', 0) + file_count}
+        if autopath_result['config']['division'] in divisions:
+            if autopath_result['status'] == "skip" or autopath_result['status'] == "success":
+                division = autopath_result['config']['division']
+                total_file_size, file_count = get_sumdata_from_csv(autopath_result['config']['replace'])
+                divisions_sum[division] = {'filesize': divisions_sum[division].get('filesize', 0) + total_file_size, 'filecount': divisions_sum[division].get('filecount', 0) + file_count}
     # 출력 전 데이터 다듬기
     for division in divisions:
         divisions_sum[division] = {'file size(byte)': divisions_sum[division].get('filesize', 0) , 'file size(Gib)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024,2), 'file count': divisions_sum[division].get('filecount', 0)}
