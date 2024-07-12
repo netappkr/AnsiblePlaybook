@@ -162,13 +162,13 @@ def get_scan_objects(data,config):
 
                 # Check if the volume should be excluded
                 if any(ex['vol_name'] == name for ex in exclude):
-                    logger.debug(f"matched exclude vol name policy , {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                    logger.info(f"matched exclude vol name policy , {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 elif path == "":
-                    logger.debug(f"path: {path}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                    logger.info(f"path: {path}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 elif comment != check_comment:            
-                    logger.debug(f"comment: {comment}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                    logger.info(f"comment: {comment}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 # Check if volume matches any division criteria
                 for div in division:
@@ -224,6 +224,7 @@ def get_scan_objects(data,config):
                             )
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
                     else:
+                        logger.info(f"정규식 && exportpolicy 가 일치하지 않습니다., {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                         logger.debug(f"allow exportpolicy list: {exportpolicy_names}")
                         logger.debug(f"정규식 && exportpolicy 가 일치하지 않습니다. datacenter : {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}, vol_name_regexp: {vol_name_regexp}, export_policy: {export_policy}")
 
