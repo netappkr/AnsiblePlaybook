@@ -1,5 +1,4 @@
 # AutoPath
-![FLM](./Images/FLM.png)
 
 ```bash
 python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/AutoPath/Autopath.py \
