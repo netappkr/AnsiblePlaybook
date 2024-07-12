@@ -9,6 +9,7 @@ import traceback
 import yaml
 import re
 import os
+import sys
 parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
 parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
@@ -114,7 +115,7 @@ def check_yaml_integrity(file_path):
             return True
         except re.error:
             logger.error(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.")
-            print(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.")
+            print(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.",file=sys.stderr)
             return False
 
     result = validate_structure(config, required_structure)
@@ -129,7 +130,7 @@ def check_yaml_integrity(file_path):
                 exit
 
         logger.error(f"Validation error: {result}")
-        print(f"Validation error: {result}")
+        print(f"Validation error: {result}",file=sys.stderr)
         exit
     else:
         return config
@@ -231,7 +232,7 @@ def get_scan_objects(data,config):
             logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
         except Exception as e:
             logger.error(traceback.format_exc())
-            print("Error:" ,traceback.format_exc())
+            print("Error:" ,traceback.format_exc(),file=sys.stderr)
     return scan_objects
 
 
@@ -254,7 +255,7 @@ def main():
             print(args.request+" request is not matched")
 
     except Exception as e:
-        print("Error:" ,traceback.format_exc())
+        print("Error:" ,traceback.format_exc(),file=sys.stderr)
         logger.error(traceback.format_exc())
 
 if __name__ == "__main__":
