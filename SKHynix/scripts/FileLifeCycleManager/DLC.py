@@ -72,7 +72,7 @@ def check_yaml_integrity(file_path):
                     'exportpolicy': [{'name': str}]
                 }
             ],
-            'exclude': [{'name': str}]
+            'exclude': [{'vol_name': str}]
         }
     }
     # YAML 파일 로드
