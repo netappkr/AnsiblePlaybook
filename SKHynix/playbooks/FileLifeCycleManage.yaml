@@ -19,6 +19,8 @@
           - 'nas'
           - 'name'
           - 'comment'
+        parameters:
+          state: online
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
