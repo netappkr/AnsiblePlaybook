@@ -609,7 +609,8 @@ def autopath_replace_status(data):
                 add=pandas.DataFrame.from_records([{
                     'status': autopath_result['status'],
                     'volumename': autopath_result['config']['volumename'],
-                    'xcp_run_info': autopath_result['config']['xcp_info']
+                    'xcp_run_info': autopath_result['config']['xcp_info'],
+                    'message':autopath_result['message']
                 }])
                 fail_table=fail_table._append(add,ignore_index = False)
         else:
