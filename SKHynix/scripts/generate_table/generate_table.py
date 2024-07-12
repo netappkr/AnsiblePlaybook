@@ -621,7 +621,6 @@ def autopath_replace_status(data):
     fail_table = pandas.DataFrame()
     ok_count = 0
     skip_count = 0
-    fail_count = 0
     ignore_count = 0
     unknown_count = 0
 
