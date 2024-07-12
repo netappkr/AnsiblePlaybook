@@ -161,8 +161,8 @@ def get_scan_objects(data,config):
                     logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 nas.path key가 비어 있습니다.")
 
                 # Check if the volume should be excluded
-                if any(ex['name'] == name for ex in exclude):
-                    logger.debug(f"exclude: {ex['name']}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                if any(ex['vol_name'] == name for ex in exclude):
+                    logger.debug(f"matched exclude vol name policy , {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 elif path == "":
                     logger.debug(f"path: {path}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
@@ -247,7 +247,8 @@ def main():
         if args.request == "get_scan_object":
             data = read_json(args.file)
             config = check_yaml_integrity(args.config)
-            print(get_scan_objects(data[args.file[0]],config))
+            if config:
+                print(get_scan_objects(data[args.file[0]],config))
             logger.info("print success")
 
         else:
