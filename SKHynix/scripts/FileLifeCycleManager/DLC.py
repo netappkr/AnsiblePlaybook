@@ -69,7 +69,7 @@ def check_yaml_integrity(file_path):
                 {
                     'name': str,
                     'exportpolicy': [{'name': str}],
-                    'comment': str
+                    'check_comment': str
                 }
             ],
             'exclude': [{'name': str}]
@@ -141,7 +141,7 @@ def get_scan_objects(data,config):
     domain = config['config']['domain']
     division = config['config']['division']
     exclude = config['config']['exclude']
-    check_comment = config['config']['comment']
+    check_comment = config['config']['division']['check_comment']
     for cluster in data:
         try:
             datacenter = cluster["cluster"]["datacenter"]
