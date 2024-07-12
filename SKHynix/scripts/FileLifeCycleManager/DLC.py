@@ -231,8 +231,8 @@ def get_scan_objects(data,config):
             # KeyError 발생시 처리 로직
             logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
         except Exception as e:
-            logger.error(traceback.format_exc())
-            print("Error:" ,traceback.format_exc(),file=sys.stderr)
+            logger.error("func get_scan_objects:",traceback.format_exc())
+            print("func get_scan_objects Error:" ,traceback.format_exc(),file=sys.stderr)
     return scan_objects
 
 
