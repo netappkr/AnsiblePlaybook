@@ -29,7 +29,7 @@ log_file_path = os.path.join(log_dir, "DLC.log")
 
 # 로거 설정
 logger = logging.getLogger('DLC')
-logger.setLevel(logging.DEBUG)  # 로그 레벨 설정
+logger.setLevel(logging.INFO)  # 로그 레벨 설정
 
 # 로그 포맷 설정
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
