@@ -33,7 +33,7 @@ options:
 ## 사용 예제
 
 ```
-python3 FLM.py -r get_scan_object --config /tmp/config.yaml -f /tmp/volume_path_info.json
+python3 DLC.py -r get_scan_object --config /tmp/config.yaml -f /tmp/volume_path_info.json
 ```
 ```
 [{'mount_path': 'fsx.netappkr.com:/wyahn', 'div': 'wy', 'export_policy': 'exportro_wy', 'xcp_option': {'fmt': "'{} {}'.format(size, x)", 'match': "type == f and fnm('*.txt') or fnm('*.log') or fnm('*.json')"}}, {'mount_path': 'astra-svm.nkic.netappkr.com:/wyfg', 'div': 'wy', 'export_policy': 'exportrw_wy', 'xcp_option': {'fmt': "'{} {}'.format(size, x)", 'match': "type == f and fnm('*.txt') or fnm('*.log') or fnm('*.json')"}}]
