@@ -635,7 +635,7 @@ def autopath_replace_status(data):
         'datatable': datatable,
         'report_config': {
             'report_name': "autopath job report table",
-            'index': True
+            'index': False
         }
     })
     # data report table
