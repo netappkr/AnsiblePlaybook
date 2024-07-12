@@ -11,6 +11,7 @@ clusters:
 DLC:
   config:
     domain: "chopincad.com"
+    check_comment: "prj"
     division:
       - name: "DRAM"
         exportpolicy:
