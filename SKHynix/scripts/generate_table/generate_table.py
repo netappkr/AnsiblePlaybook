@@ -639,8 +639,6 @@ def autopath_replace_status(data):
             ok_count = ok_count + 1
         elif autopath_result['status'] == "ignore":
             ignore_count = ignore_count + 1
-        elif autopath_result['status'] == "error":
-            fail_count = fail_count + 1
         else:
             unknown_count = unknown_count + 1
         
@@ -676,7 +674,6 @@ def autopath_replace_status(data):
         'ok_count': ok_count,
         'skip_count': skip_count,
         'ignore_count' : ignore_count,
-        'fail_count': fail_count,
         'unknown_count': unknown_count
     }])
     datatable=datatable._append(add,ignore_index = False)
