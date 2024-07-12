@@ -65,11 +65,11 @@ def check_yaml_integrity(file_path):
     required_structure = {
         'config': {
             'domain': str,
+            'check_comment': str,
             'division': [
                 {
                     'name': str,
-                    'exportpolicy': [{'name': str}],
-                    'check_comment': str
+                    'exportpolicy': [{'name': str}]
                 }
             ],
             'exclude': [{'name': str}]
@@ -141,7 +141,7 @@ def get_scan_objects(data,config):
     domain = config['config']['domain']
     division = config['config']['division']
     exclude = config['config']['exclude']
-    check_comment = config['config']['division']['check_comment']
+    check_comment = config['config']['check_comment']
     for cluster in data:
         try:
             datacenter = cluster["cluster"]["datacenter"]
@@ -171,7 +171,7 @@ def get_scan_objects(data,config):
                     logger.debug(f"comment: {comment}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 # Check if volume matches any division criteria
-                for div in division: 
+                for div in division:
                     if 'vol_name_regexp' in div: 
                         vol_name_regexp = div['vol_name_regexp']
                     else:
