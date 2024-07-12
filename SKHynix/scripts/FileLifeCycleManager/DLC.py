@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# 2024 05 02
 import warnings
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
@@ -68,7 +67,8 @@ def check_yaml_integrity(file_path):
             'division': [
                 {
                     'name': str,
-                    'exportpolicy': [{'name': str}]
+                    'exportpolicy': [{'name': str}],
+                    'comment': str
                 }
             ],
             'exclude': [{'name': str}]
@@ -140,7 +140,7 @@ def get_scan_objects(data,config):
     domain = config['config']['domain']
     division = config['config']['division']
     exclude = config['config']['exclude']
-    
+    check_comment = config['config']['comment']
     for cluster in data:
         try:
             datacenter = cluster["cluster"]["datacenter"]
@@ -148,23 +148,27 @@ def get_scan_objects(data,config):
                 svm_name = volume["svm"]["name"] if "name" in volume["svm"] else ""
                 export_policy = volume["nas"]["export_policy"]["name"] if "export_policy" in volume["nas"] and "name" in volume["nas"]["export_policy"] else ""
                 path = volume["nas"]["path"] if "path" in volume["nas"] else ""
+                comment = volume["comment"] if "comment" in volume else ""
                 name = volume["name"]
                 cluster_name = cluster['cluster']['name']
+                
                 if not svm_name:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸의 svm.name key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 svm.name key가 비어 있습니다.")
                 if not export_policy:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸의 nas.export_policy.name key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 nas.export_policy.name key가 비어 있습니다.")
                 if not path:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸의 nas.path key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 nas.path key가 비어 있습니다.")
 
                 # Check if the volume should be excluded
                 if any(ex['name'] == name for ex in exclude):
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸을 목록에서 제외합니다.")
+                    logger.debug(f"exclude: {ex['name']}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 elif path == "":
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼룸을 목록에서 제외합니다.")
-                    continue            
-
+                    logger.debug(f"path: {path}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                    continue
+                elif comment != check_comment:            
+                    logger.debug(f"comment: {comment}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                    continue
                 # Check if volume matches any division criteria
                 for div in division: 
                     if 'vol_name_regexp' in div: 
@@ -193,7 +197,7 @@ def get_scan_objects(data,config):
                                 'searchdir': search_dirs_str
                                 }
                             )
-                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
+                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
                         elif datacenter == "nkic":
                             scan_objects.append({
                                 'volume' : name,
@@ -205,7 +209,7 @@ def get_scan_objects(data,config):
                                 'searchdir': search_dirs_str
                                 }
                             )
-                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
+                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
                         else:
                             scan_objects.append({
                                 'volume' : name,
@@ -217,7 +221,7 @@ def get_scan_objects(data,config):
                                 'searchdir': search_dirs_str
                                 }
                             )
-                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼룸 목록에 추가합니다.")
+                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
                     else:
                         logger.debug(f"allow exportpolicy list: {exportpolicy_names}")
                         logger.debug(f"정규식 && exportpolicy 가 일치하지 않습니다. datacenter : {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}, vol_name_regexp: {vol_name_regexp}, export_policy: {export_policy}")

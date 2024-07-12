@@ -95,7 +95,11 @@ def storage_inode_report_by_cluster(data):
             ],
             'sorting_rules': [
                 {'column': 'No', 'order': 'asc'}
-            ]
+            ],
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            }
         }
     })
     return tables
@@ -140,7 +144,11 @@ def storage_inode_report_by_volume(data):
                 'sorting_rules': [
                     {'column': 'INODE Used', 'order': 'desc'},
                     {'column': 'INODE Total', 'order': 'desc'}
-                ]
+                ],
+                'format': {
+                    'precision': 0,
+                    'thousands': ','
+                }
             }
         })
     return tables
@@ -179,7 +187,11 @@ def storage_space_report_by_cluster(data):
             'report_name': "CAD Storage Cluster Capacity Summary",
             'sorting_rules': [
                 {'column': 'No', 'order': 'asc'}
-            ]
+            ],
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            }
         }
     })
     return tables
@@ -218,7 +230,11 @@ def storage_space_report_by_cluster(data):
             'report_name': "CAD Storage Cluster Capacity Summary",
             'sorting_rules': [
                 {'column': 'No', 'order': 'asc'}
-            ]
+            ],
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            }
         }
     })
     return tables
@@ -261,7 +277,11 @@ def storage_space_report_by_aggr(data):
             [
                 {'column': 'No', 'order': 'asc'},
                 {'column': 'Node Name', 'order': 'asc'}
-            ]
+            ],
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            }
         }
     })
     return tables
@@ -282,11 +302,11 @@ def storage_space_report_by_volume(data):
                     'SVM Name': Volume["svm"]["name"],
                     'Aggregate': Aggr_name,
                     'Volume': Volume['name'],
-                    'Total Size(TB)': round(total_size/1024/1024/1024),
-                    'Used Size(TB)': round(used_size/1024/1024/1024),
-                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024),
+                    'Total Size(GB)': round(total_size/1024/1024/1024),
+                    'Used Size(GB)': round(used_size/1024/1024/1024),
+                    'Free Size(GB)': round((total_size - used_size)/1024/1024/1024),
                     'Used Rate(%)': round(used_size / total_size * 100),
-                    'Logical Used Size(TB)': round(volume_logical_used/1024/1024/1024)
+                    'Logical Used Size(GB)': round(volume_logical_used/1024/1024/1024)
                 }])
                 datatable=datatable._append(add,ignore_index = True)
             except KeyError as e:
@@ -303,9 +323,13 @@ def storage_space_report_by_volume(data):
                 'report_name': cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
                 'sorting_rules': 
                 [
-                    {'column': 'Used Size(TB)', 'order': 'desc'}, 
-                    {'column': 'Total Size(TB)', 'order': 'desc'}
-                ]
+                    {'column': 'Used Size(GB)', 'order': 'desc'}, 
+                    {'column': 'Total Size(GB)', 'order': 'desc'}
+                ],
+                'format': {
+                    'precision': 0,
+                    'thousands': ','
+                }
             }
         })
     return tables
@@ -349,7 +373,11 @@ def storage_space_report_by_aggr_in_SoC(data):
                 {'column': 'No', 'order': 'asc'},
                 {'column': 'Total Size(TB)', 'order': 'asc'}, 
                 {'column': 'Node Name', 'order': 'desc'}
-            ]
+            ],
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            }
         }
     })
     return tables
@@ -394,7 +422,11 @@ def storage_space_report_by_volume_in_SoC(data):
                 'sorting_rules': [
                     {'column': 'Used Size(TB)', 'order': 'desc'}, 
                     {'column': 'Total Size(TB)', 'order': 'desc'}
-                ]
+                ],
+                'format': {
+                    'precision': 0,
+                    'thousands': ','
+                }
             }
         })
     return tables
@@ -443,11 +475,15 @@ def storage_snapmirror_report_by_cluster(data):
     tables.append({
         'datatable': datatable,
         'report_config': {
-            'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report"
+            'report_name': f"{cluster['cluster']['name']} SnapVault Backup Daily Report",
             # 'sorting_rules': [
             #     {'column': 'transfer end time', 'order': 'asc'},
             #     {'column': 'healthy', 'order': 'asc'}
             # ]
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            }
         }
     })
     return tables
@@ -498,7 +534,11 @@ def storage_Big_snapshot_report_by_volume(data):
             'sorting_rules': [
                 {'column': 'Used Size(TB)', 'order': 'desc'}, 
                 {'column': 'Total Size(TB)', 'order': 'desc'}
-            ]
+            ],
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            }
         }
     })
     return tables
@@ -540,6 +580,10 @@ def check_xcp_scan_status(data):
         'datatable': datatable,
         'report_config': {
             'report_name': "check xcp scan status",
+            'format': {
+                'precision': 0,
+                'thousands': ','
+            },
             'sorting_rules': [
                 {'column': 'status', 'order': 'desc'}
             ]
@@ -599,7 +643,8 @@ def autopath_replace_status(data):
             fail_count = fail_count + 1
         else:
             unknown_count = unknown_count + 1
-    
+        
+        # 파일 사이즈 합산
         if autopath_result['config']['division'] in divisions:
             if autopath_result['status'] == "skip" or autopath_result['status'] == "success":
                 division = autopath_result['config']['division']
@@ -619,7 +664,11 @@ def autopath_replace_status(data):
 
     # 출력 전 데이터 단위 계산 추가
     for division in divisions:
-        divisions_sum[division] = {'file size(byte)': divisions_sum[division].get('filesize', 0) , 'file size(Gib)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024,2), 'file count': divisions_sum[division].get('filecount', 0)}
+        divisions_sum[division] = {
+            'file size(byte)': divisions_sum[division].get('filesize', 0), 
+            'file size(Gib)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024,2),
+            'file count': divisions_sum[division].get('filecount', 0)
+        }
     
     datatable = pandas.DataFrame()
     # job report table
@@ -682,10 +731,6 @@ def format_html_style(tables=[]):
         #             'INODE Used', 
         #             'INODE Free'
         #         ],
-        #         format : {
-        #             'precision': 0,
-        #             'thousands': ","
-        #         },
         #         'sorting_rules': [
         #             {'column': 'tier', 'order': 'asc'}
         #         ]
@@ -703,10 +748,11 @@ def format_html_style(tables=[]):
         # 여기서 부터 스타일 객체로 변환됨
         datatable = datatable.style.set_caption(table["report_config"]["report_name"])
         # 튜플 값 표시 여부 
-        if "index" in table["report_config"] and table["report_config"]["index"] == True:
+        if "index" in table["report_config"] and table["report_config"]['index'] == True:
             datatable = datatable.set_table_attributes('class="mystyle"')
         else:
             datatable = datatable.set_table_attributes('class="mystyle"').hide()
+
         # Css 클래스를 정의 해서 사용하기로함
         # styles = [
         #     {"selector": ".mystyle", "props": [("font-size", "11pt"), 
@@ -724,9 +770,7 @@ def format_html_style(tables=[]):
         # datatable = datatable.set_table_styles(styles)
         # datatable = datatable.format('{:,.0f}', subset=custom_col_style_list)
         if "format" in table["report_config"]:
-            datatable = datatable.format(precision=table["report_config"]["precision"], thousands=table["report_config"]["thousands"])
-        else:
-            datatable = datatable.format(precision=0, thousands=",")
+            datatable = datatable.format(precision=table["report_config"]['format']['precision'], thousands=table["report_config"]['format']['thousands'])
 
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         if "custom_col_styles" in table["report_config"]:
