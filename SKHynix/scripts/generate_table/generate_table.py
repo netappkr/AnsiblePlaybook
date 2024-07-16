@@ -691,12 +691,12 @@ def autopath_replace_status(data):
         'datatable': datatable,
         'report_config': {
             'report_name': "autopath data report table",
-            'index': True
-        },
-        format : {
-            'precision': 2,
-            'thousands': ","
-        },
+            'index': True,
+            'format': {
+                'precision': 2,
+                'thousands': ','
+            }
+        }
     })
     logger.debug(f"func : autopath_replace_status | datatable:")
 
