@@ -771,7 +771,9 @@ def format_html_style(tables=[]):
         # datatable = datatable.format('{:,.0f}', subset=custom_col_style_list)
         if "format" in table["report_config"]:
             datatable = datatable.format(precision=table["report_config"]['format']['precision'], thousands=table["report_config"]['format']['thousands'])
-
+        else:
+            logger.debug(f"func : format_html_style | table:{table}")
+            
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         if "custom_col_styles" in table["report_config"]:
             datatable = datatable.set_properties(subset=table["report_config"]["custom_col_styles"], **{'text-align': 'right'})
