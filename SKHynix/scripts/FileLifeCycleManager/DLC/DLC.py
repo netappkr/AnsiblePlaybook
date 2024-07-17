@@ -81,6 +81,7 @@ def check_yaml_integrity(file_path):
             config = yaml.safe_load(file)
     except Exception as e:
         logger.error(f"validate error: reading YAML file: {e}")
+        print(f"Validation error: reading YAML file: {e}",file=sys.stderr)
         exit
 
     # 필수 키 및 구조 검증
