@@ -54,7 +54,7 @@ DLC:
         searchdir: [ANALOG, DIGITAL, BACKEND, ESD , CAE, IMPLE]
 
     exclude:
-      - name: "test"
+      - vol_name: "test"
 scripts_dir: '/opt/awx/projects'
 email_to: email@
 email_from: "cad_netapp@chopincad.com"
