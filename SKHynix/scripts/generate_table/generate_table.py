@@ -727,6 +727,10 @@ def format_html_style(tables=[]):
         #             'INODE Used', 
         #             'INODE Free'
         #         ],
+        #          'format': {
+        #                'precision': 2,
+        #                'thousands': ','
+        #          },
         #         'sorting_rules': [
         #             {'column': 'tier', 'order': 'asc'}
         #         ]
