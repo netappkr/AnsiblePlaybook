@@ -370,7 +370,7 @@ def storage_space_report_by_aggr_in_SoC(data):
             'report_name': "------ Aggregates Capacity Report ------",
             'sorting_rules': 
             [
-                {'column': 'No', 'order': 'asc'},
+                {'column': 'Tier', 'order': 'asc'},
                 {'column': 'Total Size(TB)', 'order': 'asc'}, 
                 {'column': 'Node Name', 'order': 'desc'}
             ],
@@ -420,6 +420,7 @@ def storage_space_report_by_volume_in_SoC(data):
             'report_config': {
                 'report_name': "SoC" + cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
                 'sorting_rules': [
+                    {'column': 'Tier', 'order': 'asc'},
                     {'column': 'Used Size(TB)', 'order': 'desc'}, 
                     {'column': 'Total Size(TB)', 'order': 'desc'}
                 ],
