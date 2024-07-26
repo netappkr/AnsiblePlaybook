@@ -24,7 +24,7 @@ Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니�
     9. Snapmirror/vault check: 정상 여부 확인
     10. 사용량 DU 메일링: 사용량이 많은 프로젝트 Volume에 대하여 주요 Directory 사용량을 확인하여 프로젝트 인원에게 메일 발송
     11. 특정 확장자, Size File 메일링: XCP 를 활용하여 특정 확장자 or 특정 Size 의 File 을 찾아 소유자에게 메일링, 
-    12. 완료 snapshot 삭제: Update 가 완료 된 Source 측 snapshot을 확인 후 삭제
+    12. ~~완료 snapshot 삭제: Update 가 완료 된 Source 측 snapshot을 확인 후 삭제~~
     13. ~~Inode Increase: Inode 사용률 75% 이상 인 Volume 에 대하여 Inode 증설~~</br> 
     [UM으로 대체하기로 결정](https://github.com/netappkr/NetAppCloudSolutionCenter/tree/master/py-RestAPI/Ontap/AIQUM%20Script)
     14. DLC (Data Life Cycle) : Storage 에서 특정 확장자 별로 Listup 하여 Report, 특정 기간이 지난 확장자에 대하여 식별 진행, 위의 내용이 History 관리가 가능해야 함
@@ -182,17 +182,7 @@ gantt
     Playbook 적용 Test                  : done, p7-5, 2024-05-23, 2d
     Playbook 수정 LSM job manager 활용   : done, p7-6, 2024-05-23, 2d
     Playbook 적용 Test                  : done, p7-7, 2024-05-23, 2d
-    AutoPath 리포트를 위한 서브 Playbook 작성 : active, p7-8, 2024-05-28, 7d
-
-    section Check usage by Directory Playbook
-    Sample Playbook 작성                : p8-1, after p7-8, 2d
-    Playbook 적용 Test                  : p8-2, after p8-1, 3d
-    Playbook 수정                       : p8-3, after p8-2, 3d
-
-    section check the File status Playbook
-    Sample Playbook 작성                : p9-1, after p8-2, 2d
-    Playbook 적용 Test                  : p9-2, after p9-1, 3d
-    Playbook 수정                       : p9-3, after p9-2, 3d
+    AutoPath 리포트를 위한 서브 Playbook 작성 : done, p7-8, 2024-05-28, 7d
 ```
 
 # 참조
