@@ -4,17 +4,23 @@
   gather_facts: no
   tasks:
     - name: Print current time and wait for 10 seconds
-      loop:
-        - 1
-        - 2
-        - 3
+      vars:
+        loop_items: 
+          - 1
+          - 2
+          - 3
+
+    - name: Print current time
+      debug:
+        msg: "{{item}}"
+      loop: "{{ loop_items }}"
       loop_control:
         loop_var: item
-      block:
-        - name: Print current time
-          debug:
-            msg: "Current time: {{ lookup('pipe', 'date +\"%Y-%m-%d %H:%M:%S\"') }}"
+
+        # - name: Print current time
+        #   debug:
+        #     msg: "Current time: {{ lookup('pipe', 'date +\"%Y-%m-%d %H:%M:%S\"') }}"
         
-        - name: Pause for 10 seconds
-          pause:
-            seconds: 10
+        # - name: Pause for 10 seconds
+        #   pause:
+        #     seconds: 10
