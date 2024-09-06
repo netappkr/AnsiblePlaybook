@@ -69,7 +69,6 @@
       loop: "{{ DLC.config.division }}"
       loop_control:
         loop_var: division
-        pause: 10
 
     - name: xcp scan
       shell: |
