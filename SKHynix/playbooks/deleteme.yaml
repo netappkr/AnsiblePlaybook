@@ -9,9 +9,10 @@
           - 1
           - 2
           - 3
-    - name: Print current time
-      debug:
-        msg: "Current time: {{ lookup('pipe', 'date +\"%Y-%m-%d %H:%M:%S\"') }}"
-      loop: "{{ loop_items }}"
-      loop_control:
-        pause: 10
+      tasks:
+        - name: Print current time
+          debug:
+            msg: "Current time: {{ lookup('pipe', 'date +\"%Y-%m-%d %H:%M:%S\"') }}"
+          loop: "{{ loop_items }}"
+          loop_control:
+            pause: 10
