@@ -1,21 +1,20 @@
 ---
 - name: Print current time every 10 seconds in a loop
   hosts: localhost
-  gather_facts: yes  # ansible_date_time 변수를 사용하기 위해 필요합니다.
+  gather_facts: no
   tasks:
-    - name: Loop to print current time with a 10-second interval
-      vars:
-        loop_items: 
-          - 1
-          - 2
-          - 3
-      loop: "{{ loop_items }}"
+    - name: Print current time and wait for 10 seconds
+      loop:
+        - 1
+        - 2
+        - 3
       loop_control:
         loop_var: item
-      tasks:
+      block:
         - name: Print current time
           debug:
             msg: "Current time: {{ lookup('pipe', 'date +\"%Y-%m-%d %H:%M:%S\"') }}"
+        
         - name: Pause for 10 seconds
           pause:
             seconds: 10
