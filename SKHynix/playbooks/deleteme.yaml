@@ -1,6 +1,6 @@
 ---
 - name: Print current time every 10 seconds in a loop
-  hosts: localhost
+  hosts: task_server_1
   gather_facts: no
   tasks:
     - name: Print current time and wait for 10 seconds
