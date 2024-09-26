@@ -57,27 +57,39 @@ def read_yaml(filelist):
             data[yaml_file] = yaml.load(file, Loader=yaml.FullLoader)
     return data
 
+def job_failed(data):
+    if ('failed','true') in data:
+        logger.error(f"function: job_failed | {data['cluster']['name']}",data['msg'])
+        return False
+    else:
+        return True
+
+
 def storage_inode_report_by_cluster(data):
     tables=[]
     datatable = pandas.DataFrame()
     for cluster in data:
         try:
-            inode_total=0
-            inode_used=0
-            for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-                inode_total= inode_total+volume["files"]["maximum"]
-                inode_used= inode_used+volume["files"]["used"]
+            if job_failed(cluster) is False:
+                logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
+                continue
+            else:
+                inode_total=0
+                inode_used=0
+                for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+                    inode_total= inode_total+volume["files"]["maximum"]
+                    inode_used= inode_used+volume["files"]["used"]
 
-            add=pandas.DataFrame.from_records([{
-                'No': cluster["cluster"]["tier"],
-                'Cluster name': cluster["cluster"]["name"],
-                '업무 구분': cluster["cluster"]["description"],
-                'INODE Total': inode_total,
-                'INODE Used': inode_used,
-                'INODE Free': inode_total - inode_used,
-                'INODE Used Rate(%)': round(inode_used / inode_total * 100)
-            }])
-            datatable=datatable._append(add,ignore_index = True)
+                add=pandas.DataFrame.from_records([{
+                    'No': cluster["cluster"]["tier"],
+                    'Cluster name': cluster["cluster"]["name"],
+                    '업무 구분': cluster["cluster"]["description"],
+                    'INODE Total': inode_total,
+                    'INODE Used': inode_used,
+                    'INODE Free': inode_total - inode_used,
+                    'INODE Used Rate(%)': round(inode_used / inode_total * 100)
+                }])
+                datatable=datatable._append(add,ignore_index = True)
         except KeyError as e:
             # KeyError 발생시 처리 로직
             logger.error(f"function: storage_inode_report_by_volume | KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
@@ -108,78 +120,86 @@ def storage_inode_report_by_volume(data):
     tables=[]
     for Cluster in data:
         datatable = pandas.DataFrame()
-        for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
-            try: 
-                Aggr_name = Volume["aggregates"][0]['name']
-                if Volume["style"] == "flexgroup":
-                    Aggr_name = "-"
-                add=pandas.DataFrame.from_records([{
-                    'cluster Name': Cluster["cluster"]["name"],
-                    'SVM Name': Volume["svm"]["name"],
-                    'Aggregate': Aggr_name,
-                    'type': Volume["style"],
-                    'Volume': Volume["name"],
-                    'INODE Total': Volume["files"]["maximum"],
-                    'INODE Used': Volume["files"]["used"],
-                    'INODE Free': Volume["files"]["maximum"] - Volume["files"]["used"],
-                    'INode Used Rate(%)': round(Volume["files"]["used"] / Volume["files"]["maximum"] * 100)
-                }])
-            except KeyError as e:
-                # KeyError 발생시 처리 로직
-                logger.error(f"function: storage_inode_report_by_volume | KeyError: {e} - {Cluster['cluster']['name']}/{Volume['name']}",traceback.format_exc())
-            except Exception as e:
-                logger.error(traceback.format_exc())
-                print("function: storage_inode_report_by_volume | Error:" ,traceback.format_exc())
+        if job_failed(Cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {Cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
+                try: 
+                    Aggr_name = Volume["aggregates"][0]['name']
+                    if Volume["style"] == "flexgroup":
+                        Aggr_name = "-"
+                    add=pandas.DataFrame.from_records([{
+                        'cluster Name': Cluster["cluster"]["name"],
+                        'SVM Name': Volume["svm"]["name"],
+                        'Aggregate': Aggr_name,
+                        'type': Volume["style"],
+                        'Volume': Volume["name"],
+                        'INODE Total': Volume["files"]["maximum"],
+                        'INODE Used': Volume["files"]["used"],
+                        'INODE Free': Volume["files"]["maximum"] - Volume["files"]["used"],
+                        'INode Used Rate(%)': round(Volume["files"]["used"] / Volume["files"]["maximum"] * 100)
+                    }])
+                except KeyError as e:
+                    # KeyError 발생시 처리 로직
+                    logger.error(f"function: storage_inode_report_by_volume | KeyError: {e} - {Cluster['cluster']['name']}/{Volume['name']}",traceback.format_exc())
+                except Exception as e:
+                    logger.error(traceback.format_exc())
+                    print("function: storage_inode_report_by_volume | Error:" ,traceback.format_exc())
 
-            datatable=datatable._append(add,ignore_index = True)
-        tables.append({
-            'datatable': datatable,
-            'report_config': {
-                'report_name': Cluster["cluster"]["name"] + " Storage Volumes INODE Report",
-                'custom_col_styles': [
-                    'INODE Total', 
-                    'INODE Used', 
-                    'INODE Free'
-                ],
-                'sorting_rules': [
-                    {'column': 'INODE Used', 'order': 'desc'},
-                    {'column': 'INODE Total', 'order': 'desc'}
-                ],
-                'format': {
-                    'precision': 0,
-                    'thousands': ','
+                datatable=datatable._append(add,ignore_index = True)
+            tables.append({
+                'datatable': datatable,
+                'report_config': {
+                    'report_name': Cluster["cluster"]["name"] + " Storage Volumes INODE Report",
+                    'custom_col_styles': [
+                        'INODE Total', 
+                        'INODE Used', 
+                        'INODE Free'
+                    ],
+                    'sorting_rules': [
+                        {'column': 'INODE Used', 'order': 'desc'},
+                        {'column': 'INODE Total', 'order': 'desc'}
+                    ],
+                    'format': {
+                        'precision': 0,
+                        'thousands': ','
+                    }
                 }
-            }
-        })
+            })
     return tables
 
 def storage_space_report_by_cluster(data):
     tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        total_size=0
-        used_size=0
-        try: 
-            for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
-                total_size= total_size+aggr["space"]["block_storage"]["size"]
-                used_size= used_size+aggr["space"]["block_storage"]["used"]
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            total_size=0
+            used_size=0
+            try: 
+                for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+                    total_size= total_size+aggr["space"]["block_storage"]["size"]
+                    used_size= used_size+aggr["space"]["block_storage"]["used"]
 
-            add=pandas.DataFrame.from_records([{
-                'No': cluster["cluster"]["tier"],
-                'Cluster name': cluster["cluster"]["name"],
-                '업무 구분': cluster["cluster"]["description"],
-                'Total Size(TB)': round(total_size/1024/1024/1024/1024),
-                'Used Size(TB)': round(used_size/1024/1024/1024/1024),
-                'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
-                'Used Rate(%)': round(used_size / total_size * 100)
-            }])
-            datatable=datatable._append(add,ignore_index = True)
-        except KeyError as e:
-            # KeyError 발생시 처리 로직
-            logger.error(f"function: storage_space_report_by_cluster | KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
-        except Exception as e:
-            logger.error(traceback.format_exc())
-            print("function: storage_space_report_by_cluster | Error:" ,traceback.format_exc())
+                add=pandas.DataFrame.from_records([{
+                    'No': cluster["cluster"]["tier"],
+                    'Cluster name': cluster["cluster"]["name"],
+                    '업무 구분': cluster["cluster"]["description"],
+                    'Total Size(TB)': round(total_size/1024/1024/1024/1024),
+                    'Used Size(TB)': round(used_size/1024/1024/1024/1024),
+                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
+                    'Used Rate(%)': round(used_size / total_size * 100)
+                }])
+                datatable=datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"function: storage_space_report_by_cluster | KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                print("function: storage_space_report_by_cluster | Error:" ,traceback.format_exc())
             
     tables.append({
         'datatable': datatable,
@@ -200,29 +220,33 @@ def storage_space_report_by_cluster(data):
     tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        total_size=0
-        used_size=0
-        try:
-            for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
-                total_size= total_size+aggr["space"]["block_storage"]["size"]
-                used_size= used_size+aggr["space"]["block_storage"]["used"]
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            total_size=0
+            used_size=0
+            try:
+                for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+                    total_size= total_size+aggr["space"]["block_storage"]["size"]
+                    used_size= used_size+aggr["space"]["block_storage"]["used"]
 
-            add=pandas.DataFrame.from_records([{
-                'No': cluster["cluster"]["tier"],
-                'Cluster name': cluster["cluster"]["name"],
-                '업무 구분': cluster["cluster"]["description"],
-                'Total Size(TB)': round(total_size/1024/1024/1024/1024),
-                'Used Size(TB)': round(used_size/1024/1024/1024/1024),
-                'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
-                'Used Rate(%)': round(used_size / total_size * 100)
-            }])
-            datatable=datatable._append(add,ignore_index = True)
-        except KeyError as e:
-            # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
-        except Exception as e:
-            logger.error(traceback.format_exc())
-            print("Error:" ,traceback.format_exc())
+                add=pandas.DataFrame.from_records([{
+                    'No': cluster["cluster"]["tier"],
+                    'Cluster name': cluster["cluster"]["name"],
+                    '업무 구분': cluster["cluster"]["description"],
+                    'Total Size(TB)': round(total_size/1024/1024/1024/1024),
+                    'Used Size(TB)': round(used_size/1024/1024/1024/1024),
+                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024),
+                    'Used Rate(%)': round(used_size / total_size * 100)
+                }])
+                datatable=datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                print("Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
@@ -243,31 +267,35 @@ def storage_space_report_by_aggr(data):
     tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
-            try:
-                total_size=aggr["space"]["block_storage"]["size"]
-                used_size=aggr["space"]["block_storage"]["used"]
-                logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
-                ratio=round(logical_used_size/used_size,2)
-                add=pandas.DataFrame.from_records([{
-                    'No': cluster["cluster"]["tier"],
-                    'Cluster Name': cluster["cluster"]["name"],
-                    'Node Name': aggr["home_node"]["name"],
-                    'Aggr Name': aggr["name"],
-                    'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
-                    'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
-                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
-                    'Used Rate(%)': round(used_size / total_size * 100),
-                    'logical_used_size(TB)': round(logical_used_size/1024/1024/1024/1024,1),
-                    'Total_Logical_size(TB)': round((total_size*ratio)/1024/1024/1024/1024,1)
-                }])
-                datatable=datatable._append(add,ignore_index = True)
-            except KeyError as e:
-                # KeyError 발생시 처리 로직
-                logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
-            except Exception as e:
-                logger.error(traceback.format_exc())
-                print("Error:" ,traceback.format_exc())
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+                try:
+                    total_size=aggr["space"]["block_storage"]["size"]
+                    used_size=aggr["space"]["block_storage"]["used"]
+                    logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
+                    ratio=aggr["space"]["efficiency_without_snapshots"]["ratio"]
+                    add=pandas.DataFrame.from_records([{
+                        'No': cluster["cluster"]["tier"],
+                        'Cluster Name': cluster["cluster"]["name"],
+                        'Node Name': aggr["home_node"]["name"],
+                        'Aggr Name': aggr["name"],
+                        'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
+                        'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
+                        'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
+                        'Used Rate(%)': round(used_size / total_size * 100),
+                        'logical_used_size(TB)': round((used_size*ratio)/1024/1024/1024/1024,1),
+                        'Total_Logical_size(TB)': round((total_size*ratio)/1024/1024/1024/1024,1)
+                    }])
+                    datatable=datatable._append(add,ignore_index = True)
+                except KeyError as e:
+                    # KeyError 발생시 처리 로직
+                    logger.error(f"KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
+                except Exception as e:
+                    logger.error(traceback.format_exc())
+                    print("Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
@@ -289,32 +317,36 @@ def storage_space_report_by_aggr(data):
 def storage_space_report_by_volume(data):
     tables = []
     for cluster in data:
-        datatable = pandas.DataFrame()
-        for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-            try:
-                total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
-                used_size=Volume["space"]["used"]
-                volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
-                Aggr_name = Volume["aggregates"][0]['name']
-                if Volume["style"] == "flexgroup":
-                    Aggr_name = "-"
-                add=pandas.DataFrame.from_records([{
-                    'SVM Name': Volume["svm"]["name"],
-                    'Aggregate': Aggr_name,
-                    'Volume': Volume['name'],
-                    'Total Size(GB)': round(total_size/1024/1024/1024),
-                    'Used Size(GB)': round(used_size/1024/1024/1024),
-                    'Free Size(GB)': round((total_size - used_size)/1024/1024/1024),
-                    'Used Rate(%)': round(used_size / total_size * 100),
-                    'Logical Used Size(GB)': round(volume_logical_used/1024/1024/1024)
-                }])
-                datatable=datatable._append(add,ignore_index = True)
-            except KeyError as e:
-                # KeyError 발생시 처리 로직
-                logger.error(f"function: storage_space_report_by_volume | KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
-            except Exception as e:
-                logger.error(traceback.format_exc())
-                print("function: storage_space_report_by_volume | Error:" ,traceback.format_exc())
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            datatable = pandas.DataFrame()
+            for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+                try:
+                    total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
+                    used_size=Volume["space"]["used"]
+                    volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
+                    Aggr_name = Volume["aggregates"][0]['name']
+                    if Volume["style"] == "flexgroup":
+                        Aggr_name = "-"
+                    add=pandas.DataFrame.from_records([{
+                        'SVM Name': Volume["svm"]["name"],
+                        'Aggregate': Aggr_name,
+                        'Volume': Volume['name'],
+                        'Total Size(GB)': round(total_size/1024/1024/1024),
+                        'Used Size(GB)': round(used_size/1024/1024/1024),
+                        'Free Size(GB)': round((total_size - used_size)/1024/1024/1024),
+                        'Used Rate(%)': round(used_size / total_size * 100),
+                        'Logical Used Size(GB)': round(volume_logical_used/1024/1024/1024)
+                    }])
+                    datatable=datatable._append(add,ignore_index = True)
+                except KeyError as e:
+                    # KeyError 발생시 처리 로직
+                    logger.error(f"function: storage_space_report_by_volume | KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
+                except Exception as e:
+                    logger.error(traceback.format_exc())
+                    print("function: storage_space_report_by_volume | Error:" ,traceback.format_exc())
                 
 
         tables.append({
@@ -323,8 +355,8 @@ def storage_space_report_by_volume(data):
                 'report_name': cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
                 'sorting_rules': 
                 [
-                    {'column': 'Used Size(GB)', 'order': 'desc'}, 
-                    {'column': 'Total Size(GB)', 'order': 'desc'}
+                    {'column': 'Logical Used Size(GB)', 'order': 'desc'}, 
+                    {'column': 'Used Size(GB)', 'order': 'desc'}
                 ],
                 'format': {
                     'precision': 0,
@@ -337,32 +369,36 @@ def storage_space_report_by_aggr_in_SoC(data):
     tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
-            try:
-                total_size=aggr["space"]["block_storage"]["size"]
-                used_size=aggr["space"]["block_storage"]["used"]
-                logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
-                ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
-                Aggr_tier = aggr["name"][:2]
-                add=pandas.DataFrame.from_records([{
-                    'Tier': Aggr_tier,
-                    'Cluster Name': cluster["cluster"]["name"],
-                    'Node Name': aggr["home_node"]["name"],
-                    'Aggr Name': aggr["name"],
-                    'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
-                    'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
-                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
-                    'Used Rate(%)': round(used_size / total_size * 100),
-                    'logical_used_size(TB)': round(logical_used_size/1024/1024/1024/1024,1),
-                    'Total_Logical_size(TB)': round((logical_used_size*ratio)/1024/1024/1024/1024,1)
-                }])
-                datatable=datatable._append(add,ignore_index = True)
-            except KeyError as e:
-                # KeyError 발생시 처리 로직
-                logger.error(f"function: storage_space_report_by_aggr_in_SoC | KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
-            except Exception as e:
-                logger.error(traceback.format_exc())
-                print("function: storage_space_report_by_aggr_in_SoC | Error:" ,traceback.format_exc())
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
+                try:
+                    total_size=aggr["space"]["block_storage"]["size"]
+                    used_size=aggr["space"]["block_storage"]["used"]
+                    logical_used_size=aggr["space"]["efficiency_without_snapshots"]["logical_used"]
+                    ratio=round(aggr["space"]["efficiency_without_snapshots"]["ratio"],2)
+                    Aggr_tier = aggr["name"][:2]
+                    add=pandas.DataFrame.from_records([{
+                        'Tier': Aggr_tier,
+                        'Cluster Name': cluster["cluster"]["name"],
+                        'Node Name': aggr["home_node"]["name"],
+                        'Aggr Name': aggr["name"],
+                        'Total Size(TB)': round(total_size/1024/1024/1024/1024,1),
+                        'Used Size(TB)': round(used_size/1024/1024/1024/1024,1),
+                        'Free Size(TB)': round((total_size - used_size)/1024/1024/1024/1024,1),
+                        'Used Rate(%)': round(used_size / total_size * 100),
+                        'logical_used_size(TB)': round((used_size*ratio)/1024/1024/1024/1024,1),
+                        'Total_Logical_size(TB)': round((total_size*ratio)/1024/1024/1024/1024,1)
+                    }])
+                    datatable=datatable._append(add,ignore_index = True)
+                except KeyError as e:
+                    # KeyError 발생시 처리 로직
+                    logger.error(f"function: storage_space_report_by_aggr_in_SoC | KeyError: {e} - {cluster['cluster']['name']}/{aggr['name']}",traceback.format_exc())
+                except Exception as e:
+                    logger.error(traceback.format_exc())
+                    print("function: storage_space_report_by_aggr_in_SoC | Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
@@ -385,93 +421,97 @@ def storage_space_report_by_aggr_in_SoC(data):
 def storage_space_report_by_volume_in_SoC(data):
     tables = []
     for cluster in data:
-        datatable = pandas.DataFrame()
-        for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-            try:
-                total_size=Volume["space"]["size"] * (1 - Volume["space"]["snapshot"]["reserve_percent"]/100)
-                used_size=Volume["space"]["used"]
-                volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
-                Aggr_name = Volume["aggregates"][0]['name']
-                Aggr_tier = Aggr_name[:2]
-                if Volume["style"] == "flexgroup":
-                    Aggr_name = "flexgroup"
-                add=pandas.DataFrame.from_records([{
-                    'Tier': Aggr_tier,
-                    'SVM Name': Volume["svm"]["name"],
-                    'Aggregate': Aggr_name,
-                    'Volume': Volume['name'],
-                    'Total Size(TB)': round(total_size/1024/1024/1024),
-                    'Used Size(TB)': round(used_size/1024/1024/1024),
-                    'Free Size(TB)': round((total_size - used_size)/1024/1024/1024),
-                    'Used Rate(%)': round(used_size / total_size * 100),
-                    'Logical Used Size(TB)': round(volume_logical_used/1024/1024/1024)
-                }])
-                datatable=datatable._append(add,ignore_index = True)
-            except KeyError as e:
-                # KeyError 발생시 처리 로직
-                logger.error(f"function: storage_space_report_by_volume_in_SoC | KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
-            except Exception as e:
-                logger.error(traceback.format_exc())
-                print("function: storage_space_report_by_volume_in_SoC | Error:" ,traceback.format_exc())
-                
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            datatable = pandas.DataFrame()
+            for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+                if 'vine' in Volume['name'] or 'user_tsmc' in Volume['name'] or 'root' in Volume['name']:
+                    continue
+                try:
+                    total_size=Volume["space"]["afs_total"]
+                    volume_logical_used=Volume["space"]["logical_space"]["used_by_afs"]
+    #                volume_logical_available=Volume["space"]["logical_space"]["available"]
+                    volume_logical_used_percent=Volume["space"]["logical_space"]["used_percent"]
+                    if Volume["style"] == "flexgroup":
+                        Aggr_name = "flexgroup"
+                    add=pandas.DataFrame.from_records([{
+                        'Volume': Volume['name'],
+                        'Total Size(TB)': round(total_size/1024/1024/1024/1024,2),
+                        'Used Size(TB)': round(volume_logical_used/1024/1024/1024/1024,2),
+    #                    'Available Size(GB)': round(volume_logical_available/1024/1024/1024),
+                        'Available Size(TB)': round((total_size - volume_logical_used)/1024/1024/1024/1024,2),
+                        'Used Rate(%)': round(volume_logical_used_percent),
+                    }])
+                    datatable=datatable._append(add,ignore_index = True)
+                except KeyError as e:
+                    # KeyError 발생시 처리 로직
+                    logger.error(f"function: storage_space_report_by_volume_in_SoC | KeyError: {e} - {Volume['svm']['name']}/{Volume['name']}",traceback.format_exc())
+                except Exception as e:
+                    logger.error(traceback.format_exc())
+                    print("function: storage_space_report_by_volume_in_SoC | Error:" ,traceback.format_exc())
+
 
         tables.append({
             'datatable': datatable,
             'report_config': {
-                'report_name': "SoC" + cluster["cluster"]["name"] + " Storage Volumes Capacity Report",
+                'report_name': "SoC " + " Storage Volumes Capacity Report",
                 'sorting_rules': [
-                    {'column': 'Tier', 'order': 'asc'},
-                    {'column': 'Used Size(TB)', 'order': 'desc'}, 
+                    {'column': 'Used Size(TB)', 'order': 'desc'},
                     {'column': 'Total Size(TB)', 'order': 'desc'}
                 ],
                 'format': {
-                    'precision': 0,
+                    'precision': 2,
                     'thousands': ','
                 }
             }
         })
     return tables
 
-
 def storage_snapmirror_report_by_cluster(data):
     tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        for snapmirror in cluster["ontap_info"]["snapmirror/relationships"]["records"]:
-            try:
-                unhealthy_reason = ""
-                transfer_time = ""
-                transfer_status = ""
-                policy_name = ""
-                if "unhealthy_reason" in snapmirror:
-                    unhealthy_reason = snapmirror["unhealthy_reason"][0]["message"]
-                
-                if "transfer" in snapmirror:
-                    transfer_time = snapmirror["transfer"]["end_time"]
-                    transfer_status = snapmirror["transfer"]["state"]
-                
-                if "policy" in snapmirror:
-                    if "name" in snapmirror["policy"]:
-                        policy_name = snapmirror["policy"]["name"]
-                    elif "uuid" in snapmirror["policy"]:
-                        policy_name = snapmirror["policy"]["uuid"]
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            for snapmirror in cluster["ontap_info"]["snapmirror/relationships"]["records"]:
+                try:
+                    unhealthy_reason = ""
+                    transfer_time = ""
+                    transfer_status = ""
+                    policy_name = ""
+                    if "unhealthy_reason" in snapmirror:
+                        unhealthy_reason = snapmirror["unhealthy_reason"][0]["message"]
+                    
+                    if "transfer" in snapmirror:
+                        transfer_time = snapmirror["transfer"]["end_time"]
+                        transfer_status = snapmirror["transfer"]["state"]
+                    
+                    if "policy" in snapmirror:
+                        if "name" in snapmirror["policy"]:
+                            policy_name = snapmirror["policy"]["name"]
+                        elif "uuid" in snapmirror["policy"]:
+                            policy_name = snapmirror["policy"]["uuid"]
 
-                add=pandas.DataFrame.from_records([{
-                    'Cluster Name': cluster["cluster"]["name"],
-                    'state': snapmirror["state"],
-                    'healthy': snapmirror['healthy'],
-                    'transfer end time': transfer_time,
-                    'transfer status': transfer_status,
-                    'policy': policy_name,
-                    'unhealthy_reason': unhealthy_reason
-                }])
-                datatable=datatable._append(add,ignore_index = True)
-            except KeyError as e:
-                # KeyError 발생시 처리 로직
-                logger.error(f"function: storage_snapmirror_report_by_cluster | KeyError: {e} - {cluster['cluster']['name']}/{snapmirror['uuid']}",traceback.format_exc())
-            except Exception as e:
-                logger.error(traceback.format_exc())
-                print("function: storage_snapmirror_report_by_cluster | Error:" ,traceback.format_exc())
+                    add=pandas.DataFrame.from_records([{
+                        'Cluster Name': cluster["cluster"]["name"],
+                        'state': snapmirror["state"],
+                        'healthy': snapmirror['healthy'],
+                        'transfer end time': transfer_time,
+                        'transfer status': transfer_status,
+                        'policy': policy_name,
+                        'unhealthy_reason': unhealthy_reason
+                    }])
+                    datatable=datatable._append(add,ignore_index = True)
+                except KeyError as e:
+                    # KeyError 발생시 처리 로직
+                    logger.error(f"function: storage_snapmirror_report_by_cluster | KeyError: {e} - {cluster['cluster']['name']}/{snapmirror['uuid']}",traceback.format_exc())
+                except Exception as e:
+                    logger.error(traceback.format_exc())
+                    print("function: storage_snapmirror_report_by_cluster | Error:" ,traceback.format_exc())
 
     tables.append({
         'datatable': datatable,
@@ -494,33 +534,37 @@ def storage_Big_snapshot_report_by_volume(data):
     tables = []
     datatable = pandas.DataFrame()
     for cluster in data:
-        try:
-            total_size=0
-            used_size=0
-            snapshot_used=0
-            for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-                total_size= volume["space"]["size"]
-                used_size= volume["space"]["used"]
-                snapshot_used=volume["space"]["snapshot"]["used"]
-                if round(used_size / total_size * 100,2) > 50:
-                    if snapshot_used > 1099511627776:
-                        add=pandas.DataFrame.from_records([{
-                            'cluster name': cluster["cluster"]["name"],
-                            'volume name' : volume["name"],
-                            'volume path' : volume["nas"]["path"],
-                            'Total Size(GiB)': round(total_size/1024/1024/1024,2),
-                            'Used Size(GiB)': round(used_size/1024/1024/1024,2),
-                            'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
-                            'Used Rate(%)': round(used_size / total_size,2),
-                            'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
-                        }])
-                        datatable = datatable._append(add,ignore_index = True)
-        except KeyError as e:
-            # KeyError 발생시 처리 로직
-            logger.error(f"function: storage_Big_snapshot_report_by_volume | KeyError: {e} - {cluster['svm']['name']}/{volume['name']}",traceback.format_exc())
-        except Exception as e:
-            logger.error(f"function: storage_Big_snapshot_report_by_volume | ", traceback.format_exc())
-            print("function: storage_Big_snapshot_report_by_volume | Error:" ,traceback.format_exc())
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            continue
+        else:
+            try:
+                total_size=0
+                used_size=0
+                snapshot_used=0
+                for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
+                    total_size= volume["space"]["size"]
+                    used_size= volume["space"]["used"]
+                    snapshot_used=volume["space"]["snapshot"]["used"]
+                    if round(used_size / total_size * 100,2) > 50:
+                        if snapshot_used > 1099511627776:
+                            add=pandas.DataFrame.from_records([{
+                                'cluster name': cluster["cluster"]["name"],
+                                'volume name' : volume["name"],
+                                'volume path' : volume["nas"]["path"],
+                                'Total Size(GiB)': round(total_size/1024/1024/1024,2),
+                                'Used Size(GiB)': round(used_size/1024/1024/1024,2),
+                                'Free Size(GiB)': round((total_size - used_size)/1024/1024/1024,2),
+                                'Used Rate(%)': round(used_size / total_size,2),
+                                'snaphost Used(Tib)': round(snapshot_used/1024/1024/1024/1024,2)
+                            }])
+                            datatable = datatable._append(add,ignore_index = True)
+            except KeyError as e:
+                # KeyError 발생시 처리 로직
+                logger.error(f"function: storage_Big_snapshot_report_by_volume | KeyError: {e} - {cluster['svm']['name']}/{volume['name']}",traceback.format_exc())
+            except Exception as e:
+                logger.error(f"function: storage_Big_snapshot_report_by_volume | ", traceback.format_exc())
+                print("function: storage_Big_snapshot_report_by_volume | Error:" ,traceback.format_exc())
             
 
     tables.append({
@@ -662,17 +706,26 @@ def autopath_replace_status(data):
 
     # 출력 전 데이터 단위 계산 추가
     for division in divisions:
+        if division == "DRAM":
+            Num = 1
+        elif division == "NAND":
+            Num = 2
+        elif division == "CIS":
+            Num = 3
+        else:
+            Num = 4
         divisions_sum[division] = {
+            'No': Num,
             'file size(byte)': divisions_sum[division].get('filesize', 0), 
-            'file size(Gib)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024,2),
+            'file size(TB)': round(divisions_sum[division].get('filesize', 0)/1024/1024/1024/1024,2),
             'file count': divisions_sum[division].get('filecount', 0)
         }
     
     datatable = pandas.DataFrame()
     # job report table
     add=pandas.DataFrame.from_records([{
-        'ok_count': ok_count,
-        'skip_count': skip_count,
+        'Current_count': ok_count,
+        'Done_count': skip_count,
         'ignore_count' : ignore_count,
         'unknown_count': unknown_count
     }])
@@ -693,11 +746,14 @@ def autopath_replace_status(data):
         'report_config': {
             'report_name': "autopath data report table",
             'index': True,
-            'format': {
-                'precision': 2,
-                'thousands': ','
-            }
-        }
+        'format': {
+            'precision': 2,
+            'thousands': ","
+        },
+        'sorting_rules': [
+                {'column': 'No', 'order': 'asc'}
+        ]
+	},
     })
     logger.debug(f"func : autopath_replace_status | datatable:")
 
@@ -728,10 +784,6 @@ def format_html_style(tables=[]):
         #             'INODE Used', 
         #             'INODE Free'
         #         ],
-        #          'format': {
-        #                'precision': 2,
-        #                'thousands': ','
-        #          },
         #         'sorting_rules': [
         #             {'column': 'tier', 'order': 'asc'}
         #         ]
@@ -772,9 +824,7 @@ def format_html_style(tables=[]):
         # datatable = datatable.format('{:,.0f}', subset=custom_col_style_list)
         if "format" in table["report_config"]:
             datatable = datatable.format(precision=table["report_config"]['format']['precision'], thousands=table["report_config"]['format']['thousands'])
-        else:
-            logger.debug(f"func : format_html_style | table:{table}")
-            
+
         # custom_col_style_list에 있는 각 컬럼에 대해 오른쪽 정렬 스타일 적용
         if "custom_col_styles" in table["report_config"]:
             datatable = datatable.set_properties(subset=table["report_config"]["custom_col_styles"], **{'text-align': 'right'})
@@ -823,9 +873,9 @@ def main():
         elif args.request == "aggr_volume_space_info_in_soc":
             data=read_json(args.file)
             tables = []
-            aggr_tables = storage_space_report_by_aggr_in_SoC(data[args.file[0]]) 
-            for table in aggr_tables:
-                tables.append(table)
+#            aggr_tables = storage_space_report_by_aggr_in_SoC(data[args.file[0]]) 
+#            for table in aggr_tables:
+#                tables.append(table)
             volume_tables = storage_space_report_by_volume_in_SoC(data[args.file[1]])
             for table in volume_tables:
                 tables.append(table)
@@ -900,6 +950,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
