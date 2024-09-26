@@ -1,6 +1,6 @@
 ---
 - name: Run Bash Script
-  hosts: task_server_1
+  hosts: task_server_1 # 스크립트가 있는 서버
   gather_facts: no
   collections:
     - netapp.ontap
@@ -8,5 +8,4 @@
     - name: Plz modify name your scrpt task
       shell: |
         echo 'hello Netapp plz modify your run command'
-
       # ignore_errors: true

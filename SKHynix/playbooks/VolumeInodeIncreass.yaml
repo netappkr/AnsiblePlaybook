@@ -24,6 +24,7 @@
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
+      ignore_errors: yes
       when: clusters.name == target.name
 
     - name: modify files by FlexVol

@@ -37,10 +37,10 @@
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
+      ignore_errors: yes
     #- name: debug show
     #  ansible.builtin.debug:
     #    msg: "{{ ontap_volumes.results }}"
-      ignore_errors: yes
       
     - name: Write result data to a JSON file
       copy:
