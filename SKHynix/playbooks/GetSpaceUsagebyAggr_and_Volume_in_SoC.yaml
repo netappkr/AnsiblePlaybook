@@ -79,8 +79,10 @@
           - 'space.snapshot.reserve_percent'
           - 'space.size'
           - 'space.used'
+          - 'space.afs_total'
           - 'style'
-          - 'space.logical_space.used_by_afs'
+          - 'space.logical_space'
+#          - 'space.logical_space.used_by_afs'
 #          - 'space.physical_used'
 #          - 'space.snapshot.reserve_size'
       register: ontap_volume

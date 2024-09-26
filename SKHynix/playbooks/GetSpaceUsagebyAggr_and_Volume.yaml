@@ -34,6 +34,7 @@
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
+      ignore_errors: True
     #- name: debug show
     #  ansible.builtin.debug:
     #    msg: "{{ ontap_aggrs.results }}"
@@ -87,6 +88,7 @@
       loop: "{{ clusters }}"
       loop_control:
         loop_var: cluster
+      ignore_errors: True
     # - name: debug show
     #   ansible.builtin.debug:
     #     msg: "{{ ontap_aggrs.results }}"

@@ -96,14 +96,14 @@
     #  ansible.builtin.debug:
     #    msg: "{{ html_tables.results }}"
 
-    - name: Send xcp scan status report via email
+    - name: Send xcpscan report via email
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "xcp scan status - {{ now(utc=false,fmt='%Y.%m.%d') }}"
+        subject: "check xcp scan status {{ '%Y-%m-%d' | strftime }} "
         body: "{{ html_table.stdout }}"
         from: "{{ email_from }}"
         secure: starttls

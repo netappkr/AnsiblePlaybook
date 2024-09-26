@@ -19,8 +19,6 @@
           - 'nas'
           - 'name'
           - 'comment'
-        parameters:
-          state: online
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
@@ -112,5 +110,6 @@
     #     dest: "/tmp/scan_list_file_results.list"
     #     content: "{{ scan_list_file_results | join('\n')}}"
     #   register: scan_list_file
+
 
 
