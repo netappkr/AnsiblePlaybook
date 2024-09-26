@@ -119,11 +119,11 @@ def storage_inode_report_by_cluster(data):
 def storage_inode_report_by_volume(data):
     tables=[]
     for Cluster in data:
-        datatable = pandas.DataFrame()
         if job_failed(Cluster) is False:
             logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {Cluster["cluster"]["name"]}를 생략합니다.")
             continue
         else:
+            datatable = pandas.DataFrame()
             for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
                 try: 
                     Aggr_name = Volume["aggregates"][0]['name']
