@@ -71,7 +71,7 @@ def storage_inode_report_by_cluster(data):
     for cluster in data:
         try:
             if job_failed(cluster) is False:
-                logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+                logger.info(f"function: storage_inode_report_by_cluster | 데이터 조회에 실패했습니다. {cluster['cluster']['name']} 를 생략합니다.")
                 continue
             else:
                 inode_total=0
@@ -118,19 +118,19 @@ def storage_inode_report_by_cluster(data):
 
 def storage_inode_report_by_volume(data):
     tables=[]
-    for Cluster in data:
-        if job_failed(Cluster) is False:
-            logger.info(f"function: storage_inode_report_by_volume | 데이터 조회에 실패했습니다. {Cluster["cluster"]["name"]}를 생략합니다.")
+    for cluster in data:
+        if job_failed(cluster) is False:
+            logger.info(f"function: storage_inode_report_by_volume | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             datatable = pandas.DataFrame()
-            for Volume in Cluster["ontap_info"]["storage/volumes"]["records"]:
+            for Volume in cluster["ontap_info"]["storage/volumes"]["records"]:
                 try: 
                     Aggr_name = Volume["aggregates"][0]['name']
                     if Volume["style"] == "flexgroup":
                         Aggr_name = "-"
                     add=pandas.DataFrame.from_records([{
-                        'cluster Name': Cluster["cluster"]["name"],
+                        'cluster Name': cluster["cluster"]["name"],
                         'SVM Name': Volume["svm"]["name"],
                         'Aggregate': Aggr_name,
                         'type': Volume["style"],
@@ -142,7 +142,7 @@ def storage_inode_report_by_volume(data):
                     }])
                 except KeyError as e:
                     # KeyError 발생시 처리 로직
-                    logger.error(f"function: storage_inode_report_by_volume | KeyError: {e} - {Cluster['cluster']['name']}/{Volume['name']}",traceback.format_exc())
+                    logger.error(f"function: storage_inode_report_by_volume | KeyError: {e} - {cluster['cluster']['name']}/{Volume['name']}",traceback.format_exc())
                 except Exception as e:
                     logger.error(traceback.format_exc())
                     print("function: storage_inode_report_by_volume | Error:" ,traceback.format_exc())
@@ -151,7 +151,7 @@ def storage_inode_report_by_volume(data):
             tables.append({
                 'datatable': datatable,
                 'report_config': {
-                    'report_name': Cluster["cluster"]["name"] + " Storage Volumes INODE Report",
+                    'report_name': cluster["cluster"]["name"] + " Storage Volumes INODE Report",
                     'custom_col_styles': [
                         'INODE Total', 
                         'INODE Used', 
@@ -174,7 +174,7 @@ def storage_space_report_by_cluster(data):
     datatable = pandas.DataFrame()
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_space_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_space_report_by_cluster | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             total_size=0
@@ -221,7 +221,7 @@ def storage_space_report_by_cluster(data):
     datatable = pandas.DataFrame()
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_space_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_space_report_by_cluster | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             total_size=0
@@ -268,7 +268,7 @@ def storage_space_report_by_aggr(data):
     datatable = pandas.DataFrame()
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_space_report_by_aggr | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_space_report_by_aggr | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
@@ -318,7 +318,7 @@ def storage_space_report_by_volume(data):
     tables = []
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_space_report_by_volume | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_space_report_by_volume | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             datatable = pandas.DataFrame()
@@ -370,7 +370,7 @@ def storage_space_report_by_aggr_in_SoC(data):
     datatable = pandas.DataFrame()
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_space_report_by_aggr_in_SoC | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_space_report_by_aggr_in_SoC | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             for aggr in cluster["ontap_info"]["storage/aggregates"]["records"]:
@@ -422,7 +422,7 @@ def storage_space_report_by_volume_in_SoC(data):
     tables = []
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_space_report_by_volume_in_SoC | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_space_report_by_volume_in_SoC | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             datatable = pandas.DataFrame()
@@ -474,7 +474,7 @@ def storage_snapmirror_report_by_cluster(data):
     datatable = pandas.DataFrame()
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_snapmirror_report_by_cluster | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_snapmirror_report_by_cluster | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             for snapmirror in cluster["ontap_info"]["snapmirror/relationships"]["records"]:
@@ -535,7 +535,7 @@ def storage_Big_snapshot_report_by_volume(data):
     datatable = pandas.DataFrame()
     for cluster in data:
         if job_failed(cluster) is False:
-            logger.info(f"function: storage_Big_snapshot_report_by_volume | 데이터 조회에 실패했습니다. {cluster["cluster"]["name"]}를 생략합니다.")
+            logger.info(f"function: storage_Big_snapshot_report_by_volume | 데이터 조회에 실패했습니다. {cluster['cluster']['name']}를 생략합니다.")
             continue
         else:
             try:
