@@ -58,7 +58,7 @@ def read_yaml(filelist):
     return data
 
 def job_failed(data):
-    if ('failed',True) in data:
+    if ('failed',True) in data.items():
         logger.error(f"function: job_failed | {data['cluster']['name']}",data['msg'])
         return False
     else:
