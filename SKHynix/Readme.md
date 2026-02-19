@@ -2,6 +2,7 @@
 WFA가 곧 EOA 된다고 합니다.</br>
 Netapp WFA를 AWX 로 마이그레이션 하는 프로젝트를 진행중입니다.
 
+
 ## 프로젝트 상세 목표
 1. AWX 환경을 구성하는 가이드 작성
 2. 아래 기능을 플레이북으로 구현
@@ -186,6 +187,9 @@ gantt
 ```
 
 # 참조
+
+<details>
+<summary>Task table</summary>
 - [애자일과 워터폴 방법론 비교 | 정의, 차이, 장단점, 적합한 조직](https://www.codestates.com/blog/content/%EC%95%A0%EC%9E%90%EC%9D%BC%EB%B0%A9%EB%B2%95%EB%A1%A0-%EC%9B%8C%ED%84%B0%ED%8F%B4%EB%B0%A9%EB%B2%95%EB%A1%A0)
 - [mermaid](https://mermaid.js.org/syntax/gantt.html)
 - [Gantt example](https://github.com/mermaidjs/mermaidjs.github.io/blob/master/gantt.md)
@@ -194,7 +198,7 @@ gantt
 - Active : Task 진행중
 - Pending : 외부또는 내부 이슈로 인해 대기 상태
 - done : 완료
-
+</details>
 ### Agile 간략설명
 ![Img](./Images/애자일-방법론-정의-장점-단점-프로세스.webp)
 ![Img](./Images/애자일-방법론-워터폴-방법론-비교-차이점-장단점-특징-요구사항.webp)
