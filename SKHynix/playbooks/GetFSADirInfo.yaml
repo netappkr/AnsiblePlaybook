@@ -18,7 +18,6 @@
           - 'svm.name'
           - 'nas'
           - 'name'
-          - 'comment'
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
