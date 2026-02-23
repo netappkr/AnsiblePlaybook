@@ -262,7 +262,7 @@ def get_scan_objects(data,config):
     return scan_objects
 
 
-def call_fsa_api(scan_objects)
+def call_fsa_api(scan_objects):
     results = []
     session = requests.Session()
     session.verify = False
