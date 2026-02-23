@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import requests
-import urllib.parse
-urllib.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import urllib3
+from urllib.parse import quote
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import argparse
 import json
 import logging
@@ -280,7 +281,7 @@ def call_fsa_api(scan_objects):
             directory = path_item["dir"]
             file_filter = path_item["file"]
 
-            encoded_path = urllib.parse.quote(directory, safe="")
+            encoded_path = quote(directory, safe="")
             url = f"{base_url}/{encoded_path}"
 
             params = {
