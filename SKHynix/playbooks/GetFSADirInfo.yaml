@@ -69,23 +69,25 @@
       loop_control:
         loop_var: division
 
-    - name: Call ONTAP REST API for FSA
+    - name: Call FSA per volume per directory
       uri:
         url: >
-          https://{{ volume.0.cluster.ip }}/api/storage/volumes/{{ volume.0.vol_uuid }}/files?return_metadata=true"
-          ?type=file
-          &modified_time{{volume.1.modified_time}}
-          $name={{volume.1.file}}
-          &return_metadata=false
+          https://{{ volume.cluster.ip }}/api/storage/volumes/{{ volume.vol_uuid }}/files/{{ directory.dir | urlencode }}
+          ?type={{ volume.fsa_option.type }}
+          &modified_time={{ volume.fsa_option.modified_time }}
+          &name={{ directory.file | urlencode }}
+          &return_records=true
+          &return_timeout=15
         method: GET
-        user: "{{ volume.0.cluster.ID }}"
-        password: "{{ volume.0.cluster.PW }}"
+        user: "{{ volume.cluster.ID }}"
+        password: "{{ volume.cluster.PW }}"
         validate_certs: false
-        force_basic_auth: yes
       loop: "{{ volume_list.stdout | subelements('fsa_option.path') }}"
       loop_control:
-        loop_var: volume
-        pause: 10
+        loop_var: pair
+      vars:
+        volume: "{{ pair.0 }}"
+        directory: "{{ pair.1 }}"
       register: scan_list
 
     - name: Search for 'project' in all directories
