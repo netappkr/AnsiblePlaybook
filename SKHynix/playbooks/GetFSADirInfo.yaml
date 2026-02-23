@@ -19,7 +19,7 @@
           - 'nas'
           - 'name'
           - 'comment'
-          - 'analytics.*'
+          - 'analytics'
           - 'uuid'
       register: ontap_volumes
       loop: "{{ clusters }}"
