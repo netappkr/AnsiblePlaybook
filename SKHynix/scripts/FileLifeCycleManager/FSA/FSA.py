@@ -327,21 +327,39 @@ def call_fsa_api(scan_objects):
                             "modified_time": r.get("modified_time")
                         })
                         summary = {
-                            "division": defaultdict(lambda: {"used": 0, "count": 0}),
-                            "volume": defaultdict(lambda: defaultdict(lambda: {"used": 0, "count": 0})),
-                            "directory": defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {"used": 0, "count": 0})))
+                            "division": {},
+                            "volume": {},
+                            "directory": {}
                         }
                         # division
+                        if div not in summary["division"]:
+                            summary["division"][div] = {"used": 0, "count": 0}
+
                         summary["division"][div]["used"] += size
                         summary["division"][div]["count"] += 1
 
                         # volume
-                        summary["volume"][div][volume_name]["used"] += size
-                        summary["volume"][div][volume_name]["count"] += 1
+                        if div not in summary["division"]:
+                            summary["division"][div] = {"used": 0, "count": 0}
+
+                        summary["division"][div]["used"] += size
+                        summary["division"][div]["count"] += 1
 
                         # directory
-                        summary["directory"][div][volume_name][directory]["used"] += size
-                        summary["directory"][div][volume_name][directory]["count"] += 1
+                        if div not in summary["directory"]:
+                            summary["directory"][div] = {}
+
+                        if volume_name not in summary["directory"][div]:
+                            summary["directory"][div][volume_name] = {}
+
+                        if directory_name not in summary["directory"][div][volume_name]:
+                            summary["directory"][div][volume_name][directory_name] = {
+                                "used": 0,
+                                "count": 0
+                            }
+
+                        summary["directory"][div][volume_name][directory_name]["used"] += size
+                        summary["directory"][div][volume_name][directory_name]["count"] += 1
 
                     next_link = data.get("_links", {}).get("next", {}).get("href")
                     if next_link:
