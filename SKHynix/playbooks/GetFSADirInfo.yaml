@@ -59,6 +59,12 @@
         msg: "{{ volume_list.stdout }}"
       register: config_mapping
 
+    - name: Save volume_list stdout as pretty YAML
+      copy:
+        dest: /tmp/fsa_volume_list.yaml
+        content: "{{ volume_list.stdout | from_json | to_nice_yaml }}"
+      register: fsa_vol_list
+
     - name: mkdir
       shell: |
         mkdir -p /data/vine/Ansible_XCP/FSA_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/result
@@ -69,25 +75,9 @@
       loop_control:
         loop_var: division
 
-    - name: Call FSA per volume per directory
-      ansible.builtin.uri:
-        url: "https://{{ volume.cluster.ip }}/api/storage/volumes/{{ volume.vol_uuid }}/files{{ directory.dir }}"
-        method: GET
-        user: "{{ volume.cluster.ID }}"
-        password: "{{ volume.cluster.PW }}"
-        validate_certs: false
-        params:
-          type: "{{ volume.fsa_option.type }}"
-          modified_time: "{{ volume.fsa_option.modified_time }}"
-          name: "{{ directory.file }}"
-          return_records: true
-      loop: "{{ volume_list.stdout | from_json | subelements('fsa_option.path') }}"
-      loop_control:
-        loop_var: pair
-      vars:
-        volume: "{{ pair.0 }}"
-        directory: "{{ pair.1 }}"
-      register: scan_list
+    - name: Get FSA data
+      command: "python3 script.py -r get_fsa_data --file {{ fsa_vol_list.dest }}"
+      register: fsa_data
 
     - name: Search for 'project' in all directories
       find:

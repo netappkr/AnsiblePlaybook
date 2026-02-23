@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import warnings
+import requests
+import urllib.parse
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
 import json
@@ -27,7 +29,7 @@ if not os.path.exists(log_dir):
 log_file_path = os.path.join(log_dir, ".log")
 
 # 로거 설정
-logger = logging.getLogger('ScanVolumeList')
+logger = logging.getLogger('fsa')
 logger.setLevel(logging.INFO)  # 로그 레벨 설정
 
 # 로그 포맷 설정
@@ -249,7 +251,67 @@ def get_scan_objects(data,config):
     return scan_objects
 
 
+def call_fsa_api(scan_objects):
+    results = []
+    session = requests.Session()
+    session.verify = False
+    session.headers.update({"Accept": "application/json"})
 
+    for obj in scan_objects:
+        cluster = obj["cluster"]
+        volume_uuid = obj["vol_uuid"]
+        fsa_option = obj["fsa_option"]
+
+        base_url = f"https://{cluster['ip']}/api/storage/volumes/{volume_uuid}/files"
+
+        auth = (cluster["ID"], cluster["PW"])
+
+        for path_item in fsa_option.get("path", []):
+            directory = path_item["dir"]
+            file_filter = path_item["file"]
+
+            encoded_path = urllib.parse.quote(directory, safe="")
+            url = f"{base_url}/{encoded_path}"
+
+            params = {
+                "type": fsa_option.get("type", "file"),
+                "modified_time": fsa_option.get("modified_time"),
+                "name": file_filter,
+                "return_records": "true",
+                "return_timeout": 30
+            }
+
+            try:
+                while url:
+                    response = session.get(url, auth=auth, params=params)
+                    response.raise_for_status()
+                    data = response.json()
+
+                    records = data.get("records", [])
+
+                    for r in records:
+                        results.append({
+                            "cluster": cluster["name"],
+                            "volume": obj["volume"],
+                            "dir": directory,
+                            "file": r.get("name"),
+                            "path": r.get("path"),
+                            "modified_time": r.get("modified_time")
+                        })
+
+                    # pagination 처리
+                    next_link = data.get("_links", {}).get("next", {}).get("href")
+                    if next_link:
+                        url = f"https://{cluster['ip']}{next_link}"
+                        params = None
+                    else:
+                        url = None
+
+            except Exception as e:
+                logger.error(f"FSA call error: {cluster['name']} {obj['volume']} {directory}")
+                logger.error(traceback.format_exc())
+
+    return results
 
 
 def main():
@@ -264,6 +326,11 @@ def main():
                 print(json.dumps(get_scan_objects(data[args.file[0]],config)))
             logger.info("print success")
 
+        elif args.request == "get_fsa_data":
+            data = read_yaml(args.file)
+            fsa_results = call_fsa_api(data)
+            print(json.dumps(fsa_results))
+            logger.info("print success")
         else:
             logger.error(args.request+" request is not matched")
             print(args.request+" request is not matched")
