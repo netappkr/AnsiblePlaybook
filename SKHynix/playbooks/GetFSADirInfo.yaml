@@ -69,8 +69,8 @@
       loop_control:
         loop_var: division
     - debug:
-        msg: "{{ volume_list.stdout | type_debug }}"
-        
+        msg: "{{ volume_list.stdout }}"
+
     - name: Call FSA per volume per directory
       uri:
         url: >
