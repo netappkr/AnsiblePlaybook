@@ -71,7 +71,11 @@
 
     - name: Call ONTAP REST API for FSA
       uri:
-        url: "https://{{ volume.cluster.ip }}/api/storage/volumes/{{ volume.vol_uuid }}/files?return_metadata=true"
+        url: >
+          https://{{ volume.cluster.ip }}/api/storage/volumes/{{ volume.vol_uuid }}/files?return_metadata=true"
+          ?type=file
+          &modified_time<=2025-12-01T00:00:00Z
+          &return_metadata=false
         method: GET
         user: "{{ volume.cluster.ID }}"
         password: "{{ volume.cluster.PW }}"

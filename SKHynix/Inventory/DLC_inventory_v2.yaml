@@ -1,0 +1,79 @@
+---
+ansible_host: 10.97.109.23
+clusters:
+  - name: nwezonm14
+    ip: "10.10.10.10"
+    description: "wezon test cluster"
+    ID: 
+    PW: 
+    datacenter: test
+    tier: 1
+DLC:
+  config:
+    domain: "chopincad.com"
+    check_comment: "prj"
+    division:
+      - name: "DRAM"
+        exportpolicy:
+          - name: "sim_dram_rg16ghbmtv_ro"
+        fsa_option:
+          type: file
+          modified_time : ">60d"
+          path: 
+            - dir: LAY
+              path: ["*.fsdb", "*.txt"]
+            - dir: SCH
+              path: ["*.fsdb", "*.txt"]
+            - dir: ESD
+              path: ["*.fsdb", "*.txt"]
+            - dir: CAE
+              path: ["*.fsdb", "*.txt"]
+            - dir: LDR
+              path: ["*.fsdb", "*.txt"]
+            - dir: CORE
+              path: ["*.fsdb", "*.txt"]
+            - dir: DV
+              path: ["*.fsdb", "*.txt"]
+          fmt: "'{} {}'.format(size, x)"
+        autopath:
+          automap: sim
+        
+      - name: "NAND"
+        exportpolicy:
+          - name: "sim_nand_qs4gslc_ro"
+        xcp_option:
+          match : "type == f and modified > 60*day and (fnm('*.fsdb') or fnm('*.db') or fnm('*.wdf') or fnm('*.wlf') or fnm('*.tr[0-9]') or fnm('*.tr[0-9][0-9]') or fnm('*.tr[0-9][0-9][0-9]'))"
+          fmt: "'{} {}'.format(size, x)"
+        autopath:
+          automap: sim
+        searchdir: [LAY, SCH, PNR, DV, ESD , CAE, IA]
+
+      - name: "CIS"
+        exportpolicy:
+          - name: "default_rw_test"
+        xcp_option:
+          match : "type == f and modified > 60*day and (fnm('*.fsdb') or fnm('*.trn') or fnm('*.dsn') or fnm('*.vcd') or fnm('*.wdf') or fnm('*.tr[0-9]') or fnm('*.tr[0-9][0-9]') or fnm('*.tr[0-9][0-9][0-9]'))"
+          fmt: "'{} {}'.format(size, x)"
+        autopath:
+          automap: sim
+        searchdir: [ANALOG, DIGITAL, BACKEND, ESD , CAE, FE, BE, LAYPXL]
+
+      - name: "SOC"
+        exportpolicy:
+          - name: "default_rw_test"
+        xcp_option:
+          match : "type == f and modified > 30*day and (fnm('*.fsdb') or fnm('*.trn') or fnm('*.dsn') or fnm('*.vcd') or fnm('*.wdf') or fnm('*.tr[0-9]') or fnm('*.tr[0-9][0-9]') or fnm('*.tr[0-9][0-9][0-9]'))"
+          fmt: "'{} {}'.format(size, x)"
+        autopath:
+          automap: library
+        searchdir: [ANALOG, DIGITAL, BACKEND, ESD , CAE, IMPLE]
+
+    exclude:
+      - vol_name: "test"
+scripts_dir: '/opt/awx/projects'
+email_to: email@
+email_from: "cad_netapp@chopincad.com"
+smtp_server: ""
+smtp_port: 25
+smtp_username: ""
+smtp_password: ""

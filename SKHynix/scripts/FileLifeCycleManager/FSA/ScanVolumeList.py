@@ -201,7 +201,7 @@ def get_scan_objects(data,config):
                                 'mount_path': f"{svm_name}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option':div['xcp_option'],
+                                'fsa_option':div['fsa_option'],
                                 'autopath': div['autopath'],
                                 'searchdir': search_dirs_str
                                 }
@@ -215,7 +215,7 @@ def get_scan_objects(data,config):
                                 'mount_path': f"{svm_name}.nkic.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option':div['xcp_option'],
+                                'fsa_option':div['fsa_option'],
                                 'autopath': div['autopath'],
                                 'searchdir': search_dirs_str
                                 }
@@ -229,7 +229,7 @@ def get_scan_objects(data,config):
                                 'mount_path': f"{cluster_name}.{domain}:{path}",
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
-                                'xcp_option': div['xcp_option'],
+                                'fsa_option': div['fsa_option'],
                                 'autopath': div['autopath'],
                                 'searchdir': search_dirs_str
                                 }
