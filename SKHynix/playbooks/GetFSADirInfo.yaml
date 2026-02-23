@@ -84,7 +84,7 @@
         user: "{{ volume.cluster.ID }}"
         password: "{{ volume.cluster.PW }}"
         validate_certs: false
-      loop: "{{ volume_list.stdout | subelements('fsa_option.path') }}"
+      loop: "{{ volume_list.stdout | from_json | subelements('fsa_option.path') }}"
       loop_control:
         loop_var: pair
       vars:
