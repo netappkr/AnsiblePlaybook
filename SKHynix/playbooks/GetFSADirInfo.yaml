@@ -79,6 +79,10 @@
       command: "python3 {{ files_matched.files[0].path }} -r get_fsa_data --file {{ fsa_vol_list.dest }}"
       register: fsa_data
 
+    - name: Display FSA data
+      debug:
+        msg: "{{ fsa_data.stdout }}"
+
     - name: Search for 'project' in all directories
       find:
         paths: "{{ scripts_dir }}"
@@ -90,7 +94,6 @@
     - name: Print the matched files
       debug:
         msg: "{{ files_matched.files[0].path }}"
-
 
     - name: write result.yaml using jinia2
       template:
