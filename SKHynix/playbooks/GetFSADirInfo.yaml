@@ -71,17 +71,16 @@
 
     - name: Call FSA per volume per directory
       uri:
-        url: >
-          https://{{ volume.cluster.ip }}/api/storage/volumes/{{ volume.vol_uuid }}/files/{{ directory.dir | urlencode }}
-          ?type={{ volume.fsa_option.type }}
-          &modified_time={{ volume.fsa_option.modified_time }}
-          &name={{ directory.file | urlencode }}
-          &return_records=true
-          &return_timeout=15
+        url: "https://{{ volume.cluster.ip }}/api/storage/volumes/{{ volume.vol_uuid }}/files{{ directory.dir }}"
         method: GET
         user: "{{ volume.cluster.ID }}"
         password: "{{ volume.cluster.PW }}"
         validate_certs: false
+        params:
+          type: "{{ volume.fsa_option.type }}"
+          modified_time: "{{ volume.fsa_option.modified_time }}"
+          name: "{{ directory.file }}"
+          return_records: true
       loop: "{{ volume_list.stdout | from_json | subelements('fsa_option.path') }}"
       loop_control:
         loop_var: pair
