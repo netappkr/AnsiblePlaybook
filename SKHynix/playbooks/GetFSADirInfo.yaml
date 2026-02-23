@@ -68,7 +68,9 @@
       loop: "{{ DLC.config.division }}"
       loop_control:
         loop_var: division
-
+    - debug:
+        msg: "{{ volume_list.stdout | type_debug }}"
+        
     - name: Call FSA per volume per directory
       uri:
         url: >
