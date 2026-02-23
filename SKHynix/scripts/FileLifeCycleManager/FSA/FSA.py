@@ -262,19 +262,31 @@ def get_scan_objects(data,config):
     return scan_objects
 
 
+from collections import defaultdict
+
 def call_fsa_api(scan_objects):
-    results = []
+
     session = requests.Session()
     session.verify = False
     session.headers.update({"Accept": "application/json"})
+
+    all_files = []
+    summary = {
+        "division": defaultdict(lambda: {"used": 0, "count": 0}),
+        "volume": defaultdict(lambda: {"used": 0, "count": 0}),
+        "directory": defaultdict(lambda: {"used": 0, "count": 0})
+    }
+
+    scan_status = []
 
     for obj in scan_objects:
         cluster = obj["cluster"]
         volume_uuid = obj["vol_uuid"]
         fsa_option = obj["fsa_option"]
+        div = obj["div"]
+        volume_name = obj["volume"]
 
         base_url = f"https://{cluster['ip']}/api/storage/volumes/{volume_uuid}/files"
-
         auth = (cluster["ID"], cluster["PW"])
 
         for path_item in fsa_option.get("path", []):
@@ -288,29 +300,45 @@ def call_fsa_api(scan_objects):
                 "type": fsa_option.get("type", "file"),
                 "modified_time": fsa_option.get("modified_time"),
                 "name": file_filter,
+                "fields": "size,name,path,modified_time",
                 "return_records": "true",
                 "return_timeout": 30
             }
 
             try:
                 while url:
-                    response = session.get(url, auth=auth, params=params,verify=False)
+                    response = session.get(url, auth=auth, params=params)
                     response.raise_for_status()
                     data = response.json()
 
                     records = data.get("records", [])
 
                     for r in records:
-                        results.append({
+                        size = r.get("size", 0)
+
+                        # 파일 개별 기록
+                        all_files.append({
                             "cluster": cluster["name"],
-                            "volume": obj["volume"],
+                            "division": div,
+                            "volume": volume_name,
                             "dir": directory,
                             "file": r.get("name"),
-                            "path": r.get("path"),
+                            "size": size,
                             "modified_time": r.get("modified_time")
                         })
 
-                    # pagination 처리
+                        # 디렉토리 집계
+                        summary["directory"][(div, volume_name, directory)]["used"] += size
+                        summary["directory"][(div, volume_name, directory)]["count"] += 1
+
+                        # 볼륨 집계
+                        summary["volume"][(div, volume_name)]["used"] += size
+                        summary["volume"][(div, volume_name)]["count"] += 1
+
+                        # 사업부 집계
+                        summary["division"][div]["used"] += size
+                        summary["division"][div]["count"] += 1
+
                     next_link = data.get("_links", {}).get("next", {}).get("href")
                     if next_link:
                         url = f"https://{cluster['ip']}{next_link}"
@@ -318,11 +346,25 @@ def call_fsa_api(scan_objects):
                     else:
                         url = None
 
-            except Exception as e:
-                logger.error(f"FSA call error: {cluster['name']} {obj['volume']} {directory}")
+                scan_status.append({
+                    "volume": volume_name,
+                    "directory": directory,
+                    "status": "SUCCESS"
+                })
+
+            except Exception:
+                scan_status.append({
+                    "volume": volume_name,
+                    "directory": directory,
+                    "status": "FAILED"
+                })
                 logger.error(traceback.format_exc())
 
-    return results
+    return {
+        "files": all_files,
+        "summary": summary,
+        "scan_status": scan_status
+    }
 
 
 def main():
