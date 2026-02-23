@@ -54,12 +54,23 @@ def read_json(filelist):
             data[json_file] = json.load(file)
     return data
 
-def read_yaml(filelist):
-    data={}
-    for yaml_file in filelist:
-        with open(yaml_file, 'r') as file:
-            data[yaml_file] = yaml.load(file)
-    return data
+def read_yaml_file(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            data = yaml.safe_load(f)
+
+        if isinstance(data, dict):
+            data = [data]
+
+        if not isinstance(data, list):
+            raise ValueError("YAML structure must be list or dict")
+
+        return data
+
+    except Exception:
+        logger.error(traceback.format_exc())
+        print("Error reading YAML:", traceback.format_exc(), file=sys.stderr)
+        return None
 
 
 def check_yaml_integrity(file_path):
@@ -327,10 +338,15 @@ def main():
             logger.info("print success")
 
         elif args.request == "get_fsa_data":
-            data = read_yaml(args.file)
-            fsa_results = call_fsa_api(data)
+            scan_objects = read_yaml_file(args.file[0])
+
+            if not scan_objects:
+                return
+
+            fsa_results = call_fsa_api(scan_objects)
             print(json.dumps(fsa_results))
             logger.info("print success")
+            
         else:
             logger.error(args.request+" request is not matched")
             print(args.request+" request is not matched")
