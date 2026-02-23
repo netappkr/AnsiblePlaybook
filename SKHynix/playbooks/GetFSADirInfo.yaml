@@ -72,16 +72,17 @@
     - name: Call ONTAP REST API for FSA
       uri:
         url: >
-          https://{{ volume.cluster.ip }}/api/storage/volumes/{{ volume.vol_uuid }}/files?return_metadata=true"
+          https://{{ volume.0.cluster.ip }}/api/storage/volumes/{{ volume.0.vol_uuid }}/files?return_metadata=true"
           ?type=file
-          &modified_time<=2025-12-01T00:00:00Z
+          &modified_time{{volume.1.modified_time}}
+          $name={{volume.1.file}}
           &return_metadata=false
         method: GET
-        user: "{{ volume.cluster.ID }}"
-        password: "{{ volume.cluster.PW }}"
+        user: "{{ volume.0.cluster.ID }}"
+        password: "{{ volume.0.cluster.PW }}"
         validate_certs: false
         force_basic_auth: yes
-      loop: "{{ volume_list.stdout }}"
+      loop: "{{ volume_list.stdout | subelements('fsa_option.path') }}"
       loop_control:
         loop_var: volume
         pause: 10

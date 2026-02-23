@@ -21,19 +21,19 @@ DLC:
           modified_time : ">60d"
           path: 
             - dir: LAY
-              path: ["*.fsdb", "*.txt"]
+              file: ["*.fsdb", "*.txt"]
             - dir: SCH
-              path: ["*.fsdb", "*.txt"]
+              file: ["*.fsdb", "*.txt"]
             - dir: ESD
-              path: ["*.fsdb", "*.txt"]
+              file: ["*.fsdb", "*.txt"]
             - dir: CAE
-              path: ["*.fsdb", "*.txt"]
+              file: ["*.fsdb", "*.txt"]
             - dir: LDR
-              path: ["*.fsdb", "*.txt"]
+              file: ["*.fsdb", "*.txt"]
             - dir: CORE
-              path: ["*.fsdb", "*.txt"]
+              file: ["*.fsdb", "*.txt"]
             - dir: DV
-              path: ["*.fsdb", "*.txt"]
+              file: ["*.fsdb", "*.txt"]
           fmt: "'{} {}'.format(size, x)"
         autopath:
           automap: sim
@@ -44,6 +44,24 @@ DLC:
         xcp_option:
           match : "type == f and modified > 60*day and (fnm('*.fsdb') or fnm('*.db') or fnm('*.wdf') or fnm('*.wlf') or fnm('*.tr[0-9]') or fnm('*.tr[0-9][0-9]') or fnm('*.tr[0-9][0-9][0-9]'))"
           fmt: "'{} {}'.format(size, x)"
+        fsa_option:
+          type: file
+          modified_time : ">60d"
+          path: 
+            - dir: LAY
+              file: ["*.fsdb", "*.db",]
+            - dir: SCH
+              file: ["*.fsdb", "*.txt"]
+            - dir: PNR
+              file: ["*.fsdb", "*.txt"]
+            - dir: DV
+              file: ["*.fsdb", "*.txt"]
+            - dir: ESD
+              file: ["*.fsdb", "*.txt"]
+            - dir: CAE
+              file: ["*.fsdb", "*.txt"]
+            - dir: IA
+              file: ["*.fsdb", "*.txt"]
         autopath:
           automap: sim
         searchdir: [LAY, SCH, PNR, DV, ESD , CAE, IA]
