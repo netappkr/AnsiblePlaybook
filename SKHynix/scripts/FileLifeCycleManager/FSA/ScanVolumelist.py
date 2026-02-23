@@ -4,7 +4,6 @@ warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import argparse
 import json
 import logging
-import pandas
 import traceback
 import yaml
 import re
