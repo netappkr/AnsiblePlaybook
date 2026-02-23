@@ -195,6 +195,7 @@ def get_scan_objects(data,config):
                     if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
                         if datacenter == "test":
                             scan_objects.append({
+                                'cluster': cluster['cluster'],
                                 'volume' : name,
                                 "vol_uuid": vol_uuid,
                                 'mount_path': f"{svm_name}.{domain}:{path}",
@@ -208,6 +209,7 @@ def get_scan_objects(data,config):
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
                         elif datacenter == "nkic":
                             scan_objects.append({
+                                'cluster': cluster['cluster'],
                                 'volume' : name,
                                 "vol_uuid": vol_uuid,
                                 'mount_path': f"{svm_name}.nkic.{domain}:{path}",
@@ -221,6 +223,7 @@ def get_scan_objects(data,config):
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
                         else:
                             scan_objects.append({
+                                'cluster': cluster['cluster'],
                                 'volume' : name,
                                 "vol_uuid": vol_uuid,
                                 'mount_path': f"{cluster_name}.{domain}:{path}",

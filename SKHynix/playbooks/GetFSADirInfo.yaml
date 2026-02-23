@@ -71,13 +71,17 @@
 
     - name: Call ONTAP REST API for FSA
       uri:
-        url: "https://{{ cluster.ip }}/api/storage/volumes/{{ volume_uuid }}/files?return_metadata=true"
+        url: "https://{{ cluster.ip }}/api/storage/volumes/{{ vol_uuid }}/files?return_metadata=true"
         method: GET
-        user: "{{ ontap_user }}"
-        password: "{{ ontap_pass }}"
+        user: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
         validate_certs: false
         force_basic_auth: yes
-      register: fsa_result
+      loop: "{{ volume_list.stdout }}"
+      loop_control:
+        loop_var: volumes
+        pause: 10
+      register: scan_list
 
     - name: Search for 'project' in all directories
       find:
