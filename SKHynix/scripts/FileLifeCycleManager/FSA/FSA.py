@@ -390,7 +390,14 @@ def main():
                 return
 
             fsa_results = call_fsa_api(scan_objects)
-            print(json.dumps(fsa_results))
+            print(
+                yaml.safe_dump(
+                    fsa_results,
+                    sort_keys=False,
+                    allow_unicode=True,
+                    default_flow_style=False
+                )
+            )
             logger.info("print success")
 
         else:
