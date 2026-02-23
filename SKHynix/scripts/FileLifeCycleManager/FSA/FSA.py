@@ -326,18 +326,22 @@ def call_fsa_api(scan_objects):
                             "size": size,
                             "modified_time": r.get("modified_time")
                         })
-
-                        # 디렉토리 집계
-                        summary["directory"][(div, volume_name, directory)]["used"] += size
-                        summary["directory"][(div, volume_name, directory)]["count"] += 1
-
-                        # 볼륨 집계
-                        summary["volume"][(div, volume_name)]["used"] += size
-                        summary["volume"][(div, volume_name)]["count"] += 1
-
-                        # 사업부 집계
+                        summary = {
+                            "division": defaultdict(lambda: {"used": 0, "count": 0}),
+                            "volume": defaultdict(lambda: defaultdict(lambda: {"used": 0, "count": 0})),
+                            "directory": defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {"used": 0, "count": 0})))
+                        }
+                        # division
                         summary["division"][div]["used"] += size
                         summary["division"][div]["count"] += 1
+
+                        # volume
+                        summary["volume"][div][volume_name]["used"] += size
+                        summary["volume"][div][volume_name]["count"] += 1
+
+                        # directory
+                        summary["directory"][div][volume_name][directory]["used"] += size
+                        summary["directory"][div][volume_name][directory]["count"] += 1
 
                     next_link = data.get("_links", {}).get("next", {}).get("href")
                     if next_link:
