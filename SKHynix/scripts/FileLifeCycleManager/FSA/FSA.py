@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import warnings
 import requests
-import urllib.parse
-warnings.simplefilter(action='ignore', category=DeprecationWarning)
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import argparse
 import json
 import logging
@@ -262,7 +262,7 @@ def get_scan_objects(data,config):
     return scan_objects
 
 
-def call_fsa_api(scan_objects):
+def call_fsa_api(scan_objects)
     results = []
     session = requests.Session()
     session.verify = False
@@ -294,7 +294,7 @@ def call_fsa_api(scan_objects):
 
             try:
                 while url:
-                    response = session.get(url, auth=auth, params=params)
+                    response = session.get(url, auth=auth, params=params,verify=False)
                     response.raise_for_status()
                     data = response.json()
 
@@ -346,7 +346,7 @@ def main():
             fsa_results = call_fsa_api(scan_objects)
             print(json.dumps(fsa_results))
             logger.info("print success")
-            
+
         else:
             logger.error(args.request+" request is not matched")
             print(args.request+" request is not matched")
