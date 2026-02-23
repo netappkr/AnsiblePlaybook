@@ -41,7 +41,7 @@
     - name: Search for 'script' in all directories
       find:
         paths: "{{ scripts_dir }}"
-        patterns: "ScanVolumeList.py"
+        patterns: "FSA.py"
         recurse: yes
         file_type: file
       register: files_matched
@@ -76,7 +76,7 @@
         loop_var: division
 
     - name: Get FSA data
-      command: "python3 script.py -r get_fsa_data --file {{ fsa_vol_list.dest }}"
+      command: "python3 {{ files_matched.files[0].path }} -r get_fsa_data --file {{ fsa_vol_list.dest }}"
       register: fsa_data
 
     - name: Search for 'project' in all directories
