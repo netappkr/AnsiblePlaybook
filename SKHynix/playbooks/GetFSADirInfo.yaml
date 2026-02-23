@@ -41,7 +41,7 @@
     - name: Search for 'script' in all directories
       find:
         paths: "{{ scripts_dir }}"
-        patterns: "DLC.py"
+        patterns: "ScanVolumeList.py"
         recurse: yes
         file_type: file
       register: files_matched
