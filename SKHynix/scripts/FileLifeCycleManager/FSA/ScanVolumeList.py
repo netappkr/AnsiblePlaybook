@@ -261,7 +261,7 @@ def main():
             data = read_json(args.file)
             config = check_yaml_integrity(args.config)
             if config:
-                print(get_scan_objects(data[args.file[0]],config))
+                print(json.dumps(get_scan_objects(data[args.file[0]],config)))
             logger.info("print success")
 
         else:
