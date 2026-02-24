@@ -12,7 +12,7 @@ import re
 import os
 import sys
 parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
-parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename1 filename2", required=False)
+parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename", required=False)
 parser.add_argument("-r", "--request", type=str, help="request type",required=False)
 parser.add_argument("--config", type=str, help="config.yaml",required=False)
 args= parser.parse_args()
@@ -388,6 +388,42 @@ def call_fsa_api(scan_objects):
         "scan_status": scan_status
     }
 
+def build_mail_report(report_data):
+
+    summary = report_data.get("summary", {})
+    scan_status = report_data.get("scan_status", [])
+
+    html = """
+    <html>
+    <body>
+    <h2>FSA Scan Summary Report</h2>
+    """
+
+    # ===== Division Summary =====
+    html += "<h3>Division Summary</h3>"
+    html += "<table border='1' cellpadding='5' cellspacing='0'>"
+    html += "<tr><th>Division</th><th>Total Used (MB)</th><th>File Count</th></tr>"
+
+    for div, data in summary.get("division", {}).items():
+        used_mb = data["used"] / (1024 * 1024)
+        html += f"<tr><td>{div}</td><td>{used_mb:.2f}</td><td>{data['count']}</td></tr>"
+
+    html += "</table><br>"
+
+    # ===== Scan Status =====
+    html += "<h3>Scan Status</h3>"
+    html += "<table border='1' cellpadding='5' cellspacing='0'>"
+    html += "<tr><th>Volume</th><th>Directory</th><th>Status</th></tr>"
+
+    for item in scan_status:
+        color = "green" if item["status"] == "SUCCESS" else "red"
+        html += f"<tr><td>{item['volume']}</td><td>{item['directory']}</td><td style='color:{color}'>{item['status']}</td></tr>"
+
+    html += "</table>"
+
+    html += "</body></html>"
+
+    return html
 
 def main():
     # cURL command's target URL
@@ -417,6 +453,10 @@ def main():
                 )
             )
             logger.info("print success")
+        elif args.request == "build_mail":
+            report = read_yaml_file(args.file[0])
+            html = build_mail_report(report)
+            print(f"Mail HTML saved to {path}")
 
         else:
             logger.error(args.request+" request is not matched")

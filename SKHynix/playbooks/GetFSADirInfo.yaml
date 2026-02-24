@@ -83,22 +83,25 @@
       debug:
         msg: "{{ fsa_data.stdout }}"
 
-    - name: Search for 'project' in all directories
-      find:
-        paths: "{{ scripts_dir }}"
-        patterns: "DLCXcpscan.j2"
-        recurse: yes
-        file_type: file
-      register: files_matched
+    - name: email format
+      command: "python3 {{ files_matched.files[0].path }} -r build_mail --file {{ fsa_vol_list.dest }}"
+      register: html
 
-    - name: Print the matched files
-      debug:
-        msg: "{{ files_matched.files[0].path }}"
-
-    - name: write result.yaml using jinia2
-      template:
-        src: DLCXcpscan.j2
-        dest: /tmp/scan_list_file_results.yaml
+    - name: Send inode usage report via email
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        subject: "fsa summary - {{ now(utc=false,fmt='%Y.%m.%d') }}"
+        body: "{{ html.stdout }}"
+        from: "{{ email_from }}"
+        secure: starttls
+        subtype: html
+        headers: 
+        - Content-Type="text/html"
+      when: html.stdout is defined
 
       
     # - name: Format scan results
