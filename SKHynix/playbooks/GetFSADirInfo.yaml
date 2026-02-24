@@ -86,7 +86,7 @@
     - name: Save volume_list stdout as pretty YAML
       copy:
         dest: /tmp/fsa_data.yaml
-        content: "{{ fsa_data.stdout | to_nice_yaml }}"
+        content: "{{ fsa_data.stdout}}"
       register: fsa_data_file
 
     - name: email format
