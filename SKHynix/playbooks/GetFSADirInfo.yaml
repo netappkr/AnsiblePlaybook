@@ -83,8 +83,14 @@
       debug:
         msg: "{{ fsa_data.stdout }}"
 
+    - name: Save volume_list stdout as pretty YAML
+      copy:
+        dest: /tmp/fsa_volume_list.yaml
+        content: "{{ fsa_data.stdout | to_nice_yaml }}"
+      register: fsa_data_file
+
     - name: email format
-      command: "python3 {{ files_matched.files[0].path }} -r build_mail --file {{ fsa_vol_list.dest }}"
+      command: "python3 {{ files_matched.files[0].path }} -r build_mail --file {{ fsa_data_file.dest }}"
       register: html
 
     - name: Send inode usage report via email
