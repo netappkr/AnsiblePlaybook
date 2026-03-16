@@ -6,25 +6,18 @@
     - netapp.ontap
   tasks:
     - name: Get rest data information
-      na_ontap_rest_info:
+      na_ontap_rest_cli:
         hostname: "{{ cluster.ip }}"
         username: "{{ cluster.ID }}"
         password: "{{ cluster.PW }}"
         https: true
         validate_certs: false
-        gather_subset:
-          - volume_info
-        fields:
-          - 'svm.name'
-          - 'nas'
-          - 'name'
-          - 'comment'
-          - 'analytics'
-          - 'uuid'
-        parameters:
+        command: "volume show"
+        params:
           type: rw
-          space.logical.used_percent: ">=80"
-          space.logical_reporting: "true"
+          total: ">=99TB"
+          logical-used-percent: ">=80"
+          is-space-reporting-logical: true
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
