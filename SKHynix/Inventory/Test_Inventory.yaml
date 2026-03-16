@@ -125,7 +125,7 @@ all:
           division:
             - name: "DRAM"
               fsa_option:
-                type: file
+                type: directory
                 path: 
                   - dir: wooyoung
                   - dir: jeehyun
