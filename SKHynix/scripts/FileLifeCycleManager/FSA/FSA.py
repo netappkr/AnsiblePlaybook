@@ -153,7 +153,7 @@ def get_scan_objects(data,config):
     # Extract configuration details
     domain = config['config']['domain']
     division = config['config']['division']
-    exclude = config['config']['exclude']
+    exclude = config['config']['exclude'] if "exclude" in config else None
     for cluster in data:
         try:
             datacenter = cluster["cluster"]["datacenter"]
@@ -175,13 +175,14 @@ def get_scan_objects(data,config):
                 if not analytics:
                     logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 analytics_state key가 비어 있습니다.")
                 # Check if the volume should be excluded
-                if any(ex['vol_name'] == name for ex in exclude):
-                    logger.info(f"matched exclude vol name policy , {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
-                    continue
-                elif path == "":
+                if exclude in config:
+                    if any(ex['vol_name'] == name for ex in exclude):
+                        logger.info(f"matched exclude vol name policy , {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                        continue
+                if path == "":
                     logger.info(f"path: {path}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
-                elif analytics != "on":            
+                if analytics != "on":            
                     logger.info(f"analytics: {analytics}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 # Check if volume matches any division criteria
@@ -202,7 +203,6 @@ def get_scan_objects(data,config):
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
                                 'fsa_option':div['fsa_option'],
-                                'autopath': div['autopath'],
                                 'searchdir': search_dirs_str
                                 }
                             )
@@ -216,7 +216,6 @@ def get_scan_objects(data,config):
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
                                 'fsa_option':div['fsa_option'],
-                                'autopath': div['autopath'],
                                 'searchdir': search_dirs_str
                                 }
                             )
@@ -230,7 +229,6 @@ def get_scan_objects(data,config):
                                 'div' : f"{div['name']}",
                                 'export_policy': f"{export_policy}",
                                 'fsa_option': div['fsa_option'],
-                                'autopath': div['autopath'],
                                 'searchdir': search_dirs_str
                                 }
                             )
