@@ -76,15 +76,12 @@ def read_yaml_file(file_path):
 def check_yaml_integrity(file_path):
     required_structure = {
         'cli': {
-            'LogicalUsedPercent:': str,
             'policy:': str,
-            'total:': str,
             'division': [
                 {
                     'name': str
                 }
-            ],
-            'exclude': [{'vol_name': str}]
+            ]
         }
     }
     # YAML 파일 로드
