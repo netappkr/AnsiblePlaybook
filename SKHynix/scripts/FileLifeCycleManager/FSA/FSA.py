@@ -75,13 +75,13 @@ def read_yaml_file(file_path):
 
 def check_yaml_integrity(file_path):
     required_structure = {
-        'config': {
-            'domain': str,
-            'check_comment': str,
+        'cli': {
+            'LogicalUsedPercent:': str,
+            'policy:': str,
+            'total:': str,
             'division': [
                 {
-                    'name': str,
-                    'exportpolicy': [{'name': str}]
+                    'name': str
                 }
             ],
             'exclude': [{'vol_name': str}]
@@ -154,28 +154,26 @@ def get_scan_objects(data,config):
     domain = config['config']['domain']
     division = config['config']['division']
     exclude = config['config']['exclude']
-    check_comment = config['config']['check_comment']
     for cluster in data:
         try:
             datacenter = cluster["cluster"]["datacenter"]
-            for volume in cluster["ontap_info"]["storage/volumes"]["records"]:
-                svm_name = volume["svm"]["name"] if "name" in volume["svm"] else ""
-                export_policy = volume["nas"]["export_policy"]["name"] if "export_policy" in volume["nas"] and "name" in volume["nas"]["export_policy"] else ""
-                path = volume["nas"]["path"] if "path" in volume["nas"] else ""
-                comment = volume["comment"] if "comment" in volume else ""
+            for volume in cluster["msg"]["records"]:
+                svm_name = volume["vserver"] if "vserver" in volume else ""
+                export_policy = volume["policy"]if "policy" in volume else ""
+                path = volume["junction_path"] if "junction_path" in volume else ""
                 name = volume["name"]
                 cluster_name = cluster['cluster']['name']
                 vol_uuid = volume["uuid"]
-                analytics = volume["analytics"]["state"] if "analytics" in volume else ""
+                analytics = volume["analytics_state"] if "analytics_state" in volume else ""
 
                 if not svm_name:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 svm.name key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 vserver key가 비어 있습니다.")
                 if not export_policy:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 nas.export_policy.name key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 policy key가 비어 있습니다.")
                 if not path:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 nas.path key가 비어 있습니다.")
-                if not path:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 nas.path key가 비어 있습니다.")
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 junction_path key가 비어 있습니다.")
+                if not analytics:
+                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 analytics_state key가 비어 있습니다.")
                 # Check if the volume should be excluded
                 if any(ex['vol_name'] == name for ex in exclude):
                     logger.info(f"matched exclude vol name policy , {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
@@ -183,29 +181,18 @@ def get_scan_objects(data,config):
                 elif path == "":
                     logger.info(f"path: {path}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
-                elif comment != check_comment:            
-                    logger.info(f"comment: {comment}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
-                    continue
                 elif analytics != "on":            
-                    logger.info(f"analytics: {comment}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                    logger.info(f"analytics: {analytics}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
                     continue
                 # Check if volume matches any division criteria
                 for div in division:
-                    if 'vol_name_regexp' in div: 
-                        vol_name_regexp = div['vol_name_regexp']
-                    else:
-                        vol_name_regexp = ".*"
-                    exportpolicy_names = [exp['name'] for exp in div['exportpolicy']]
-                    if not svm_name:
-                        logger.debug(f"{div['name']} 의 vol_name_regexp key가 비어 있습니다.")
-
                     if 'searchdir' in div:
                         search_dirs_str = ' '.join(div['searchdir'])
                     else:
                         search_dirs_str = None
 
                     # Check if volume name matches the regexp or export policy names
-                    if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
+                    if "fsa_option" in div:
                         if datacenter == "test":
                             scan_objects.append({
                                 'cluster': cluster['cluster'],
@@ -249,9 +236,8 @@ def get_scan_objects(data,config):
                             )
                             logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
                     else:
-                        logger.info(f"정규식 && exportpolicy 가 일치하지 않습니다., {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
-                        logger.debug(f"allow exportpolicy list: {exportpolicy_names}")
-                        logger.debug(f"정규식 && exportpolicy 가 일치하지 않습니다. datacenter : {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}, vol_name_regexp: {vol_name_regexp}, export_policy: {export_policy}")
+                        logger.info(f"fsa_option 이 비어있습니다., {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                        logger.debug(f"fsa_option 이 비어있습니다.. datacenter : {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}")
 
         except KeyError as e:
             # KeyError 발생시 처리 로직
