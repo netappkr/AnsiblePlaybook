@@ -15,13 +15,14 @@
         verb: GET
         command: "volume"
         params:
-          type: rw
-          total: ">=10GB"
-          logical-used-percent: ">=5"
+          type: "{{ config.cli.type }}"
+          total: "{{ config.cli.total }}"
+          logical-used-percent: "{{ config.cli.total }}"
           is-space-reporting-logical: true
-          is-flexgroup : false
+          is-flexgroup : true
           analytics-state: "on"
-          volume : "!*spot*,!effi* "
+          volume : "{{ config.cli.volumename }}"
+          policy: "{{ config.cli.policy }}"
           fields: vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,uuid
       register: ontap_volumes
       loop: "{{ clusters }}"
@@ -37,7 +38,7 @@
     - name: Write result data to a config file
       copy:
         dest: "/tmp/config.yaml"
-        content: "{{ DLC | to_nice_yaml }}"
+        content: "{{ config | to_nice_yaml }}"
       register: config
 
     - name: Search for 'script' in all directories

@@ -89,4 +89,55 @@ all:
         smtp_password: <<app_password>>
         ansible_user: root
         ansible_ssh_private_key_file: ~/.ssh/SeanP.pem
+---
+all:
+  children:
+    task_servers:
+      hosts:
+        task_server_1_flm:
+          ansible_host: <<task server ip>>
+      vars:
+        clusters:
+          - name: fsxn
+            ip: 0.0.0.0
+            description: "Netapp APAC AWS account"
+            ID: ID
+            PW: PW
+            datacenter: aws
+            tier: 1
+          - name: FAS8040
+            ip: 0.0.0.0
+            description: "NetappKR local"
+            ID: ID
+            PW: PW
+            tier: 2
+            datacenter: nkic
+          - name: AFF8080
+            ip: 0.0.0.0
+            description: "NetappKR local"
+            ID: ID
+            PW: PW
+            tier: 3
+            datacenter: nkic
+        config:
+          domain: "netappkr.com"
+          division:
+            - name: "DRAM"
+              fsa_option:
+                type: file
+                path: 
+                  - dir: LAY
+                  - dir: SCH
+                  - dir: ESD
+                  - dir: CAE
+                  - dir: LDR
+                  - dir: CORE
+                  - dir: DV
+          cli:                                   # 예외처리 할 볼륨이름입니다. 조건에 부합하더라도 예외에 이름이 있는경우 FLM 대상에 포함되지 않습니다.
+            - volumename: "!*spot*,!effi*"
+            - policy: "!*_ro,*_ro1,!*exportro*,!no_access"
+            - type: "rw"
+            - total: ">=10GB"
+            - logical-used-percent: ">=5"
 
+              
