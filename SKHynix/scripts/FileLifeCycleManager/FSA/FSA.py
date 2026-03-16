@@ -151,9 +151,9 @@ def check_yaml_integrity(file_path):
 def get_scan_objects(data,config):
     scan_objects =[]
     # Extract configuration details
-    domain = config['config']['domain']
-    division = config['config']['division']
-    exclude = config['config']['exclude'] if "exclude" in config else None
+    domain = config['domain']
+    division = config['division']
+    exclude = config['exclude'] if "exclude" in config else None
     for cluster in data:
         try:
             datacenter = cluster["cluster"]["datacenter"]
