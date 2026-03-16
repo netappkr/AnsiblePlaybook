@@ -75,14 +75,11 @@ def read_yaml_file(file_path):
 
 def check_yaml_integrity(file_path):
     required_structure = {
-        'cli': {
-            'policy:': str,
-            'division': [
-                {
-                    'name': str
-                }
-            ]
-        }
+        'division': [
+            {
+                'name': str
+            }
+        ]
     }
     # YAML 파일 로드
     try:
