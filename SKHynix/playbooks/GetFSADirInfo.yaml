@@ -17,13 +17,13 @@
         params:
           type: "{{ config.cli.type }}"
           total: "{{ config.cli.total }}"
-          logical-used-percent: "{{ config.cli.logical-used-percent }}"
+          logical-used-percent: "{{ config.cli.LogicalUsedPercent }}"
           is-space-reporting-logical: true
           is-flexgroup : true
           analytics-state: "on"
           volume : "{{ config.cli.volumename }}"
           policy: "{{ config.cli.policy }}"
-          fields: vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,uuid
+          fields: "vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,uuid"
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
