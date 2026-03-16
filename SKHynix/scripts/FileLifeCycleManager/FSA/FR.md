@@ -48,10 +48,11 @@ vol show -type rw -total >=99TB -volume !*spot*, !fg_oss*, !effi* -logical-used-
 # 3. 최종 분석 대상 Volume List 생성
 
 위 조건을 통과한 볼륨들을 **최종 분석 대상 리스트로 생성**한다.
-예시
-    vol_project01
-    vol_project02
-    vol_project03
+
+#### 예시
+-    vol_project01
+-    vol_project02
+-    vol_project03
 
 이 리스트를 기반으로 디렉토리 용량 분석을 진행한다.
 
@@ -83,11 +84,10 @@ xcp scan -fork -duk
 
 하지만 볼륨마다 **디렉토리 depth가 다를 수 있다.**
 
-예시
-
-    vol1/SCH/USER
-    vol2/PROJECT/SCH/USER
-    vol3/data/project/SCH/USER
+#### 예시
+-    vol1/SCH/USER
+-    vol2/PROJECT/SCH/USER
+-    vol3/data/project/SCH/USER
 
 따라서 **볼륨별 분석 depth를 별도 관리할 필요가 있다.**
 
@@ -96,7 +96,7 @@ xcp scan -fork -duk
 # 7. 디렉토리 사용량 정렬
 수집된 디렉토리 정보를 **용량 기준으로 내림차순 정렬**한다.
 
-예시
+#### 예시
 |  Directory   |Size|
 |  ----------- |--------|
 |  userA       | 8 TB |
@@ -109,10 +109,10 @@ xcp scan -fork -duk
 # 8. 작은 디렉토리 제외
 분석 결과 중 **용량이 거의 없는 디렉토리는 제외**한다.
 
-예시
-    1GB 이하 제외
+#### 예시
+-    1GB 이하 제외
 
-목적
+#### 목적
 -   의미 없는 데이터 제거
 -   실제 용량을 많이 사용하는 사용자만 추출
 
@@ -121,19 +121,16 @@ xcp scan -fork -duk
 # 9. 디렉토리 Owner 확인
 각 디렉토리의 소유자를 확인한다.
 
-예시
+#### 예시
 
 ``` bash
 ls -ld directory
 ```
 
-출력 예
-
+#### 출력 예
+```
     drwx------ userA
-
-owner
-
-    userA
+```
 
 ------------------------------------------------------------------------
 
@@ -152,7 +149,7 @@ owner
 
 수집된 데이터를 표 형태로 정리한다.
 
-예시
+#### 예시
 
 |  Directory   |Size   |Owner   |Email |
 |  ----------- |------ |------- |-------------------|
@@ -165,8 +162,7 @@ owner
 
 정리된 결과를 기반으로 **담당자 및 사용자에게 이메일을 발송**한다.
 
-메일 내용 예시
-
+#### 메일 내용 예시
 -   디렉토리 사용량
 -   사용자 정보
 -   정리 요청 안내
@@ -175,31 +171,31 @@ owner
 
 # 전체 Workflow 요약
 
-    1. 대형 볼륨 조회
-       (99TB 이상 + 사용률 80%)
+1. 대형 볼륨 조회
+    (99TB 이상 + 사용률 80%)
 
-    2. 정책 기준 제외
-       (ro / no_access)
+2. 정책 기준 제외
+    (ro / no_access)
 
-    3. 최종 볼륨 리스트 생성
+3. 최종 볼륨 리스트 생성
 
-    4. 볼륨별 디렉토리 사용량 분석
-       - FSA → REST API
-       - non FSA → xcp scan
+4. 볼륨별 디렉토리 사용량 분석
+    - FSA → REST API
+    - non FSA → xcp scan
 
-    5. 특정 depth 디렉토리 분석
+5. 특정 depth 디렉토리 분석
 
-    6. 용량 기준 정렬
+6. 용량 기준 정렬
 
-    7. 작은 디렉토리 제외
+7. 작은 디렉토리 제외
 
-    8. 디렉토리 owner 확인
+8. 디렉토리 owner 확인
 
-    9. owner → email 매핑
+9. owner → email 매핑
 
-    10. 표 생성
+10. 표 생성
 
-    11. 이메일 발송
+11. 이메일 발송
 
 ------------------------------------------------------------------------
 
