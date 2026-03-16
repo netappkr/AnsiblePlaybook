@@ -21,7 +21,7 @@
           is-space-reporting-logical: true
           is-flexgroup : false
           analytics-state: "on"
-          fields: vserver,volume,policy
+          fields: vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,uuid
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
