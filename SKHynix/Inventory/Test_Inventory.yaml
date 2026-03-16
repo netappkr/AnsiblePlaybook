@@ -127,13 +127,8 @@ all:
               fsa_option:
                 type: file
                 path: 
-                  - dir: LAY
-                  - dir: SCH
-                  - dir: ESD
-                  - dir: CAE
-                  - dir: LDR
-                  - dir: CORE
-                  - dir: DV
+                  - dir: wooyoung
+                  - dir: jeehyun
           cli:                                   # 예외처리 할 볼륨이름입니다. 조건에 부합하더라도 예외에 이름이 있는경우 FLM 대상에 포함되지 않습니다.
             - volumename: "!*spot*,!effi*"
             - policy: "!*_ro,*_ro1,!*exportro*,!no_access"
