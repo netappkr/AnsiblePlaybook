@@ -17,7 +17,7 @@
         params:
           type: "{{ config.cli.type }}"
           total: "{{ config.cli.total }}"
-          logical-used-percent: "{{ config.cli.total }}"
+          logical-used-percent: "{{ config.cli.logical-used-percent }}"
           is-space-reporting-logical: true
           is-flexgroup : true
           analytics-state: "on"
