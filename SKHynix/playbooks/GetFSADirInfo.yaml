@@ -12,7 +12,8 @@
         password: "{{ cluster.PW }}"
         https: true
         validate_certs: false
-        command: "volume show"
+        verb: GET
+        command: "volume"
         params:
           type: rw
           total: ">=99TB"
