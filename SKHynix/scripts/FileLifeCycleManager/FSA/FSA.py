@@ -263,21 +263,21 @@ def call_fsa_api(scan_objects):
         fsa_option = obj["fsa_option"]
         div = obj["div"]
         volume_name = obj["volume"]
+        type = obj["type"]
 
         base_url = f"https://{cluster['ip']}/api/storage/volumes/{volume_uuid}/files"
         auth = (cluster["ID"], cluster["PW"])
 
         for path_item in fsa_option.get("path", []):
-            directory = path_item["dir"]
-            file_filter = path_item["file"]
+            directory = path_item["dir"] if "dir" in path_item["dir"] else ""
+            file_filter = path_item["file"] if "file" in path_item["file"] else ""
 
             encoded_path = quote(directory, safe="")
             url = f"{base_url}/{encoded_path}"
 
             params = {
-                "type": fsa_option.get("type", "file"),
-                "modified_time": fsa_option.get("modified_time"),
-                "name": file_filter,
+                "type": fsa_option.get("type", type),
+                "size": ""
                 "fields": "size,name,path,modified_time",
                 "return_records": "true",
                 "return_timeout": 30
