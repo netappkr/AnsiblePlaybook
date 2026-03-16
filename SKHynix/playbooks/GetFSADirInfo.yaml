@@ -21,6 +21,10 @@
           - 'comment'
           - 'analytics'
           - 'uuid'
+        parameters:
+          type: rw
+          space.logical.used_percent: ">=80"
+          space.logical_reporting: "true"
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
