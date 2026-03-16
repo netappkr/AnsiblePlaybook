@@ -134,7 +134,7 @@ def check_yaml_integrity(file_path):
     result = validate_structure(config, required_structure)
     if result != True:
         # 정규식 표현 검증
-        for division in config['config']['division']:
+        for division in config['division']:
             if 'vol_name_regexp' in division:
                 vol_name_regexp = division['vol_name_regexp']
             else:
