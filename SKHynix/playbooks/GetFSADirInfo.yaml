@@ -23,7 +23,7 @@
           analytics-state: "on"
           volume : "{{ config.cli.volumename }}"
           policy: "{{ config.cli.policy }}"
-          fields: "vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,uuid"
+          fields: "vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,instance-uuid"
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
