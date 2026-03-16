@@ -264,6 +264,7 @@ def call_fsa_api(scan_objects):
         div = obj["div"]
         volume_name = obj["volume"]
         type = obj["type"]
+        analytics_bytes_used = obj["size"]
 
         base_url = f"https://{cluster['ip']}/api/storage/volumes/{volume_uuid}/files"
         auth = (cluster["ID"], cluster["PW"])
@@ -277,8 +278,8 @@ def call_fsa_api(scan_objects):
 
             params = {
                 "type": fsa_option.get("type", type),
-                "size": ""
-                "fields": "size,name,path,modified_time",
+                "analytics.bytes_used": analytics_bytes_used,
+                "fields": "size,name,path,modified_time,analytics.bytes_used",
                 "return_records": "true",
                 "return_timeout": 30
             }

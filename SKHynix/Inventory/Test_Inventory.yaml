@@ -125,6 +125,7 @@ all:
           division:
             - name: "DRAM"
               fsa_option:
+                sanalytics_bytes_used: ">1G"
                 type: directory
                 path: 
                   - dir: wooyoung
