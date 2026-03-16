@@ -16,9 +16,12 @@
         command: "volume"
         params:
           type: rw
-          total: ">=99TB"
-          logical-used-percent: ">=80"
+          total: ">=10GB"
+          logical-used-percent: ">=5"
           is-space-reporting-logical: true
+          is-flexgroup : false
+          analytics-state: "on"
+        fields: vserver,volume,policy,
       register: ontap_volumes
       loop: "{{ clusters }}"
       loop_control:
