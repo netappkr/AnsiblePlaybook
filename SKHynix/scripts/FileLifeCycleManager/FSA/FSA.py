@@ -155,7 +155,7 @@ def get_scan_objects(data,config):
                 svm_name = volume["vserver"] if "vserver" in volume else ""
                 export_policy = volume["policy"]if "policy" in volume else ""
                 path = volume["junction_path"] if "junction_path" in volume else ""
-                name = volume["name"]
+                name = volume["volume"]
                 cluster_name = cluster['cluster']['name']
                 vol_uuid = volume["uuid"]
                 analytics = volume["analytics_state"] if "analytics_state" in volume else ""
