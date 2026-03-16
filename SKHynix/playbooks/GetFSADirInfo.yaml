@@ -19,7 +19,7 @@
           total: "{{ config.cli.total }}"
           logical-used-percent: "{{ config.cli.LogicalUsedPercent }}"
           is-space-reporting-logical: true
-          is-flexgroup : true
+          is-flexgroup : false
           analytics-state: "on"
           volume : "{{ config.cli.volumename }}"
           policy: "{{ config.cli.policy }}"
