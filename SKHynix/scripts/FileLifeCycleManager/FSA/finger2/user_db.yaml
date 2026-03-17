@@ -1,0 +1,20 @@
+users:
+  "00000001":
+    empid: "0000005"
+    name: "아무개(TL)"
+    dept: "HBM DV"
+    position: "Part 장"
+    workstate: "C"
+    email: "aaaaa@sk.com"
+    home: "/home/tdesign/td0000005"
+    shell: "/sbin/nologin"
+
+  "00000002":
+    empid: "0000006"
+    name: "홍길동"
+    dept: "Cloud Team"
+    position: "Engineer"
+    workstate: "C"
+    email: "hong@sk.com"
+    home: "/home/hong"
+    shell: "/bin/bash"
