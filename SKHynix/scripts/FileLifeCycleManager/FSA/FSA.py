@@ -157,7 +157,7 @@ def get_scan_objects(data,config):
                 path = volume["junction_path"] if "junction_path" in volume else ""
                 name = volume["volume"]
                 cluster_name = cluster['cluster']['name']
-                vol_uuid = volume["uuid"]
+                vol_uuid = volume["instance_uuid"]
                 analytics = volume["analytics_state"] if "analytics_state" in volume else ""
 
                 if not svm_name:
