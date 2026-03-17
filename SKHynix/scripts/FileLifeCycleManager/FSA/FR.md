@@ -166,7 +166,7 @@ Name : 아무개(TL)
 Dept. : HBM DV
 Job position : Part 장
 Workstate : C
-E-mail : amoga@sk.com
+E-mail : aaaaa@sk.com
 Home : /home/tdesign/td0000005
 Shell : /sbin/nologin
 ```
