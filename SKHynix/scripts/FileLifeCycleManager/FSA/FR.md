@@ -79,8 +79,7 @@ xcp scan -fork -duk
 용량 분석 대상 디렉토리는 다음과 같은 구조를 가진다.
 
 #### 예시
-
-    volume/SCH/USER
+volume/SCH/USER
 
 하지만 볼륨마다 **디렉토리 depth가 다를 수 있다.**
 
@@ -133,18 +132,32 @@ xcp scan -fork -duk
 ------------------------------------------------------------------------
 
 # 9. 디렉토리 Owner 확인
-각 디렉토리의 소유자를 확인한다.
+fsa api 정보에서 각 디렉토리의 소유자를 확인한다.
 
 #### 예시
 
-``` bash
-ls -ld directory
+``` json
+{
+  "_links": {
+    "next": {
+      "href": "/api/resourcelink"
+    },
+    "self": {
+      "href": "/api/resourcelink"
+    }
+  },
+  "num_records": 1,
+  "records": [
+    {
+      "group_id": 30,
+      "name": "string",
+      "owner_id": 54738,
+      "path": "string",
+    }
+  ]
+}
 ```
 
-#### 출력 예
-```
-    drwx------ userA
-```
 
 ------------------------------------------------------------------------
 

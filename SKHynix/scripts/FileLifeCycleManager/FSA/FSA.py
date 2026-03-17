@@ -269,8 +269,8 @@ def call_fsa_api(scan_objects):
         auth = (cluster["ID"], cluster["PW"])
 
         for path_item in fsa_option.get("path", []):
-            directory = path_item["dir"] if "dir" in path_item["dir"] else ""
-            file_filter = path_item["file"] if "file" in path_item["file"] else ""
+            directory = path_item["dir"] if "dir" in path_item else ""
+            file_filter = path_item["file"] if "file" in path_item else ""
 
             encoded_path = quote(directory, safe="")
             url = f"{base_url}/{encoded_path}"
@@ -278,7 +278,7 @@ def call_fsa_api(scan_objects):
             params = {
                 "type": fsa_option.get("type"),
                 "analytics.bytes_used": fsa_option.get("analytics_bytes_used"),
-                "fields": "size,name,path,modified_time,analytics.bytes_used",
+                "fields": "size,name,owner_id,path,modified_time,analytics.bytes_used",
                 "return_records": "true",
                 "return_timeout": 30
             }
@@ -292,16 +292,16 @@ def call_fsa_api(scan_objects):
                     records = data.get("records", [])
 
                     for r in records:
-                        size = r.get("size", 0)
-
                         # 파일 개별 기록
                         all_files.append({
                             "cluster": cluster["name"],
                             "division": div,
                             "volume": volume_name,
                             "dir": directory,
-                            "file": r.get("name"),
-                            "size": size,
+                            "name": r.get("name", None),
+                            "type": r.get("type", None),
+                            "size": r.get("size", 0),
+                            "bytes_used": r.get("analytics", {}).get("bytes_used", 0),
                             "modified_time": r.get("modified_time")
                         })
                         summary = {
