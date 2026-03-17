@@ -292,6 +292,7 @@ def call_fsa_api(scan_objects):
                     records = data.get("records", [])
 
                     for r in records:
+                        bytes_used = r.get("analytics", {}).get("bytes_used", 0)
                         # 파일 개별 기록
                         all_files.append({
                             "cluster": cluster["name"],
@@ -301,7 +302,7 @@ def call_fsa_api(scan_objects):
                             "name": r.get("name", None),
                             "type": r.get("type", None),
                             "size": r.get("size", 0),
-                            "bytes_used": r.get("analytics", {}).get("bytes_used", 0),
+                            "bytes_used": bytes_used,
                             "modified_time": r.get("modified_time")
                         })
                         summary = {
@@ -313,14 +314,14 @@ def call_fsa_api(scan_objects):
                         if div not in summary["division"]:
                             summary["division"][div] = {"used": 0, "count": 0}
 
-                        summary["division"][div]["used"] += size
+                        summary["division"][div]["used"] += bytes_used
                         summary["division"][div]["count"] += 1
 
                         # volume
                         if div not in summary["division"]:
                             summary["division"][div] = {"used": 0, "count": 0}
 
-                        summary["division"][div]["used"] += size
+                        summary["division"][div]["used"] += bytes_used
                         summary["division"][div]["count"] += 1
 
                         # directory
@@ -336,7 +337,7 @@ def call_fsa_api(scan_objects):
                                 "count": 0
                             }
 
-                        summary["directory"][div][volume_name][directory_name]["used"] += size
+                        summary["directory"][div][volume_name][directory_name]["used"] += bytes_used
                         summary["directory"][div][volume_name][directory_name]["count"] += 1
 
                     next_link = data.get("_links", {}).get("next", {}).get("href")
