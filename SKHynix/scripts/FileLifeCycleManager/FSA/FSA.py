@@ -132,6 +132,9 @@ def get_scan_objects(data, config):
 # -------------------------
 # USER 디렉토리 찾기
 # -------------------------
+from collections import deque
+from urllib.parse import quote
+
 def find_directories(scan_objects):
 
     logger.info(f"[START] find_directories count={len(scan_objects)}")
@@ -146,72 +149,73 @@ def find_directories(scan_objects):
         base_url = f"https://{cluster['ip']}/api/storage/volumes/{obj['vol_uuid']}/files"
         auth = (cluster["ID"], cluster["PW"])
 
-        for p in obj["fsa_option"].get("path", []):
-            target = p.get("dir")
+        # 🔥 target 리스트 (소문자 변환)
+        targets = [p.get("dir").lower() for p in obj["fsa_option"].get("path", [])]
 
-            logger.info(f"[SEARCH] volume={obj['volume']} target={target}")
+        logger.info(f"[SEARCH] volume={obj['volume']} targets={targets}")
 
-            queue = deque([("/", 1)])
-            visited = set()
+        queue = deque([("/", 1)])
+        visited = set()
 
-            while queue:
-                path, depth = queue.popleft()
+        while queue:
+            path, depth = queue.popleft()
 
-                if depth > 7 or path in visited:
-                    continue
+            if depth > 7 or path in visited:
+                continue
 
-                visited.add(path)
+            visited.add(path)
 
-                try:
+            try:
+                # 🔥 path 기반 URL
+                encoded_path = quote(path if path else "/")
+                url = f"{base_url}/{encoded_path}"
+
+                logger.debug(f"[REQUEST] {url}")
+                logger.debug(f"[AUTH] user={auth[0]} password=****")
+
+                res = session.get(
+                    url,
+                    auth=auth,
                     params={
-                        "path": path,
                         "type": "directory",
                         "fields": "name,path"
-                    }
-                    logger.debug(f"[REQUEST] GET {base_url}")
-                    logger.debug(f"[PARAMS] {params}")
-                    req = PreparedRequest()
-                    req.prepare_url(base_url, params)
+                    },
+                    timeout=30
+                )
 
-                    logger.debug(f"[REQUEST] {req.url}")
-                    res = session.get(
-                        base_url,
-                        auth=auth,
-                        params=params,
-                        timeout=10
-                    )
-                    
-                    logger.debug(f"[RESPONSE] status={res.status_code}")
-                    logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
+                logger.debug(f"[RESPONSE] status={res.status_code}")
+                logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
 
-                    res.raise_for_status()
-                    records = res.json().get("records", [])
+                res.raise_for_status()
+                records = res.json().get("records", [])
 
-                    logger.debug(f"[API] path={path} count={len(records)}")
+                logger.debug(f"[API] path={path} count={len(records)}")
 
-                    for r in records:
-                        name = r.get("name")
+                for r in records:
+                    name = r.get("name")
+                    full_path = r.get("path")
 
-                        if name in [".", ".."]:
-                            continue
+                    if name in [".", ".."]:
+                        continue
 
-                        full_path = r.get("path")
+                    # 🔥 target 매칭
+                    if name and name.lower() in targets:
+                        logger.info(f"[FOUND] {full_path}")
 
-                        if name.lower() == target.lower():
-                            logger.info(f"[FOUND] {full_path}")
+                        results.append({
+                            "cluster": cluster,
+                            "volume": obj["volume"],
+                            "division": obj["div"],
+                            "found_path": full_path,
+                            "vol_uuid": obj["vol_uuid"]
+                        })
 
-                            results.append({
-                                "cluster": cluster,
-                                "volume": obj["volume"],
-                                "division": obj["div"],
-                                "found_path": full_path,
-                                "vol_uuid": obj["vol_uuid"]
-                            })
-
+                    # 🔥 BFS 확장
+                    if full_path:
                         queue.append((full_path, depth + 1))
 
-                except Exception as e:
-                    logger.error(f"[ERROR] find_dir path={path} {str(e)}")
+            except Exception as e:
+                logger.error(f"[ERROR] find_dir path={path} {str(e)}")
 
     logger.info(f"[END] find_directories found={len(results)}")
     return results
