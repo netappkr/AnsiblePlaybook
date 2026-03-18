@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
+
 import requests
 import urllib3
-from urllib.parse import quote
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import argparse
 import json
 import logging
@@ -11,440 +10,379 @@ import yaml
 import re
 import os
 import sys
-parser = argparse.ArgumentParser(description="Please refer to Netapp korea github : https://github.com/netappkr/AnsiblePlaybook/tree/main/SKHynics/scripts")
-parser.add_argument("-f", "--file", type=str, nargs='+', help="read filenames example: -f filename", required=False)
-parser.add_argument("-r", "--request", type=str, help="request type",required=False)
-parser.add_argument("--config", type=str, help="config.yaml",required=False)
-args= parser.parse_args()
+import subprocess
+from collections import deque
 
-# 사용자 홈 디렉토리 경로 얻기
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# -------------------------
+# argparse
+# -------------------------
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--file", type=str, nargs='+')
+parser.add_argument("-r", "--request", type=str)
+parser.add_argument("--config", type=str)
+args = parser.parse_args()
+
+# -------------------------
+# logging 설정
+# -------------------------
 home_dir = os.path.expanduser("~")
 log_dir = os.path.join(home_dir, "logs")
 
-# 로그 디렉토리가 존재하지 않으면 생성
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
+os.makedirs(log_dir, exist_ok=True)
 
-# 로그 파일 경로 설정
-log_file_path = os.path.join(log_dir, ".log")
+log_file_path = os.path.join(log_dir, "fsa.log")
 
-# 로거 설정
-logger = logging.getLogger('fsa')
-logger.setLevel(logging.INFO)  # 로그 레벨 설정
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 
-# 로그 포맷 설정
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger("fsa")
+logger.setLevel(getattr(logging, log_level, logging.INFO))
 
-# 파일 핸들러 설정
-file_handler = logging.FileHandler(log_file_path, mode='a')  # 파일 경로를 정확하게 지정
+formatter = logging.Formatter(
+    '%(asctime)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+file_handler = logging.FileHandler(log_file_path, mode='a')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-# 선택적으로 콘솔 로그 출력
-# stream_handler = logging.StreamHandler()
-# stream_handler.setFormatter(formatter)
-# logger.addHandler(stream_handler)
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
 
-# JSON 파일로부터 데이터를 읽어옵니다.
-
+# -------------------------
+# JSON / YAML
+# -------------------------
 def read_json(filelist):
-    data={}
-    for json_file in filelist:
-        with open(json_file, 'r') as file:
-            data[json_file] = json.load(file)
+    data = {}
+    for f in filelist:
+        with open(f) as file:
+            data[f] = json.load(file)
     return data
 
-def read_yaml_file(file_path):
-    try:
-        with open(file_path, 'r') as f:
-            data = yaml.safe_load(f)
+def read_yaml(path):
+    with open(path) as f:
+        return yaml.safe_load(f)
 
-        if isinstance(data, dict):
-            data = [data]
-
-        if not isinstance(data, list):
-            raise ValueError("YAML structure must be list or dict")
-
-        return data
-
-    except Exception:
-        logger.error(traceback.format_exc())
-        print("Error reading YAML:", traceback.format_exc(), file=sys.stderr)
-        return None
-
-
+# -------------------------
+# YAML 검증
+# -------------------------
 def check_yaml_integrity(file_path):
-    required_structure = {
-        'division': [
-            {
-                'name': str
-            }
-        ]
-    }
-    # YAML 파일 로드
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path) as file:
             config = yaml.safe_load(file)
-    except Exception as e:
-        logger.error(f"validate error: reading YAML file: {e}")
-        print(f"Validation error: reading YAML file: {e}",file=sys.stderr)
-        exit
 
-    # 필수 키 및 구조 검증
-    def validate_structure(data, structure):
-        if not isinstance(data, dict):
-            return "Data is not a dictionary"
+        if "division" not in config:
+            raise ValueError("division key missing")
 
-        for key, value_type in structure.items():
-            if isinstance(value_type, list):
-                if key not in data:
-                    return f"Missing key {key}"
-                if not isinstance(data[key], list):
-                    return f"Key '{key}' must be a list"
-                for item in data[key]:
-                    result = validate_structure(item, value_type[0])
-                    if result != True:
-                        return result
-            elif isinstance(value_type, dict):
-                if key not in data:
-                    return f"Missing key {key}"
-                result = validate_structure(data[key], value_type)
-                if result != True:
-                    return result
-            else:
-                if key not in data or not isinstance(data[key], value_type):
-                    return f"Key '{key}' must be a {value_type.__name__}"
-        return True
-    
-    def check_regex(regexp):
-        try:
-            re.compile(regexp)
-            return True
-        except re.error:
-            logger.error(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.")
-            print(f"Validation error: {vol_name_regexp} 정규식 표현이 유효하지 않습니다.",file=sys.stderr)
-            return False
-
-    result = validate_structure(config, required_structure)
-    if result != True:
-        # 정규식 표현 검증
-        for division in config['division']:
-            if 'vol_name_regexp' in division:
-                vol_name_regexp = division['vol_name_regexp']
-            else:
-                vol_name_regexp = ".*"
-            if not check_regex(vol_name_regexp):
-                exit
-
-        logger.error(f"Validation error: {result}")
-        print(f"Validation error: {result}",file=sys.stderr)
-        exit
-    else:
         return config
-    
-def get_scan_objects(data,config):
-    scan_objects =[]
-    # Extract configuration details
-    domain = config['domain']
-    division = config['division']
-    exclude = config['exclude'] if "exclude" in config else None
+
+    except Exception as e:
+        logger.error(f"[ERROR] YAML validation: {str(e)}")
+        print(traceback.format_exc(), file=sys.stderr)
+        sys.exit(1)
+
+# -------------------------
+# scan object 생성
+# -------------------------
+def get_scan_objects(data, config):
+
+    logger.info("[START] get_scan_objects")
+
+    scan_objects = []
+    domain = config.get("domain")
+    division = config.get("division", [])
+
     for cluster in data:
         try:
-            datacenter = cluster["cluster"]["datacenter"]
+            cluster_info = cluster["cluster"]
+
             for volume in cluster["msg"]["records"]:
-                svm_name = volume["vserver"] if "vserver" in volume else ""
-                export_policy = volume["policy"]if "policy" in volume else ""
-                path = volume["junction_path"] if "junction_path" in volume else ""
-                name = volume["volume"]
-                cluster_name = cluster['cluster']['name']
-                vol_uuid = volume["instance_uuid"]
-                analytics = volume["analytics_state"] if "analytics_state" in volume else ""
+                name = volume.get("volume")
+                path = volume.get("junction_path")
+                uuid = volume.get("instance_uuid")
+                analytics = volume.get("analytics_state")
 
-                if not svm_name:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 vserver key가 비어 있습니다.")
-                if not export_policy:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 policy key가 비어 있습니다.")
-                if not path:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 junction_path key가 비어 있습니다.")
-                if not analytics:
-                    logger.debug(f"{cluster['cluster']['name']} {name} 볼륨의 analytics_state key가 비어 있습니다.")
-                # Check if the volume should be excluded
-                if exclude in config:
-                    if any(ex['vol_name'] == name for ex in exclude):
-                        logger.info(f"matched exclude vol name policy , {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
-                        continue
-                if path == "":
-                    logger.info(f"path: {path}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
+                if not path or analytics != "on":
                     continue
-                if analytics != "on":            
-                    logger.info(f"analytics: {analytics}, {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
-                    continue
-                # Check if volume matches any division criteria
+
                 for div in division:
-                    if 'searchdir' in div:
-                        search_dirs_str = ' '.join(div['searchdir'])
-                    else:
-                        search_dirs_str = None
+                    if "fsa_option" not in div:
+                        continue
 
-                    # Check if volume name matches the regexp or export policy names
-                    if "fsa_option" in div:
-                        if datacenter == "test":
-                            scan_objects.append({
-                                'cluster': cluster['cluster'],
-                                'volume' : name,
-                                "vol_uuid": vol_uuid,
-                                'mount_path': f"{svm_name}.{domain}:{path}",
-                                'div' : f"{div['name']}",
-                                'export_policy': f"{export_policy}",
-                                'fsa_option':div['fsa_option'],
-                                'searchdir': search_dirs_str
-                                }
-                            )
-                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
-                        elif datacenter == "nkic":
-                            scan_objects.append({
-                                'cluster': cluster['cluster'],
-                                'volume' : name,
-                                "vol_uuid": vol_uuid,
-                                'mount_path': f"{svm_name}.nkic.{domain}:{path}",
-                                'div' : f"{div['name']}",
-                                'export_policy': f"{export_policy}",
-                                'fsa_option':div['fsa_option'],
-                                'searchdir': search_dirs_str
-                                }
-                            )
-                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
-                        else:
-                            scan_objects.append({
-                                'cluster': cluster['cluster'],
-                                'volume' : name,
-                                "vol_uuid": vol_uuid,
-                                'mount_path': f"{cluster_name}.{domain}:{path}",
-                                'div' : f"{div['name']}",
-                                'export_policy': f"{export_policy}",
-                                'fsa_option': div['fsa_option'],
-                                'searchdir': search_dirs_str
-                                }
-                            )
-                            logger.debug(f"{datacenter}, {cluster['cluster']['name']} {name} 볼륨 목록에 추가합니다.")
-                    else:
-                        logger.info(f"fsa_option 이 비어있습니다., {cluster['cluster']['name']} {name} 볼륨을 목록에서 제외합니다.")
-                        logger.debug(f"fsa_option 이 비어있습니다.. datacenter : {datacenter}, cluster_name: {cluster['cluster']['name']}, volume_name: {name}")
+                    scan_objects.append({
+                        "cluster": cluster_info,
+                        "volume": name,
+                        "vol_uuid": uuid,
+                        "div": div["name"],
+                        "fsa_option": div["fsa_option"]
+                    })
 
-        except KeyError as e:
-            # KeyError 발생시 처리 로직
-            logger.error(f"KeyError: {e} - {cluster['cluster']['name']}",traceback.format_exc())
-        except Exception as e:
-            logger.error("func get_scan_objects:",traceback.format_exc())
-            print("func get_scan_objects Error:" ,traceback.format_exc(),file=sys.stderr)
+                    logger.debug(f"[ADD] volume={name}")
+
+        except Exception:
+            logger.error(traceback.format_exc())
+
+    logger.info(f"[END] get_scan_objects count={len(scan_objects)}")
     return scan_objects
 
+# -------------------------
+# USER 디렉토리 찾기
+# -------------------------
+def find_directories(scan_objects):
 
-from collections import defaultdict
-
-def call_fsa_api(scan_objects):
+    logger.info(f"[START] find_directories count={len(scan_objects)}")
 
     session = requests.Session()
     session.verify = False
-    session.headers.update({"Accept": "application/json"})
 
-    all_files = []
-    summary = {
-        "division": defaultdict(lambda: {"used": 0, "count": 0}),
-        "volume": defaultdict(lambda: {"used": 0, "count": 0}),
-        "directory": defaultdict(lambda: {"used": 0, "count": 0})
-    }
-
-    scan_status = []
+    results = []
 
     for obj in scan_objects:
         cluster = obj["cluster"]
-        volume_uuid = obj["vol_uuid"]
-        fsa_option = obj["fsa_option"]
-        div = obj["div"]
-        volume_name = obj["volume"]
-        
-
-        base_url = f"https://{cluster['ip']}/api/storage/volumes/{volume_uuid}/files"
+        base_url = f"https://{cluster['ip']}/api/storage/volumes/{obj['vol_uuid']}/files"
         auth = (cluster["ID"], cluster["PW"])
 
-        for path_item in fsa_option.get("path", []):
-            directory = path_item["dir"] if "dir" in path_item else ""
-            file_filter = path_item["file"] if "file" in path_item else ""
+        for p in obj["fsa_option"].get("path", []):
+            target = p.get("dir")
 
-            encoded_path = quote(directory, safe="")
-            url = f"{base_url}/{encoded_path}"
+            logger.info(f"[SEARCH] volume={obj['volume']} target={target}")
 
-            params = {
-                "type": fsa_option.get("type"),
-                "analytics.bytes_used": fsa_option.get("analytics_bytes_used"),
-                "fields": "size,name,owner_id,path,modified_time,analytics.bytes_used",
-                "return_records": "true",
-                "return_timeout": 30
-            }
+            queue = deque([("/", 1)])
+            visited = set()
 
-            try:
-                while url:
-                    response = session.get(url, auth=auth, params=params)
-                    response.raise_for_status()
-                    data = response.json()
+            while queue:
+                path, depth = queue.popleft()
 
-                    records = data.get("records", [])
+                if depth > 7 or path in visited:
+                    continue
+
+                visited.add(path)
+
+                try:
+                    res = session.get(
+                        base_url,
+                        auth=auth,
+                        params={
+                            "path": path,
+                            "type": "directory",
+                            "fields": "name,path"
+                        },
+                        timeout=10
+                    )
+
+                    res.raise_for_status()
+                    records = res.json().get("records", [])
+
+                    logger.debug(f"[API] path={path} count={len(records)}")
 
                     for r in records:
-                        bytes_used = r.get("analytics", {}).get("bytes_used", 0)
-                        # 파일 개별 기록
-                        all_files.append({
-                            "cluster": cluster["name"],
-                            "division": div,
-                            "volume": volume_name,
-                            "dir": directory,
-                            "name": r.get("name", None),
-                            "type": r.get("type", None),
-                            "size": r.get("size", 0),
-                            "bytes_used": bytes_used,
-                            "modified_time": r.get("modified_time")
-                        })
-                        summary = {
-                            "division": {},
-                            "volume": {},
-                            "directory": {}
-                        }
-                        # division
-                        if div not in summary["division"]:
-                            summary["division"][div] = {"used": 0, "count": 0}
+                        name = r.get("name")
 
-                        summary["division"][div]["used"] += bytes_used
-                        summary["division"][div]["count"] += 1
+                        if name in [".", ".."]:
+                            continue
 
-                        # volume
-                        if div not in summary["division"]:
-                            summary["division"][div] = {"used": 0, "count": 0}
+                        full_path = r.get("path")
 
-                        summary["division"][div]["used"] += bytes_used
-                        summary["division"][div]["count"] += 1
+                        if name.lower() == target.lower():
+                            logger.info(f"[FOUND] {full_path}")
 
-                        # directory
-                        if div not in summary["directory"]:
-                            summary["directory"][div] = {}
+                            results.append({
+                                "cluster": cluster,
+                                "volume": obj["volume"],
+                                "division": obj["div"],
+                                "found_path": full_path,
+                                "vol_uuid": obj["vol_uuid"]
+                            })
 
-                        if volume_name not in summary["directory"][div]:
-                            summary["directory"][div][volume_name] = {}
+                        queue.append((full_path, depth + 1))
 
-                        if directory_name not in summary["directory"][div][volume_name]:
-                            summary["directory"][div][volume_name][directory_name] = {
-                                "used": 0,
-                                "count": 0
-                            }
+                except Exception as e:
+                    logger.error(f"[ERROR] find_dir path={path} {str(e)}")
 
-                        summary["directory"][div][volume_name][directory_name]["used"] += bytes_used
-                        summary["directory"][div][volume_name][directory_name]["count"] += 1
+    logger.info(f"[END] find_directories found={len(results)}")
+    return results
 
-                    next_link = data.get("_links", {}).get("next", {}).get("href")
-                    if next_link:
-                        url = f"https://{cluster['ip']}{next_link}"
-                        params = None
-                    else:
-                        url = None
+# -------------------------
+# email 조회
+# -------------------------
+def get_email(owner_id):
+    try:
+        res = subprocess.run(
+            ["finger2", str(owner_id)],
+            capture_output=True,
+            text=True
+        )
 
-                scan_status.append({
-                    "volume": volume_name,
-                    "directory": directory,
-                    "status": "SUCCESS"
+        for line in res.stdout.splitlines():
+            if "E-mail" in line:
+                return line.split(":")[1].strip()
+
+    except Exception as e:
+        logger.error(f"[ERROR] email owner={owner_id} {str(e)}")
+
+    return "unknown"
+
+# -------------------------
+# usage 조회
+# -------------------------
+def get_usage(found_dirs):
+
+    logger.info(f"[START] get_usage count={len(found_dirs)}")
+
+    session = requests.Session()
+    session.verify = False
+
+    result = []
+
+    for item in found_dirs:
+        cluster = item["cluster"]
+
+        try:
+            res = session.get(
+                f"https://{cluster['ip']}/api/storage/volumes/{item['vol_uuid']}/files",
+                auth=(cluster["ID"], cluster["PW"]),
+                params={
+                    "path": item["found_path"],
+                    "type": "directory",
+                    "fields": "name,path,owner_id,analytics.bytes_used"
+                },
+                timeout=10
+            )
+
+            res.raise_for_status()
+            records = res.json().get("records", [])
+
+            logger.info(f"[QUERY] path={item['found_path']} count={len(records)}")
+
+            for r in records:
+                if r.get("name") in [".", ".."]:
+                    continue
+
+                owner = r.get("owner_id")
+                used = r.get("analytics", {}).get("bytes_used", 0)
+
+                result.append({
+                    "division": item["division"],
+                    "volume": item["volume"],
+                    "user": r.get("name"),
+                    "full_path": r.get("path"),
+                    "owner_id": owner,
+                    "email": get_email(owner),
+                    "bytes_used": used
                 })
 
-            except Exception:
-                scan_status.append({
-                    "volume": volume_name,
-                    "directory": directory,
-                    "status": "FAILED"
-                })
-                logger.error(traceback.format_exc())
+        except Exception as e:
+            logger.error(f"[ERROR] usage path={item['found_path']} {str(e)}")
 
-    return {
-        "files": all_files,
-        "summary": summary,
-        "scan_status": scan_status
-    }
+    result.sort(key=lambda x: x["bytes_used"], reverse=True)
 
-def build_mail_report(report_data):
+    logger.info(f"[END] get_usage users={len(result)}")
+    return result
 
-    summary = report_data.get("summary", {})
-    scan_status = report_data.get("scan_status", [])
+# -------------------------
+# HTML
+# -------------------------
+def build_html(data):
 
     html = """
-    <html>
-    <body>
-    <h2>FSA Scan Summary Report</h2>
-    """
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th {
+            background-color: #f2f2f2;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+<body>
 
-    # ===== Division Summary =====
-    html += "<h3>Division Summary</h3>"
-    html += "<table border='1' cellpadding='5' cellspacing='0'>"
-    html += "<tr><th>Division</th><th>Total Used (MB)</th><th>File Count</th></tr>"
+<h2>Directory Usage Report</h2>
 
-    for div, data in summary.get("division", {}).items():
-        used_mb = data["used"] / (1024 * 1024)
-        html += f"<tr><td>{div}</td><td>{used_mb:.2f}</td><td>{data['count']}</td></tr>"
+<table>
+    <tr>
+        <th>Division</th>
+        <th>Volume</th>
+        <th>User</th>
+        <th>Usage (GB)</th>
+        <th>Email</th>
+    </tr>
+"""
 
-    html += "</table><br>"
+    for d in data:
+        gb = d["bytes_used"] / (1024**3)
 
-    # ===== Scan Status =====
-    html += "<h3>Scan Status</h3>"
-    html += "<table border='1' cellpadding='5' cellspacing='0'>"
-    html += "<tr><th>Volume</th><th>Directory</th><th>Status</th></tr>"
+        html += f"""
+    <tr>
+        <td>{d['division']}</td>
+        <td>{d['volume']}</td>
+        <td>{d['user']}</td>
+        <td>{gb:.2f}</td>
+        <td>{d['email']}</td>
+    </tr>
+"""
 
-    for item in scan_status:
-        color = "green" if item["status"] == "SUCCESS" else "red"
-        html += f"<tr><td>{item['volume']}</td><td>{item['directory']}</td><td style='color:{color}'>{item['status']}</td></tr>"
+    html += """
+</table>
 
-    html += "</table>"
-
-    html += "</body></html>"
+</body>
+</html>
+"""
 
     return html
 
+# -------------------------
+# main
+# -------------------------
 def main():
-    # cURL command's target URL
-    # url = 'http://10.10.242.101:12993/metrics'  # Replace with your actual URL
-    # 무결성 검사 실행
     try:
         if args.request == "get_scan_object":
             data = read_json(args.file)
             config = check_yaml_integrity(args.config)
-            if config:
-                print(json.dumps(get_scan_objects(data[args.file[0]],config)))
-            logger.info("print success")
+            result = get_scan_objects(data[args.file[0]], config)
+            print(yaml.safe_dump(result, sort_keys=False))
 
-        elif args.request == "get_fsa_data":
-            scan_objects = read_yaml_file(args.file[0])
+        elif args.request == "find_dir":
+            data = read_yaml(args.file[0])
+            print(yaml.safe_dump(find_directories(data), sort_keys=False))
 
-            if not scan_objects:
-                return
+        elif args.request == "get_usage":
+            data = read_yaml(args.file[0])
+            print(yaml.safe_dump(get_usage(data), sort_keys=False))
 
-            fsa_results = call_fsa_api(scan_objects)
-            print(
-                yaml.safe_dump(
-                    fsa_results,
-                    sort_keys=False,
-                    allow_unicode=True,
-                    default_flow_style=False
-                )
-            )
-            logger.info("print success")
         elif args.request == "build_mail":
-            report = read_yaml_file(args.file[0])
-            html = build_mail_report(report)
-            print(f"Mail HTML saved to {path}")
+            data = read_yaml(args.file[0])
+            print(build_html(data))
 
         else:
-            logger.error(args.request+" request is not matched")
-            print(args.request+" request is not matched")
+            logger.error(f"invalid request: {args.request}")
+            print("invalid request")
 
-    except Exception as e:
-        print("Error:" ,traceback.format_exc(),file=sys.stderr)
+    except Exception:
         logger.error(traceback.format_exc())
+        print(traceback.format_exc(), file=sys.stderr)
 
 if __name__ == "__main__":
     main()
-

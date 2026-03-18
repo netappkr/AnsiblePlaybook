@@ -1,11 +1,27 @@
 ---
-- name: Ontap File Lifecycle Managed
+- name: Ontap File Lifecycle Managed (FSA v2)
   hosts: task_server_1_fsa
   gather_facts: no
   collections:
     - netapp.ontap
+
+  vars:
+    work_dir: "/tmp/fsa/{{ now(utc=false, fmt='%Y%m%d_%H%M%S') }}"
+
   tasks:
-    - name: Get rest data information
+
+    # ------------------------
+    # 0. 작업 디렉토리 생성
+    # ------------------------
+    - name: Create work directory
+      file:
+        path: "{{ work_dir }}"
+        state: directory
+
+    # ------------------------
+    # 1. ONTAP Volume 조회
+    # ------------------------
+    - name: Get volume information
       na_ontap_rest_cli:
         hostname: "{{ cluster.ip }}"
         username: "{{ cluster.ID }}"
@@ -19,9 +35,9 @@
           total: "{{ config.cli.total }}"
           logical-used-percent: "{{ config.cli.LogicalUsedPercent }}"
           is-space-reporting-logical: true
-          is-flexgroup : false
+          is-flexgroup: false
           analytics-state: "on"
-          volume : "{{ config.cli.volumename }}"
+          volume: "{{ config.cli.volumename }}"
           policy: "{{ config.cli.policy }}"
           fields: "vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,instance-uuid"
       register: ontap_volumes
@@ -29,99 +45,104 @@
       loop_control:
         loop_var: cluster
 
-    - name: Write result data to a JSON file
+    - name: Save volume JSON
       copy:
-        dest: "/tmp/volume_path_info.json"
+        dest: "{{ work_dir }}/volume.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
-      register: datafile
 
-    - name: Write result data to a config file
+    - name: Save config YAML
       copy:
-        dest: "/tmp/config.yaml"
+        dest: "{{ work_dir }}/config.yaml"
         content: "{{ config | to_nice_yaml }}"
-      register: config
 
-    - name: Search for 'script' in all directories
+    # ------------------------
+    # 2. FSA.py 위치 찾기
+    # ------------------------
+    - name: Find FSA.py
       find:
         paths: "{{ scripts_dir }}"
-        patterns: "FSA.py"
+        patterns: "fsa.py"
         recurse: yes
-        file_type: file
-      register: files_matched
+      register: fsa_script
 
-    - name: Print the matched files
-      debug:
-        msg: "{{ files_matched.files[0].path }}"
+    - name: Set script path
+      set_fact:
+        fsa_path: "{{ fsa_script.files[0].path }}"
 
-    - name: Generate FLM list
-      command: "python3 {{ files_matched.files[0].path }} -r get_scan_object --config {{ config.dest }} -f {{ datafile.dest }}"
-      register: volume_list
+    # ------------------------
+    # 3. Scan Object 생성
+    # ------------------------
+    - name: Generate scan objects
+      command: >
+        python3 {{ fsa_path }}
+        -r get_scan_object
+        -f {{ work_dir }}/volume.json
+        --config {{ work_dir }}/config.yaml
+      register: scan_object
 
-    - name: Display volume_list
-      debug:
-        msg: "{{ volume_list.stdout }}"
-      register: config_mapping
-
-    - name: Save volume_list stdout as pretty YAML
+    - name: Save scan objects
       copy:
-        dest: /tmp/fsa_volume_list.yaml
-        content: "{{ volume_list.stdout | from_json | to_nice_yaml }}"
-      register: fsa_vol_list
+        dest: "{{ work_dir }}/scan_objects.yaml"
+        content: "{{ scan_object.stdout }}"
 
-    - name: mkdir
-      shell: |
-        mkdir -p /data/vine/Ansible_XCP/FSA_result/{{division.name}}/{{ now(utc=false,fmt='%Y%m%d') }}/info
-      ignore_errors: true
-      loop: "{{ DLC.config.division }}"
-      loop_control:
-        loop_var: division
+    # ------------------------
+    # 4. USER 디렉토리 탐색
+    # ------------------------
+    - name: Find USER directories
+      command: >
+        python3 {{ fsa_path }}
+        -r find_dir
+        -f {{ work_dir }}/scan_objects.yaml
+      register: found_dirs
 
-    - name: Get FSA data
-      command: "python3 {{ files_matched.files[0].path }} -r get_fsa_data --file {{ fsa_vol_list.dest }}"
-      register: fsa_data
-
-    - name: Display FSA data
-      debug:
-        msg: "{{ fsa_data.stdout }}"
-
-    - name: Save volume_list stdout as pretty YAML
+    - name: Save found dirs
       copy:
-        dest: /tmp/fsa_data.yaml
-        content: "{{ fsa_data.stdout}}"
-      register: fsa_data_file
+        dest: "{{ work_dir }}/found_dirs.yaml"
+        content: "{{ found_dirs.stdout }}"
 
-    - name: email format
-      command: "python3 {{ files_matched.files[0].path }} -r build_mail --file {{ fsa_data_file.dest }}"
+    # ------------------------
+    # 5. Usage 조회
+    # ------------------------
+    - name: Get usage data
+      command: >
+        python3 {{ fsa_path }}
+        -r get_usage
+        -f {{ work_dir }}/found_dirs.yaml
+      register: usage
+
+    - name: Save usage
+      copy:
+        dest: "{{ work_dir }}/usage.yaml"
+        content: "{{ usage.stdout }}"
+
+    # ------------------------
+    # 6. HTML 생성
+    # ------------------------
+    - name: Build HTML report
+      command: >
+        python3 {{ fsa_path }}
+        -r build_mail
+        -f {{ work_dir }}/usage.yaml
       register: html
 
-    - name: Send inode usage report via email
+    - name: Save HTML file
+      copy:
+        dest: "{{ work_dir }}/report.html"
+        content: "{{ html.stdout }}"
+
+    # ------------------------
+    # 7. 이메일 발송
+    # ------------------------
+    - name: Send FSA report email
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "fsa summary - {{ now(utc=false,fmt='%Y.%m.%d') }}"
+        subject: "FSA Report - {{ now(utc=false,fmt='%Y.%m.%d') }}"
         body: "{{ html.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
-        headers: 
-        - Content-Type="text/html"
       when: html.stdout is defined
-
-      
-    # - name: Format scan results
-    #   set_fact:
-    #     formatted_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('<br>')] }}"
-    #     scan_list_file_results: "{{ formatted_results | default([]) + [item.stdout_lines[2:] | join('\n')] }}"
-    #   loop: "{{ scan_list.results }}"
-    #   loop_control:
-    #     loop_var: item
-
-    # - name: Write result data to a scan_list file
-    #   copy:
-    #     dest: "/tmp/scan_list_file_results.list"
-    #     content: "{{ scan_list_file_results | join('\n')}}"
-    #   register: scan_list_file
-
