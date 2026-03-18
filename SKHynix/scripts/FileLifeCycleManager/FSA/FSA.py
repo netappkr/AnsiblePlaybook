@@ -206,7 +206,8 @@ def find_directories(scan_objects):
                         # 🔥 하위 1-depth 조회
                         encoded = quote(full_path)
                         sub_url = f"{base_url}/{encoded}"
-
+                        logger.debug(f"[REQUEST] {sub_url}")
+                        logger.debug(f"[AUTH] user={auth[0]} password=****")
                         res2 = session.get(
                             sub_url,
                             auth=auth,
@@ -216,10 +217,13 @@ def find_directories(scan_objects):
                             },
                             timeout=10
                         )
+                        logger.debug(f"[RESPONSE] status={res.status_code}")
+                        logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
 
                         res2.raise_for_status()
                         sub_records = res2.json().get("records", [])
-
+                        logger.debug(f"[API] path={path} count={len(sub_records)}")
+                        
                         for sr in sub_records:
                             sub_name = sr.get("name")
 
