@@ -14,6 +14,8 @@ import subprocess
 from collections import deque
 from requests.models import PreparedRequest
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from collections import deque
+from urllib.parse import quote
 
 # -------------------------
 # argparse
@@ -132,8 +134,6 @@ def get_scan_objects(data, config):
 # -------------------------
 # USER 디렉토리 찾기
 # -------------------------
-from collections import deque
-from urllib.parse import quote
 
 def find_directories(scan_objects):
 
@@ -244,6 +244,7 @@ def get_email(owner_id):
 # -------------------------
 # usage 조회
 # -------------------------
+
 def get_usage(found_dirs):
 
     logger.info(f"[START] get_usage count={len(found_dirs)}")
@@ -257,25 +258,46 @@ def get_usage(found_dirs):
         cluster = item["cluster"]
 
         try:
+            base_url = f"https://{cluster['ip']}/api/storage/volumes/{item['vol_uuid']}/files"
+
+            # 🔥 path 기반 방식으로 변경
+            path = item["found_path"] if item["found_path"] else "/"
+            encoded_path = quote(path)
+
+            url = f"{base_url}/{encoded_path}"
+
+            logger.debug(f"[REQUEST] {url}")
+            logger.debug(f"[AUTH] user={cluster['ID']} password=****")
+
             res = session.get(
-                f"https://{cluster['ip']}/api/storage/volumes/{item['vol_uuid']}/files",
+                url,
                 auth=(cluster["ID"], cluster["PW"]),
                 params={
-                    "path": item["found_path"],
                     "type": "directory",
                     "fields": "name,path,owner_id,analytics.bytes_used"
                 },
                 timeout=10
             )
 
+            logger.debug(f"[RESPONSE] status={res.status_code}")
+            logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
+
             res.raise_for_status()
             records = res.json().get("records", [])
 
-            logger.info(f"[QUERY] path={item['found_path']} count={len(records)}")
+            logger.info(f"[QUERY] path={path} count={len(records)}")
 
             for r in records:
                 if r.get("name") in [".", ".."]:
                     continue
+
+                name = r.get("name")
+
+                # 🔥 full_path 재조합
+                if path == "/" or path == "":
+                    full_path = f"/{name}"
+                else:
+                    full_path = f"{path}/{name}"
 
                 owner = r.get("owner_id")
                 used = r.get("analytics", {}).get("bytes_used", 0)
@@ -283,8 +305,8 @@ def get_usage(found_dirs):
                 result.append({
                     "division": item["division"],
                     "volume": item["volume"],
-                    "user": r.get("name"),
-                    "full_path": r.get("path"),
+                    "user": name,
+                    "full_path": full_path,
                     "owner_id": owner,
                     "email": get_email(owner),
                     "bytes_used": used
