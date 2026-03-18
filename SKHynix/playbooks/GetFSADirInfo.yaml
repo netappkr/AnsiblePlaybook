@@ -61,7 +61,7 @@
     - name: Find FSA.py
       find:
         paths: "{{ scripts_dir }}"
-        patterns: "fsa.py"
+        patterns: "FSA.py"
         recurse: yes
       register: fsa_script
 
