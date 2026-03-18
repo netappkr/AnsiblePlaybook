@@ -12,7 +12,7 @@ import os
 import sys
 import subprocess
 from collections import deque
-
+from requests.models import PreparedRequest
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # -------------------------
@@ -170,6 +170,10 @@ def find_directories(scan_objects):
                     }
                     logger.debug(f"[REQUEST] GET {base_url}")
                     logger.debug(f"[PARAMS] {params}")
+                    req = PreparedRequest()
+                    req.prepare_url(base_url, params)
+
+                    logger.debug(f"[REQUEST] {req.url}")
                     res = session.get(
                         base_url,
                         auth=auth,
