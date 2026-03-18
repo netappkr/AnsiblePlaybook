@@ -149,13 +149,13 @@ def find_directories(scan_objects):
         base_url = f"https://{cluster['ip']}/api/storage/volumes/{obj['vol_uuid']}/files"
         auth = (cluster["ID"], cluster["PW"])
 
-        # 🔥 target 리스트 (소문자 변환)
         targets = [p.get("dir") for p in obj["fsa_option"].get("path", [])]
 
         logger.info(f"[SEARCH] volume={obj['volume']} targets={targets}")
 
         queue = deque([("/", 1)])
         visited = set()
+        found_roots = set()  # 🔥 발견된 target 경로 저장
 
         while queue:
             path, depth = queue.popleft()
@@ -166,7 +166,6 @@ def find_directories(scan_objects):
             visited.add(path)
 
             try:
-                # 🔥 path 기반 URL
                 encoded_path = quote(path if path else "/")
                 url = f"{base_url}/{encoded_path}"
 
@@ -195,22 +194,56 @@ def find_directories(scan_objects):
                     name = r.get("name")
                     full_path = r.get("path")
 
-                    if name in [".", ".."]:
+                    if name in [".", "..", ".snapshot"]:
                         continue
 
-                    # 🔥 target 매칭
-                    if name and name in targets:
-                        logger.info(f"[FOUND] {full_path}")
+                    # 🔥 target 어디서든 발견
+                    if name in targets:
+                        logger.info(f"[FOUND ROOT] {full_path}")
 
-                        results.append({
-                            "cluster": cluster,
-                            "volume": obj["volume"],
-                            "division": obj["div"],
-                            "found_path": full_path,
-                            "vol_uuid": obj["vol_uuid"]
-                        })
+                        found_roots.add(full_path)
 
-                    # 🔥 BFS 확장
+                        # 🔥 하위 1-depth 조회
+                        encoded = quote(full_path)
+                        sub_url = f"{base_url}/{encoded}"
+
+                        res2 = session.get(
+                            sub_url,
+                            auth=auth,
+                            params={
+                                "type": "directory",
+                                "fields": "name,path"
+                            },
+                            timeout=10
+                        )
+
+                        res2.raise_for_status()
+                        sub_records = res2.json().get("records", [])
+
+                        for sr in sub_records:
+                            sub_name = sr.get("name")
+
+                            if sub_name in [".", "..", ".snapshot"]:
+                                continue
+
+                            sub_path = f"{full_path}/{sub_name}"
+
+                            results.append({
+                                "cluster": cluster,
+                                "volume": obj["volume"],
+                                "division": obj["div"],
+                                "found_path": sub_path,
+                                "vol_uuid": obj["vol_uuid"]
+                            })
+
+                        # 🔥 이 경로 밑으로는 더 탐색 안함
+                        continue
+
+                    # 🔥 이미 target으로 잡힌 경로 하위면 skip
+                    if any(path.startswith(root) for root in found_roots):
+                        continue
+
+                    # 🔥 BFS 계속 진행
                     if full_path:
                         queue.append((full_path, depth + 1))
 
