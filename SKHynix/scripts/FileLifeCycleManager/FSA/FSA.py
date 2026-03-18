@@ -163,16 +163,17 @@ def find_directories(scan_objects):
                 visited.add(path)
 
                 try:
+                    params={
+                        "path": path,
+                        "type": "directory",
+                        "fields": "name,path"
+                    }
                     logger.debug(f"[REQUEST] GET {base_url}")
-                    logger.debug(f"[PARAMS] path={path}")
+                    logger.debug(f"[PARAMS] {params}")
                     res = session.get(
                         base_url,
                         auth=auth,
-                        params={
-                            "path": path,
-                            "type": "directory",
-                            "fields": "name,path"
-                        },
+                        params=params,
                         timeout=10
                     )
                     
