@@ -150,7 +150,7 @@ def find_directories(scan_objects):
         auth = (cluster["ID"], cluster["PW"])
 
         # 🔥 target 리스트 (소문자 변환)
-        targets = [p.get("dir").lower() for p in obj["fsa_option"].get("path", [])]
+        targets = [p.get("dir") for p in obj["fsa_option"].get("path", [])]
 
         logger.info(f"[SEARCH] volume={obj['volume']} targets={targets}")
 
@@ -199,7 +199,7 @@ def find_directories(scan_objects):
                         continue
 
                     # 🔥 target 매칭
-                    if name and name.lower() in targets:
+                    if name and name in targets:
                         logger.info(f"[FOUND] {full_path}")
 
                         results.append({
