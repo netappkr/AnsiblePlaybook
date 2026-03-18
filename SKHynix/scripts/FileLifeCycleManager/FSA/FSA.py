@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--file", type=str, nargs='+')
 parser.add_argument("-r", "--request", type=str)
 parser.add_argument("--config", type=str)
+parser.add_argument("--debug", action="store_true", help="enable debug logging")
 args = parser.parse_args()
 
 # -------------------------
@@ -34,7 +35,7 @@ os.makedirs(log_dir, exist_ok=True)
 
 log_file_path = os.path.join(log_dir, "fsa.log")
 
-log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+log_level = "DEBUG" if args.debug else os.getenv("LOG_LEVEL", "INFO").upper()
 
 logger = logging.getLogger("fsa")
 logger.setLevel(getattr(logging, log_level, logging.INFO))
