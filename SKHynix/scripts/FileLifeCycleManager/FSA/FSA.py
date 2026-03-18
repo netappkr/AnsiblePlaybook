@@ -163,6 +163,8 @@ def find_directories(scan_objects):
                 visited.add(path)
 
                 try:
+                    logger.debug(f"[REQUEST] GET {base_url}")
+                    logger.debug(f"[PARAMS] path={path}")
                     res = session.get(
                         base_url,
                         auth=auth,
@@ -173,6 +175,9 @@ def find_directories(scan_objects):
                         },
                         timeout=10
                     )
+                    
+                    logger.debug(f"[RESPONSE] status={res.status_code}")
+                    logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
 
                     res.raise_for_status()
                     records = res.json().get("records", [])
@@ -211,12 +216,13 @@ def find_directories(scan_objects):
 # -------------------------
 def get_email(owner_id):
     try:
+        logger.debug(f"[EMAIL_CMD] finger2 {owner_id}")
         res = subprocess.run(
             ["finger2", str(owner_id)],
             capture_output=True,
             text=True
         )
-
+        logger.debug(f"[EMAIL_OUTPUT] {res.stdout.strip()}")
         for line in res.stdout.splitlines():
             if "E-mail" in line:
                 return line.split(":")[1].strip()
