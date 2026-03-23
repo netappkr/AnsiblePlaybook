@@ -301,7 +301,7 @@ def get_user_info(owner_id):
 
             if "E-mail" in line:
                 email = line.split(":")[1].strip()
-
+        logger.debug(f"[debug] owner_id={owner_id}, name={name}, email={email}")
         return name, email
 
     except Exception as e:
