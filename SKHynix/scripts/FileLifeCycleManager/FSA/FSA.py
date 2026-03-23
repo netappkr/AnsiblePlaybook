@@ -290,7 +290,7 @@ def get_user_info(owner_id):
             capture_output=True,
             text=True
         )
-
+        logger.debug(f"[debug] res={res}")
         name = "unknown"
         email = "unknown"
 
