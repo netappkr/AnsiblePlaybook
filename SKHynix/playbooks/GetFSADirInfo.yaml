@@ -6,9 +6,7 @@
     - netapp.ontap
 
   vars:
-    work_base_dir: "/tmp/fsa"
-    now_ts: "{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
-    work_dir: "{{ work_base_dir }}/{{ now_ts }}"
+    work_dir: "/tmp/fsa"
 
   tasks:
 
@@ -75,6 +73,11 @@
         file_type: file
       register: fsa_script
 
+    - name: Validate FSA.py exists
+      fail:
+        msg: "FSA.py not found"
+      when: fsa_script.matched == 0
+
     - name: Set script path
       set_fact:
         fsa_path: "{{ fsa_script.files[0].path }}"
@@ -96,9 +99,9 @@
         content: "{{ scan_objects.stdout }}"
 
     # -------------------------
-    # 🔥 핵심: usage까지 한번에
+    # usage 수집 (핵심)
     # -------------------------
-    - name: Collect usage (BFS + usage 통합)
+    - name: Collect usage
       command: >
         python3 {{ fsa_path }}
         -r find_and_collect_usage
@@ -130,7 +133,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "FSA Usage Report - {{ now_ts }}"
+        subject: "FSA Usage Report"
         body: "{{ html.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
