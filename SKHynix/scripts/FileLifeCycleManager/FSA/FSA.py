@@ -275,25 +275,32 @@ def find_directories(scan_objects):
     return results
 
 # -------------------------
-# email 조회
+# username email 조회
 # -------------------------
-def get_email(owner_id):
+def get_user_info(owner_id):
     try:
-        logger.debug(f"[EMAIL_CMD] finger2 {owner_id}")
         res = subprocess.run(
             ["finger2", str(owner_id)],
             capture_output=True,
             text=True
         )
-        logger.debug(f"[EMAIL_OUTPUT] {res.stdout.strip()}")
+
+        name = "unknown"
+        email = "unknown"
+
         for line in res.stdout.splitlines():
+
+            if "Name:" in line:
+                name = line.split("Name:")[1].strip()
+
             if "E-mail" in line:
-                return line.split(":")[1].strip()
+                email = line.split(":")[1].strip()
+
+        return name, email
 
     except Exception as e:
-        logger.error(f"[ERROR] email owner={owner_id} {str(e)}")
-
-    return "unknown"
+        logger.error(f"[ERROR] get_user_info owner={owner_id} {str(e)}")
+        return "unknown", "unknown"
 
 # -------------------------
 # usage 조회
@@ -345,24 +352,21 @@ def get_usage(found_dirs):
                 if r.get("name") in [".", ".."]:
                     continue
 
-                name = r.get("name")
-
-                # 🔥 full_path 재조합
-                if path == "/" or path == "":
-                    full_path = f"/{name}"
-                else:
-                    full_path = f"{path}/{name}"
+                dir_name = r.get("name")
+                parent = r.get("path") or "/"
+                full_path = f"{parent.rstrip('/')}/{dir_name}"
 
                 owner = r.get("owner_id")
                 used = r.get("analytics", {}).get("bytes_used", 0)
-
+                username, email = get_user_info(owner)
                 result.append({
                     "division": item["division"],
                     "volume": item["volume"],
-                    "user": name,
+                    "dir_name": dir_name,
                     "full_path": full_path,
                     "owner_id": owner,
-                    "email": get_email(owner),
+                    "user": username,
+                    "email": email,
                     "bytes_used": used
                 })
 
@@ -430,8 +434,9 @@ def build_html(data):
     <tr>
         <td>{d['division']}</td>
         <td>{d['volume']}</td>
-        <td>{d['user']}</td>
+        <td>{d['full_path']}</td>
         <td>{gb:.2f}</td>
+        <td>{d['user']}</td>
         <td>{d['email']}</td>
     </tr>
 """
