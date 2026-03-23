@@ -135,15 +135,15 @@ def get_scan_objects(data, config):
 # USER 디렉토리 찾기
 # -------------------------
 
-def find_directories(scan_objects):
+def find_and_collect_usage(scan_objects):
 
-    logger.info(f"[START] find_directories count={len(scan_objects)}")
+    logger.info(f"[START] find_and_collect_usage count={len(scan_objects)}")
 
     session = requests.Session()
     session.verify = False
 
     results = []
-    seen_paths = set()  # 🔥 중복 방지
+    seen_paths = set()  # 중복 방지
 
     for obj in scan_objects:
         cluster = obj["cluster"]
@@ -171,21 +171,16 @@ def find_directories(scan_objects):
                 url = f"{base_url}/{encoded_path}"
 
                 logger.debug(f"[REQUEST] {url}")
-                logger.debug(f"[AUTH] user={auth[0]} password=****")
-                logger.debug(f"[ENCODED] raw={path} encoded={encoded_path}")
 
                 res = session.get(
                     url,
                     auth=auth,
                     params={
                         "type": "directory",
-                        "fields": "name,path"
+                        "fields": "name,path,type"
                     },
                     timeout=30
                 )
-
-                logger.debug(f"[RESPONSE] status={res.status_code}")
-                logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
 
                 res.raise_for_status()
                 records = res.json().get("records", [])
@@ -195,14 +190,18 @@ def find_directories(scan_objects):
                 for r in records:
                     name = r.get("name")
                     parent = r.get("path") or "/"
+                    r_type = r.get("type")
 
                     if name in [".", "..", ".snapshot"]:
                         continue
 
-                    # 🔥 핵심: full_path 생성
+                    if r_type != "directory":
+                        continue
+
+                    # 🔥 full path 생성
                     full_path = f"{parent.rstrip('/')}/{name}"
 
-                    logger.debug(f"[PATH] parent={parent} name={name} full={full_path}")
+                    logger.debug(f"[PATH] {full_path}")
 
                     # 🔥 target 발견
                     if name in targets:
@@ -213,65 +212,72 @@ def find_directories(scan_objects):
                         logger.info(f"[FOUND ROOT] {full_path}")
                         found_roots.add(full_path)
 
-                        # 🔥 하위 1-depth 조회
-                        encoded = quote(full_path, safe="")
-                        sub_url = f"{base_url}/{encoded}"
-
-                        logger.debug(f"[REQUEST] {sub_url}")
+                        # 🔥 하위 디렉토리 조회 + usage 수집
+                        encoded_sub = quote(full_path, safe="")
+                        sub_url = f"{base_url}/{encoded_sub}"
 
                         res2 = session.get(
                             sub_url,
                             auth=auth,
                             params={
                                 "type": "directory",
-                                "fields": "name,path"
+                                "fields": "name,path,owner_id,analytics.bytes_used,type"
                             },
                             timeout=10
                         )
 
-                        logger.debug(f"[RESPONSE] status={res2.status_code}")
-                        logger.debug(f"[RESPONSE_BODY] {res2.text[:300]}")
-
                         res2.raise_for_status()
                         sub_records = res2.json().get("records", [])
 
-                        logger.debug(f"[API] sub_path={full_path} count={len(sub_records)}")
+                        logger.debug(f"[USAGE API] path={full_path} count={len(sub_records)}")
 
                         for sr in sub_records:
                             sub_name = sr.get("name")
                             sub_parent = sr.get("path") or full_path
+                            sub_type = sr.get("type")
 
                             if sub_name in [".", "..", ".snapshot"]:
                                 continue
 
-                            # 🔥 핵심: sub full path 생성
-                            sub_path = f"{sub_parent.rstrip('/')}/{sub_name}"
+                            if sub_type != "directory":
+                                continue
 
-                            if sub_path not in seen_paths:
-                                seen_paths.add(sub_path)
+                            sub_full_path = f"{sub_parent.rstrip('/')}/{sub_name}"
 
-                                results.append({
-                                    "cluster": cluster,
-                                    "volume": obj["volume"],
-                                    "division": obj["div"],
-                                    "found_path": sub_path,
-                                    "vol_uuid": obj["vol_uuid"]
-                                })
+                            if sub_full_path in seen_paths:
+                                continue
 
-                        # 🔥 target 밑은 더 안탐
+                            seen_paths.add(sub_full_path)
+
+                            owner = sr.get("owner_id")
+                            used = sr.get("analytics", {}).get("bytes_used", 0)
+
+                            username, email = get_user_info(owner)
+
+                            results.append({
+                                "division": obj["div"],
+                                "volume": obj["volume"],
+                                "user_dir": sub_name,
+                                "full_path": sub_full_path,
+                                "owner_id": owner,
+                                "user_name": username,
+                                "email": email,
+                                "bytes_used": used
+                            })
+
                         continue
 
-                    # 🔥 이미 root 잡힌 경로 하위 skip
+                    # 🔥 이미 target 하위면 탐색 skip
                     if any(path.startswith(root) for root in found_roots):
                         continue
 
-                    # 🔥 BFS 확장 (핵심)
+                    # 🔥 BFS 확장
                     queue.append((full_path, depth + 1))
 
             except Exception as e:
-                logger.error(f"[ERROR] find_dir path={path} {str(e)}")
+                logger.error(f"[ERROR] path={path} {str(e)}")
 
-    logger.info(f"[END] find_directories found={len(results)}")
+    logger.info(f"[END] find_and_collect_usage result_count={len(results)}")
     return results
 
 # -------------------------
@@ -301,82 +307,6 @@ def get_user_info(owner_id):
     except Exception as e:
         logger.error(f"[ERROR] get_user_info owner={owner_id} {str(e)}")
         return "unknown", "unknown"
-
-# -------------------------
-# usage 조회
-# -------------------------
-
-def get_usage(found_dirs):
-
-    logger.info(f"[START] get_usage count={len(found_dirs)}")
-
-    session = requests.Session()
-    session.verify = False
-
-    result = []
-
-    for item in found_dirs:
-        cluster = item["cluster"]
-
-        try:
-            base_url = f"https://{cluster['ip']}/api/storage/volumes/{item['vol_uuid']}/files"
-
-            # 🔥 path 기반 방식으로 변경
-            path = item["found_path"] if item["found_path"] else "/"
-            encoded_path = quote(path, safe="")
-
-            url = f"{base_url}/{encoded_path}"
-
-            logger.debug(f"[REQUEST] {url}")
-            logger.debug(f"[AUTH] user={cluster['ID']} password=****")
-            logger.debug(f"[ENCODED] raw={path} encoded={encoded_path}")
-            res = session.get(
-                url,
-                auth=(cluster["ID"], cluster["PW"]),
-                params={
-                    "type": "directory",
-                    "fields": "name,path,owner_id,analytics.bytes_used"
-                },
-                timeout=10
-            )
-
-            logger.debug(f"[RESPONSE] status={res.status_code}")
-            logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
-
-            res.raise_for_status()
-            records = res.json().get("records", [])
-
-            logger.info(f"[QUERY] path={path} count={len(records)}")
-
-            for r in records:
-                if r.get("name") in [".", ".."]:
-                    continue
-
-                dir_name = r.get("name")
-                parent = r.get("path") or "/"
-                full_path = f"{parent.rstrip('/')}/{dir_name}"
-
-                owner = r.get("owner_id")
-                used = r.get("analytics", {}).get("bytes_used", 0)
-                username, email = get_user_info(owner)
-                result.append({
-                    "division": item["division"],
-                    "volume": item["volume"],
-                    "dir_name": dir_name,
-                    "full_path": full_path,
-                    "owner_id": owner,
-                    "user": username,
-                    "email": email,
-                    "bytes_used": used
-                })
-
-        except Exception as e:
-            logger.error(f"[ERROR] usage path={item['found_path']} {str(e)}")
-
-    result.sort(key=lambda x: x["bytes_used"], reverse=True)
-
-    logger.info(f"[END] get_usage users={len(result)}")
-    return result
 
 # -------------------------
 # HTML

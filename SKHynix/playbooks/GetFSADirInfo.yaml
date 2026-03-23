@@ -1,26 +1,29 @@
 ---
-- name: Ontap File Lifecycle Managed (FSA v2)
+- name: Ontap File Lifecycle Managed (FSA v3)
   hosts: task_server_1_fsa
   gather_facts: no
   collections:
     - netapp.ontap
 
-  tasks:
-    # ------------------------
-    # 0. 작업 디렉토리 생성
-    # ------------------------
-    - name: Set work_dir
-      set_fact:
-        work_dir: "/tmp/fsa/{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+  vars:
+    work_base_dir: "/tmp/fsa"
+    now_ts: "{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+    work_dir: "{{ work_base_dir }}/{{ now_ts }}"
 
+  tasks:
+
+    # -------------------------
+    # 작업 디렉토리 생성
+    # -------------------------
     - name: Create work directory
       file:
         path: "{{ work_dir }}"
         state: directory
+        mode: "0755"
 
-    # ------------------------
-    # 1. ONTAP Volume 조회
-    # ------------------------
+    # -------------------------
+    # ONTAP 볼륨 조회
+    # -------------------------
     - name: Get volume information
       na_ontap_rest_cli:
         hostname: "{{ cluster.ip }}"
@@ -45,79 +48,71 @@
       loop_control:
         loop_var: cluster
 
+    # -------------------------
+    # JSON 저장
+    # -------------------------
     - name: Save volume JSON
       copy:
         dest: "{{ work_dir }}/volume.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
 
+    # -------------------------
+    # config 저장
+    # -------------------------
     - name: Save config YAML
       copy:
         dest: "{{ work_dir }}/config.yaml"
         content: "{{ config | to_nice_yaml }}"
 
-    # ------------------------
-    # 2. FSA.py 위치 찾기
-    # ------------------------
+    # -------------------------
+    # FSA.py 찾기
+    # -------------------------
     - name: Find FSA.py
       find:
         paths: "{{ scripts_dir }}"
         patterns: "FSA.py"
         recurse: yes
+        file_type: file
       register: fsa_script
 
     - name: Set script path
       set_fact:
         fsa_path: "{{ fsa_script.files[0].path }}"
 
-    # ------------------------
-    # 3. Scan Object 생성
-    # ------------------------
-    - name: Generate scan objects
+    # -------------------------
+    # scan_object 생성
+    # -------------------------
+    - name: Generate scan_objects
       command: >
         python3 {{ fsa_path }}
         -r get_scan_object
-        -f {{ work_dir }}/volume.json
         --config {{ work_dir }}/config.yaml
-      register: scan_object
+        -f {{ work_dir }}/volume.json
+      register: scan_objects
 
-    - name: Save scan objects
+    - name: Save scan_objects YAML
       copy:
         dest: "{{ work_dir }}/scan_objects.yaml"
-        content: "{{ scan_object.stdout }}"
+        content: "{{ scan_objects.stdout }}"
 
-    # ------------------------
-    # 4. USER 디렉토리 탐색
-    # ------------------------
-    - name: Find USER directories
+    # -------------------------
+    # 🔥 핵심: usage까지 한번에
+    # -------------------------
+    - name: Collect usage (BFS + usage 통합)
       command: >
         python3 {{ fsa_path }}
-        -r find_dir
+        -r find_and_collect_usage
         -f {{ work_dir }}/scan_objects.yaml
-      register: found_dirs
+      register: usage_result
 
-    - name: Save found dirs
-      copy:
-        dest: "{{ work_dir }}/found_dirs.yaml"
-        content: "{{ found_dirs.stdout }}"
-
-    # ------------------------
-    # 5. Usage 조회
-    # ------------------------
-    - name: Get usage data
-      command: >
-        python3 {{ fsa_path }}
-        -r get_usage
-        -f {{ work_dir }}/found_dirs.yaml
-      register: usage
-
-    - name: Save usage
+    - name: Save usage YAML
       copy:
         dest: "{{ work_dir }}/usage.yaml"
-        content: "{{ usage.stdout }}"
+        content: "{{ usage_result.stdout }}"
 
-    # ------------------------
-    # 6. HTML 생성
-    # ------------------------
+    # -------------------------
+    # HTML 생성
+    # -------------------------
     - name: Build HTML report
       command: >
         python3 {{ fsa_path }}
@@ -125,24 +120,21 @@
         -f {{ work_dir }}/usage.yaml
       register: html
 
-    - name: Save HTML file
-      copy:
-        dest: "{{ work_dir }}/report.html"
-        content: "{{ html.stdout }}"
-
-    # ------------------------
-    # 7. 이메일 발송
-    # ------------------------
-    - name: Send FSA report email
+    # -------------------------
+    # 메일 발송
+    # -------------------------
+    - name: Send usage report mail
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ email_to }}"
-        subject: "FSA Report - {{ now(utc=false,fmt='%Y.%m.%d') }}"
+        subject: "FSA Usage Report - {{ now_ts }}"
         body: "{{ html.stdout }}"
         from: "{{ email_from }}"
         secure: starttls
         subtype: html
+        headers:
+          - Content-Type="text/html"
       when: html.stdout is defined
