@@ -184,61 +184,6 @@ E-mail\s*:\s*(.*)
 * 이메일 포함
 * 테이블 형태 출력
 
----
-
-# ⚠️ 주의사항
-
-## 1️⃣ ONTAP API 구조
-
-* `path` = 부모 경로
-* `name` = 디렉토리 이름
-* full_path 직접 생성 필요
-
----
-
-## 2️⃣ owner_id 주의
-
-```text id="warn01"
-owner_id = 0 → system/root 계정
-```
-
----
-
-## 3️⃣ finger2 의존성
-
-* OS에 설치 필요
-* 환경별 출력 포맷 다를 수 있음
-
----
-
-## 4️⃣ Ansible YAML 저장
-
-반드시 변환 필요
-
-```yaml id="warn02"
-content: "{{ usage_result.stdout | from_yaml | to_nice_yaml }}"
-```
-
----
-
-# 🔥 성능 특징
-
-* BFS + 즉시 수집 구조
-* API 호출 최소화 (약 50% 감소)
-* 중복 제거 (seen_paths)
-* depth 제한으로 과도한 탐색 방지
-
----
-
-# 🚀 향후 개선 항목
-
-* Top N 사용자 리포트
-* 용량 임계치 알림
-* 사용자별 개별 메일 발송
-* user_db.yaml 기반 lookup (finger 제거)
-* 캐싱 적용 (finger 호출 최적화)
-
----
 
 ```
 
