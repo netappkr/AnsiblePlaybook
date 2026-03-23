@@ -43,7 +43,7 @@ logger = logging.getLogger("fsa")
 logger.setLevel(getattr(logging, log_level, logging.INFO))
 
 formatter = logging.Formatter(
-    '%(asctime)s %(levelname)s %(message)s',
+    '%(asctime)s %(levelname)s [%(funcName)s] %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
@@ -171,7 +171,7 @@ def find_directories(scan_objects):
 
                 logger.debug(f"[REQUEST] {url}")
                 logger.debug(f"[AUTH] user={auth[0]} password=****")
-
+                logger.debug(f"[ENCODED] raw={path} encoded={encoded_path}")
                 res = session.get(
                     url,
                     auth=auth,
@@ -208,6 +208,7 @@ def find_directories(scan_objects):
                         sub_url = f"{base_url}/{encoded}"
                         logger.debug(f"[REQUEST] {sub_url}")
                         logger.debug(f"[AUTH] user={auth[0]} password=****")
+                        logger.debug(f"[ENCODED] raw={path} encoded={encoded_path}")
                         res2 = session.get(
                             sub_url,
                             auth=auth,
@@ -305,7 +306,7 @@ def get_usage(found_dirs):
 
             logger.debug(f"[REQUEST] {url}")
             logger.debug(f"[AUTH] user={cluster['ID']} password=****")
-
+            logger.debug(f"[ENCODED] raw={path} encoded={encoded_path}")
             res = session.get(
                 url,
                 auth=(cluster["ID"], cluster["PW"]),
