@@ -391,13 +391,10 @@ def main():
             result = get_scan_objects(data[args.file[0]], config)
             print(yaml.safe_dump(result, sort_keys=False))
 
-        elif args.request == "find_dir":
+        elif args.request == "find_and_collect_usage":
             data = read_yaml(args.file[0])
-            print(yaml.safe_dump(find_directories(data), sort_keys=False))
-
-        elif args.request == "get_usage":
-            data = read_yaml(args.file[0])
-            print(yaml.safe_dump(get_usage(data), sort_keys=False))
+            result = find_and_collect_usage(data)
+            print(yaml.safe_dump(result, sort_keys=False))
 
         elif args.request == "build_mail":
             data = read_yaml(args.file[0])
