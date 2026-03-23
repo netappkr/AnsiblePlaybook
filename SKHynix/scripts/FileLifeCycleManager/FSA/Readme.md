@@ -151,26 +151,6 @@ division:
 
 ---
 
-## 📌 full_path 생성 방식
-
-ONTAP API 특성상 full path는 직접 생성해야 함
-
-```id="logic01"
-full_path = parent.rstrip("/") + "/" + name
-```
-
----
-
-## 📌 탐색 방식
-
-```id="logic02"
-/ → USER 발견
-→ /USER 하위 조회
-→ /USER/{user_dir} 수집
-```
-
----
-
 # 👤 사용자 정보 조회
 
 ```bash id="user01"
