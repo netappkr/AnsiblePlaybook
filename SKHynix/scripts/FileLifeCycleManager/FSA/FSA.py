@@ -318,29 +318,10 @@ def build_html(data):
 <head>
     <meta charset="UTF-8">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        h2 {
-            margin-bottom: 10px;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th {
-            background-color: #f2f2f2;
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        tr:nth-child(even) {
-            background-color: #fafafa;
-        }
+        body { font-family: Arial; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
@@ -348,38 +329,37 @@ def build_html(data):
 <h2>Directory Usage Report</h2>
 
 <table>
-    <tr>
-        <th>Division</th>
-        <th>Volume</th>
-        <th>User</th>
-        <th>Usage (GB)</th>
-        <th>Email</th>
-    </tr>
+<tr>
+    <th>Division</th>
+    <th>Volume</th>
+    <th>User Dir</th>
+    <th>User Name</th>
+    <th>Email</th>
+    <th>Usage (GB)</th>
+</tr>
 """
 
     for d in data:
-        gb = d["bytes_used"] / (1024**3)
+        gb = d.get("bytes_used", 0) / (1024**3)
 
         html += f"""
-    <tr>
-        <td>{d['division']}</td>
-        <td>{d['volume']}</td>
-        <td>{d['full_path']}</td>
-        <td>{gb:.2f}</td>
-        <td>{d['user']}</td>
-        <td>{d['email']}</td>
-    </tr>
+<tr>
+    <td>{d.get('division')}</td>
+    <td>{d.get('volume')}</td>
+    <td>{d.get('user_dir')}</td>
+    <td>{d.get('user_name')}</td>
+    <td>{d.get('email')}</td>
+    <td>{gb:.2f}</td>
+</tr>
 """
 
     html += """
 </table>
-
 </body>
 </html>
 """
 
     return html
-
 # -------------------------
 # main
 # -------------------------
