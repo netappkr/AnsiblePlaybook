@@ -1,218 +1,294 @@
-# 📦 FSA Directory Usage Analyzer
+# 📊 FSA (File System Analytics) Usage Collector
 
-NetApp ONTAP FSA(File System Analytics) API를 활용하여
-**USER 디렉토리 하위 사용량을 분석하고, 사용자별 이메일 매핑 및 HTML 리포트를 생성하는 도구**
-
----
-
-# 🚀 Overview
-
-이 스크립트는 다음과 같은 흐름으로 동작합니다:
-
-```
-ONTAP Volume → USER 디렉토리 탐색 → 하위 디렉토리 usage 조회
-→ owner_id 기반 사용자 정보 조회 → HTML 리포트 생성
-```
+ONTAP File Analytics API를 활용하여 특정 디렉토리 구조를 탐색(BFS)하고,
+사용자별 디렉토리 사용량을 수집하여 HTML 리포트 및 이메일로 전달하는 자동화 시스템입니다.
 
 ---
 
-# 🏗️ Architecture
+# 🧱 아키텍처 개요
 
-```
-[scan object JSON]
+```id="arch01"
+Ansible Playbook
         ↓
-get_scan_object
+     FSA.py
         ↓
-scan_objects.yaml
+  ONTAP REST API
         ↓
-find_dir
+     finger2 (user lookup)
         ↓
-found_dirs.yaml
-        ↓
-get_usage
-        ↓
-usage.yaml
-        ↓
-build_mail
-        ↓
-report.html
+   HTML Report → Email
 ```
 
 ---
 
-# 📂 Features
+# 🚀 주요 기능
 
-* ✅ ONTAP FSA API 기반 디렉토리 분석
-* ✅ BFS 기반 USER 디렉토리 자동 탐색
-* ✅ 사용자별 용량 집계
-* ✅ `owner_id → email` 매핑 (finger2)
-* ✅ YAML 기반 데이터 처리 (Ansible 친화)
-* ✅ HTML 리포트 생성
-* ✅ 상세 로그 (INFO / DEBUG 지원)
+* ONTAP Volume 정보 조회
+* BFS 기반 디렉토리 탐색 (최대 depth 7)
+* Target 디렉토리 자동 탐색
+* 사용자별 디렉토리 usage 수집
+* owner_id → 사용자 이름 / 이메일 매핑
+* HTML 리포트 생성 및 메일 발송
 
 ---
 
-# ⚙️ Requirements
+# 📁 작업 디렉토리
 
-* Python 3.8+
-* requests
-* PyYAML
-* ONTAP FSA enabled (analytics_state = on)
-* Linux 환경 (finger2 사용)
+```id="dir01"
+/tmp/fsa/
+ ├── volume.json
+ ├── config.yaml
+ ├── scan_objects.yaml
+ ├── usage.yaml
+```
 
-```bash
-pip install requests pyyaml
+> 실행 시 항상 overwrite 됩니다.
+
+---
+
+# ⚙️ Ansible 플레이북 연동
+
+## 📌 사용 플레이북
+
+```id="playbook01"
+GetFSADirInfo.yaml
 ```
 
 ---
 
-# 🔧 Configuration (config.yaml)
+## 📌 전체 실행 흐름
 
-```yaml
-domain: example.com
+```id="flow01"
+1. ONTAP volume 조회
+2. volume.json 생성
+3. config.yaml 생성
+4. scan_objects 생성 (get_scan_object)
+5. BFS 탐색 + usage 수집 (find_and_collect_usage)
+6. usage.yaml 생성
+7. HTML 생성 (build_mail)
+8. 이메일 발송
+```
 
+---
+
+## 📌 핵심 Task
+
+```yaml id="ansible01"
+- name: Collect usage
+  command: >
+    python3 {{ fsa_path }}
+    -r find_and_collect_usage
+    -f {{ work_dir }}/scan_objects.yaml
+```
+
+---
+
+# 🧪 Python 단독 실행 방법
+
+## 1️⃣ scan_object 생성
+
+```bash id="run01"
+python3 FSA.py -r get_scan_object \
+  --config config.yaml \
+  -f volume.json
+```
+
+---
+
+## 2️⃣ usage 수집 (핵심)
+
+```bash id="run02"
+python3 FSA.py -r find_and_collect_usage \
+  -f scan_objects.yaml
+```
+
+---
+
+## 3️⃣ HTML 리포트 생성
+
+```bash id="run03"
+python3 FSA.py -r build_mail \
+  -f usage.yaml
+```
+
+---
+
+# 📄 config.yaml 예시
+
+```yaml id="cfg01"
 division:
-  - name: SCH
+  - name: DRAM
     fsa_option:
       path:
         - dir: USER
+        - dir: FE
 ```
 
 ---
 
-# 📥 Input Data (scan JSON)
+# 📄 usage.yaml 예시
 
-ONTAP REST API (`/storage/volumes`) 결과 JSON 필요
-
----
-
-# 🧪 Usage
-
-## 1️⃣ Scan Object 생성
-
-```bash
-python fsa.py -r get_scan_object -f volumes.json --config config.yaml
-```
-
-👉 output: `scan_objects.yaml`
-
----
-
-## 2️⃣ USER 디렉토리 탐색
-
-```bash
-python fsa.py -r find_dir -f scan_objects.yaml
-```
-
-👉 output: `found_dirs.yaml`
-
----
-
-## 3️⃣ 사용자 Usage 조회
-
-```bash
-python fsa.py -r get_usage -f found_dirs.yaml
-```
-
-👉 output: `usage.yaml`
-
----
-
-## 4️⃣ HTML 리포트 생성
-
-```bash
-python fsa.py -r build_mail -f usage.yaml > report.html
+```yaml id="usage01"
+- division: DRAM
+  volume: vol2
+  user_dir: hanmin
+  full_path: /USER/hanmin
+  owner_id: 0
+  user_name: root
+  email: system@sk.com
+  bytes_used: 10568507392
 ```
 
 ---
 
-# 📊 Output Example
+# 🔍 핵심 로직 설명
 
-## YAML
+## 📌 BFS 탐색
 
-```yaml
-- division: SCH
-  volume: vol1
-  user: wooyoung
-  full_path: /data/USER/wooyoung
-  owner_id: 1001
-  email: wooyoung@company.com
-  bytes_used: 104857600
+* `/`부터 시작하여 디렉토리 순회
+* 최대 depth 7까지 탐색
+* target 발견 시 하위 디렉토리만 조회
+
+---
+
+## 📌 full_path 생성 방식
+
+ONTAP API 특성상 full path는 직접 생성해야 함
+
+```id="logic01"
+full_path = parent.rstrip("/") + "/" + name
 ```
 
 ---
 
-## HTML
+## 📌 탐색 방식
 
-* 사용자별 사용량 테이블
+```id="logic02"
+/ → USER 발견
+→ /USER 하위 조회
+→ /USER/{user_dir} 수집
+```
+
+---
+
+# 👤 사용자 정보 조회
+
+```bash id="user01"
+finger2 <owner_id>
+```
+
+---
+
+## 📌 출력 예시
+
+```id="user02"
+Name : root
+E-mail : system@sk.com
+```
+
+---
+
+## 📌 파싱 방식
+
+```python id="user03"
+Name\s*:\s*(.*)
+E-mail\s*:\s*(.*)
+```
+
+---
+
+# 📧 HTML 리포트
+
+* 사용자별 디렉토리 사용량
 * GB 단위 변환
 * 이메일 포함
+* 테이블 형태 출력
 
 ---
 
-# 🪵 Logging
+# ⚠️ 주의사항
 
-로그 위치:
+## 1️⃣ ONTAP API 구조
 
-```bash
-~/logs/fsa.log
-```
+* `path` = 부모 경로
+* `name` = 디렉토리 이름
+* full_path 직접 생성 필요
 
-로그 레벨 설정:
+---
 
-```bash
-export LOG_LEVEL=DEBUG
-```
+## 2️⃣ owner_id 주의
 
-로그 예시:
-
-```
-[INFO] [START] find_directories
-[INFO] [FOUND] /data/USER/wooyoung
-[INFO] [QUERY] path=/data/USER count=45
-[DEBUG] [USER] wooyoung 123456789 wooyoung@company.com
+```text id="warn01"
+owner_id = 0 → system/root 계정
 ```
 
 ---
 
-# ⚠️ Troubleshooting
+## 3️⃣ finger2 의존성
 
-## 🔸 API 응답 없음
-
-* ONTAP FSA 활성화 확인 (`analytics_state = on`)
-* 네트워크 / 인증 확인
-
-## 🔸 email 조회 실패
-
-* finger2 설치 확인
-* owner_id 존재 여부 확인
-
-## 🔸 디렉토리 탐색 안됨
-
-* `fsa_option.path.dir` 값 확인
-* BFS depth (기본 7) 초과 여부 확인
+* OS에 설치 필요
+* 환경별 출력 포맷 다를 수 있음
 
 ---
 
-# 🤝 Ansible Integration
+## 4️⃣ Ansible YAML 저장
 
-이 스크립트는 각 단계별로 실행 가능하여
-Ansible Playbook과 쉽게 연동 가능합니다.
+반드시 변환 필요
 
----
-
-# 🔥 Future Enhancements
-
-* 📧 SMTP 기반 메일 자동 발송
-* 👤 사용자별 개별 리포트
-* 📊 용량 threshold 알림
-* ⏱ cron 기반 자동 실행
+```yaml id="warn02"
+content: "{{ usage_result.stdout | from_yaml | to_nice_yaml }}"
+```
 
 ---
 
-# 🧑‍💻 Author
+# 🔥 성능 특징
 
-NetApp Korea Automation Script
-Maintained for internal FSA usage analysis
+* BFS + 즉시 수집 구조
+* API 호출 최소화 (약 50% 감소)
+* 중복 제거 (seen_paths)
+* depth 제한으로 과도한 탐색 방지
 
 ---
+
+# 🚀 향후 개선 항목
+
+* Top N 사용자 리포트
+* 용량 임계치 알림
+* 사용자별 개별 메일 발송
+* user_db.yaml 기반 lookup (finger 제거)
+* 캐싱 적용 (finger 호출 최적화)
+
+---
+
+# 🧩 트러블슈팅
+
+## ❌ invalid request
+
+```text id="tr01"
+→ Python request 분기 누락
+```
+
+---
+
+## ❌ KeyError: user
+
+```text id="tr02"
+→ user → user_dir 변경 반영 안됨
+```
+
+---
+
+## ❌ TypeError: string indices
+
+```text id="tr03"
+→ YAML이 문자열로 저장됨
+→ Ansible에서 from_yaml 필요
+```
+
+---
+
+# 😎 한줄 요약
+
+```id="summary01"
+ONTAP 디렉토리를 BFS로 탐색하여 사용자별 사용량을 자동으로 수집하고 리포팅하는 시스템
+```
