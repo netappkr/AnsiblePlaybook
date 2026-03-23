@@ -166,7 +166,7 @@ def find_directories(scan_objects):
             visited.add(path)
 
             try:
-                encoded_path = quote(path if path else "/")
+                encoded_path = quote(path if path else "/", safe="")
                 url = f"{base_url}/{encoded_path}"
 
                 logger.debug(f"[REQUEST] {url}")
