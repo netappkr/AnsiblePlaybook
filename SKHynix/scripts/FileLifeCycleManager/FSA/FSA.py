@@ -143,6 +143,7 @@ def find_directories(scan_objects):
     session.verify = False
 
     results = []
+    seen_paths = set()  # 🔥 중복 방지
 
     for obj in scan_objects:
         cluster = obj["cluster"]
@@ -155,7 +156,7 @@ def find_directories(scan_objects):
 
         queue = deque([("/", 1)])
         visited = set()
-        found_roots = set()  # 🔥 발견된 target 경로 저장
+        found_roots = set()
 
         while queue:
             path, depth = queue.popleft()
@@ -172,6 +173,7 @@ def find_directories(scan_objects):
                 logger.debug(f"[REQUEST] {url}")
                 logger.debug(f"[AUTH] user={auth[0]} password=****")
                 logger.debug(f"[ENCODED] raw={path} encoded={encoded_path}")
+
                 res = session.get(
                     url,
                     auth=auth,
@@ -192,23 +194,31 @@ def find_directories(scan_objects):
 
                 for r in records:
                     name = r.get("name")
-                    full_path = r.get("path")
+                    parent = r.get("path") or "/"
 
                     if name in [".", "..", ".snapshot"]:
                         continue
 
-                    # 🔥 target 어디서든 발견
-                    if name in targets:
-                        logger.info(f"[FOUND ROOT] {full_path}")
+                    # 🔥 핵심: full_path 생성
+                    full_path = f"{parent.rstrip('/')}/{name}"
 
+                    logger.debug(f"[PATH] parent={parent} name={name} full={full_path}")
+
+                    # 🔥 target 발견
+                    if name in targets:
+
+                        if full_path in found_roots:
+                            continue
+
+                        logger.info(f"[FOUND ROOT] {full_path}")
                         found_roots.add(full_path)
 
                         # 🔥 하위 1-depth 조회
                         encoded = quote(full_path, safe="")
                         sub_url = f"{base_url}/{encoded}"
+
                         logger.debug(f"[REQUEST] {sub_url}")
-                        logger.debug(f"[AUTH] user={auth[0]} password=****")
-                        logger.debug(f"[ENCODED] raw={path} encoded={encoded_path}")
+
                         res2 = session.get(
                             sub_url,
                             auth=auth,
@@ -218,39 +228,45 @@ def find_directories(scan_objects):
                             },
                             timeout=10
                         )
-                        logger.debug(f"[RESPONSE] status={res.status_code}")
-                        logger.debug(f"[RESPONSE_BODY] {res.text[:300]}")
+
+                        logger.debug(f"[RESPONSE] status={res2.status_code}")
+                        logger.debug(f"[RESPONSE_BODY] {res2.text[:300]}")
 
                         res2.raise_for_status()
                         sub_records = res2.json().get("records", [])
-                        logger.debug(f"[API] path={path} count={len(sub_records)}")
-                        
+
+                        logger.debug(f"[API] sub_path={full_path} count={len(sub_records)}")
+
                         for sr in sub_records:
                             sub_name = sr.get("name")
+                            sub_parent = sr.get("path") or full_path
 
                             if sub_name in [".", "..", ".snapshot"]:
                                 continue
 
-                            sub_path = f"{full_path}/{sub_name}"
+                            # 🔥 핵심: sub full path 생성
+                            sub_path = f"{sub_parent.rstrip('/')}/{sub_name}"
 
-                            results.append({
-                                "cluster": cluster,
-                                "volume": obj["volume"],
-                                "division": obj["div"],
-                                "found_path": sub_path,
-                                "vol_uuid": obj["vol_uuid"]
-                            })
+                            if sub_path not in seen_paths:
+                                seen_paths.add(sub_path)
 
-                        # 🔥 이 경로 밑으로는 더 탐색 안함
+                                results.append({
+                                    "cluster": cluster,
+                                    "volume": obj["volume"],
+                                    "division": obj["div"],
+                                    "found_path": sub_path,
+                                    "vol_uuid": obj["vol_uuid"]
+                                })
+
+                        # 🔥 target 밑은 더 안탐
                         continue
 
-                    # 🔥 이미 target으로 잡힌 경로 하위면 skip
+                    # 🔥 이미 root 잡힌 경로 하위 skip
                     if any(path.startswith(root) for root in found_roots):
                         continue
 
-                    # 🔥 BFS 계속 진행
-                    if full_path:
-                        queue.append((full_path, depth + 1))
+                    # 🔥 BFS 확장 (핵심)
+                    queue.append((full_path, depth + 1))
 
             except Exception as e:
                 logger.error(f"[ERROR] find_dir path={path} {str(e)}")
