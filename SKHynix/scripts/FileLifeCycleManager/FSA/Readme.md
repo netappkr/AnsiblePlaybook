@@ -260,35 +260,6 @@ content: "{{ usage_result.stdout | from_yaml | to_nice_yaml }}"
 
 ---
 
-# 🧩 트러블슈팅
-
-## ❌ invalid request
-
-```text id="tr01"
-→ Python request 분기 누락
 ```
 
----
 
-## ❌ KeyError: user
-
-```text id="tr02"
-→ user → user_dir 변경 반영 안됨
-```
-
----
-
-## ❌ TypeError: string indices
-
-```text id="tr03"
-→ YAML이 문자열로 저장됨
-→ Ansible에서 from_yaml 필요
-```
-
----
-
-# 😎 한줄 요약
-
-```id="summary01"
-ONTAP 디렉토리를 BFS로 탐색하여 사용자별 사용량을 자동으로 수집하고 리포팅하는 시스템
-```
