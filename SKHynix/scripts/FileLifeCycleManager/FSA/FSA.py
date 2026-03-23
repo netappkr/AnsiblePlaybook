@@ -204,7 +204,7 @@ def find_directories(scan_objects):
                         found_roots.add(full_path)
 
                         # 🔥 하위 1-depth 조회
-                        encoded = quote(full_path)
+                        encoded = quote(full_path, safe="")
                         sub_url = f"{base_url}/{encoded}"
                         logger.debug(f"[REQUEST] {sub_url}")
                         logger.debug(f"[AUTH] user={auth[0]} password=****")
@@ -300,7 +300,7 @@ def get_usage(found_dirs):
 
             # 🔥 path 기반 방식으로 변경
             path = item["found_path"] if item["found_path"] else "/"
-            encoded_path = quote(path)
+            encoded_path = quote(path, safe="")
 
             url = f"{base_url}/{encoded_path}"
 
