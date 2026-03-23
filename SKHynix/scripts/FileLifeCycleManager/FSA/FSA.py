@@ -296,8 +296,8 @@ def get_user_info(owner_id):
 
         for line in res.stdout.splitlines():
 
-            if "Name:" in line:
-                name = line.split("Name:")[1].strip()
+            if "Name" in line:
+                name = line.split(":")[1].strip()
 
             if "E-mail" in line:
                 email = line.split(":")[1].strip()
