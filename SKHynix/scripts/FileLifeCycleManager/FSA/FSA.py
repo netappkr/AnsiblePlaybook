@@ -267,7 +267,7 @@ def find_and_collect_usage(scan_objects):
                                 params[k] = v
 
                         logger.debug(f"[REQUEST] {sub_url}")
-                        logger.debug(f"[REQUEST_Params] {params}")
+                        logger.debug(f"[REQUEST_PARAMS] {params}")
                         res2 = session.get(
                             url=sub_url,
                             auth=auth,
