@@ -253,14 +253,20 @@ def find_and_collect_usage(scan_objects):
                         encoded_sub = quote(full_path, safe="")
                         sub_url = f"{base_url}/{encoded_sub}"
 
+                        # 기본 params
+                        params = {
+                            "fields": "name,path,owner_id,analytics.bytes_used,type"
+                        }
+
+                        # 🔥 config fsa_option 병합
+                        if "fsa_option" in obj:
+                            params.update(obj["fsa_option"])
+
                         res2 = session.get(
-                            sub_url,
+                            url=sub_url,
                             auth=auth,
-                            params={
-                                "type": "directory",
-                                "fields": "name,path,owner_id,analytics.bytes_used,type"
-                            },
-                            timeout=10
+                            params=params,
+                            timeout=30
                         )
 
                         res2.raise_for_status()

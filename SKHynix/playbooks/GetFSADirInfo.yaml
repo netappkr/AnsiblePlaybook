@@ -113,7 +113,7 @@
         dest: "{{ work_dir }}/usage.yaml"
         content: "{{ usage_result.stdout }}"
 
-    # -------------------------
+    # -------------------------ß
     # HTML 생성 (수정)
     # -------------------------
     - name: Build HTML report
@@ -123,6 +123,10 @@
         -f {{ work_dir }}/usage.yaml
       register: mail_result
 
+    - name: Save mail_result YAML
+      copy:
+        dest: "{{ work_dir }}/mail.yaml"
+        content: "{{ mail_result.stdout }}"
 
     # -------------------------
     # 결과 파싱
@@ -130,7 +134,7 @@
     - name: Parse mail result
       set_fact:
         mail_data: "{{ mail_result.stdout | from_yaml }}"
-        
+
     - debug:
         var: mail_data
     # -------------------------
