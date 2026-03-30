@@ -3,37 +3,38 @@
 # -------------------------
 # 외부 라이브러리 import
 # -------------------------
-import requests                 # REST API 호출용
-import urllib3                 # HTTPS 경고 제거용
+import requests                 # ONTAP REST API 호출
+import urllib3                 # HTTPS 경고 비활성화
 import argparse                # CLI 인자 처리
-import json                    # JSON 처리
-import logging                 # 로깅
+import json                    # JSON 파싱
+import logging                 # 로그 처리
 import traceback               # 에러 traceback 출력
-import yaml                    # YAML 처리
+import yaml                    # YAML 파싱
+import re
 import os
 import sys
 import subprocess              # 외부 명령 실행 (finger2)
 from collections import deque  # BFS 탐색용 큐
+from requests.models import PreparedRequest
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from collections import deque
 from urllib.parse import quote # URL 인코딩
 
-# HTTPS 인증 경고 제거
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 # -------------------------
-# argparse 설정
+# argparse
 # -------------------------
-# CLI 실행 시 사용할 옵션 정의
+# CLI 실행 시 입력받는 옵션 정의
 parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--file", type=str, nargs='+')   # 입력 파일
-parser.add_argument("-r", "--request", type=str)           # 수행할 기능
-parser.add_argument("--config", type=str)                  # config 파일
-parser.add_argument("--debug", action="store_true")        # debug 모드
+parser.add_argument("-f", "--file", type=str, nargs='+')   # 입력 파일 (JSON/YAML)
+parser.add_argument("-r", "--request", type=str)           # 실행할 기능 (분기 처리용)
+parser.add_argument("--config", type=str)                  # config YAML 경로
+parser.add_argument("--debug", action="store_true", help="enable debug logging")
 args = parser.parse_args()
 
 # -------------------------
 # logging 설정
 # -------------------------
-# 로그 파일 위치 및 포맷 정의
+# 로그 파일 경로 생성 (~user/logs/fsa.log)
 home_dir = os.path.expanduser("~")
 log_dir = os.path.join(home_dir, "logs")
 os.makedirs(log_dir, exist_ok=True)
@@ -47,7 +48,8 @@ logger = logging.getLogger("fsa")
 logger.setLevel(getattr(logging, log_level, logging.INFO))
 
 formatter = logging.Formatter(
-    '%(asctime)s %(levelname)s [%(funcName)s] %(message)s'
+    '%(asctime)s %(levelname)s [%(funcName)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
 )
 
 # 파일 로그
@@ -61,10 +63,14 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 # -------------------------
-# JSON / YAML 읽기 함수
+# JSON / YAML
 # -------------------------
 def read_json(filelist):
-    """여러 JSON 파일을 읽어서 dict 형태로 반환"""
+    """
+    여러 JSON 파일을 읽어서 dict 형태로 반환
+    key: 파일명
+    value: JSON 내용
+    """
     data = {}
     for f in filelist:
         with open(f) as file:
@@ -72,7 +78,9 @@ def read_json(filelist):
     return data
 
 def read_yaml(path):
-    """YAML 파일 읽기"""
+    """
+    YAML 파일을 읽어서 dict 형태로 반환
+    """
     with open(path) as f:
         return yaml.safe_load(f)
 
@@ -80,7 +88,10 @@ def read_yaml(path):
 # YAML 검증
 # -------------------------
 def check_yaml_integrity(file_path):
-    """config YAML 유효성 체크 (division 필수)"""
+    """
+    config YAML 구조 검증
+    - division key 필수
+    """
     try:
         with open(file_path) as file:
             config = yaml.safe_load(file)
@@ -100,29 +111,32 @@ def check_yaml_integrity(file_path):
 # -------------------------
 def get_scan_objects(data, config):
     """
-    ONTAP volume 정보 기반으로
-    FSA 스캔 대상 객체(scan_objects) 생성
+    ONTAP volume 정보를 기반으로
+    FSA 스캔 대상(scan_objects) 생성
     """
 
     logger.info("[START] get_scan_objects")
 
     scan_objects = []
-    division = config.get("division", [])
+    domain = config.get("domain")          # 현재 코드에서는 미사용 (확장 대비)
+    division = config.get("division", [])  # division 설정
 
     for cluster in data:
         try:
             cluster_info = cluster["cluster"]
 
+            # ONTAP volume 목록 순회
             for volume in cluster["msg"]["records"]:
                 name = volume.get("volume")
                 path = volume.get("junction_path")
                 uuid = volume.get("instance_uuid")
                 analytics = volume.get("analytics_state")
 
-                # junction_path 없거나 analytics off면 제외
+                # junction_path 없거나 analytics OFF인 경우 제외
                 if not path or analytics != "on":
                     continue
 
+                # division 기준으로 scan object 생성
                 for div in division:
                     if "fsa_option" not in div:
                         continue
@@ -144,38 +158,44 @@ def get_scan_objects(data, config):
     return scan_objects
 
 # -------------------------
-# USER 디렉토리 탐색 + 사용량 수집
+# USER 디렉토리 찾기 + 사용량 수집
 # -------------------------
 def find_and_collect_usage(scan_objects):
     """
-    BFS 방식으로 디렉토리 탐색하여
-    target 디렉토리(USER 등) 찾고
-    하위 디렉토리 usage 수집
+    BFS 방식으로 디렉토리 탐색
+    1. target 디렉토리(USER 등) 찾기
+    2. 해당 하위 디렉토리 usage 수집
     """
 
     logger.info(f"[START] find_and_collect_usage count={len(scan_objects)}")
 
     session = requests.Session()
-    session.verify = False
+    session.verify = False  # SSL 인증서 검증 비활성화
 
     results = []
-    seen_paths = set()  # 중복 방지
+    seen_paths = set()  # 중복 path 방지
 
     for obj in scan_objects:
         cluster = obj["cluster"]
+
+        # ONTAP REST API URL 구성
         base_url = f"https://{cluster['ip']}/api/storage/volumes/{obj['vol_uuid']}/files"
         auth = (cluster["ID"], cluster["PW"])
 
+        # 탐색 대상 디렉토리 목록
         targets = [p.get("dir") for p in obj["fsa_option"].get("path", [])]
 
-        queue = deque([("/", 1)])  # BFS 시작
+        logger.info(f"[SEARCH] volume={obj['volume']} targets={targets}")
+
+        # BFS 초기값 (루트부터 시작)
+        queue = deque([("/", 1)])
         visited = set()
         found_roots = set()
 
         while queue:
             path, depth = queue.popleft()
 
-            # 최대 depth 제한 + 방문 체크
+            # depth 제한 및 방문 여부 체크
             if depth > 7 or path in visited:
                 continue
 
@@ -185,6 +205,9 @@ def find_and_collect_usage(scan_objects):
                 encoded_path = quote(path if path else "/", safe="")
                 url = f"{base_url}/{encoded_path}"
 
+                logger.debug(f"[REQUEST] {url}")
+
+                # 디렉토리 목록 조회
                 res = session.get(
                     url,
                     auth=auth,
@@ -198,6 +221,8 @@ def find_and_collect_usage(scan_objects):
                 res.raise_for_status()
                 records = res.json().get("records", [])
 
+                logger.debug(f"[API] path={path} count={len(records)}")
+
                 for r in records:
                     name = r.get("name")
                     parent = r.get("path") or "/"
@@ -210,7 +235,10 @@ def find_and_collect_usage(scan_objects):
                     if r_type != "directory":
                         continue
 
+                    # full path 생성
                     full_path = f"{parent.rstrip('/')}/{name}"
+
+                    logger.debug(f"[PATH] {full_path}")
 
                     # target 디렉토리 발견
                     if name in targets:
@@ -218,6 +246,7 @@ def find_and_collect_usage(scan_objects):
                         if full_path in found_roots:
                             continue
 
+                        logger.info(f"[FOUND ROOT] {full_path}")
                         found_roots.add(full_path)
 
                         # 하위 디렉토리 usage 조회
@@ -234,17 +263,25 @@ def find_and_collect_usage(scan_objects):
                             timeout=10
                         )
 
+                        res2.raise_for_status()
                         sub_records = res2.json().get("records", [])
+
+                        logger.debug(f"[USAGE API] path={full_path} count={len(sub_records)}")
 
                         for sr in sub_records:
                             sub_name = sr.get("name")
                             sub_parent = sr.get("path") or full_path
+                            sub_type = sr.get("type")
 
                             if sub_name in [".", "..", ".snapshot"]:
                                 continue
 
+                            if sub_type != "directory":
+                                continue
+
                             sub_full_path = f"{sub_parent.rstrip('/')}/{sub_name}"
 
+                            # 중복 제거
                             if sub_full_path in seen_paths:
                                 continue
 
@@ -253,8 +290,10 @@ def find_and_collect_usage(scan_objects):
                             owner = sr.get("owner_id")
                             used = sr.get("analytics", {}).get("bytes_used", 0)
 
+                            # owner_id → 사용자 정보 조회
                             username, email = get_user_info(owner)
 
+                            # 결과 저장
                             results.append({
                                 "division": obj["div"],
                                 "volume": obj["volume"],
@@ -268,7 +307,7 @@ def find_and_collect_usage(scan_objects):
 
                         continue
 
-                    # BFS 확장
+                    # BFS 확장 (하위 디렉토리 탐색)
                     queue.append((full_path, depth + 1))
 
             except Exception as e:
@@ -278,10 +317,13 @@ def find_and_collect_usage(scan_objects):
     return results
 
 # -------------------------
-# 사용자 정보 조회 (finger2)
+# 사용자 정보 조회
 # -------------------------
 def get_user_info(owner_id):
-    """owner_id → 사용자 이름 / 이메일 조회"""
+    """
+    owner_id → 사용자 이름 / 이메일 변환
+    (finger2 명령어 활용)
+    """
     try:
         res = subprocess.run(
             ["finger2", str(owner_id)],
@@ -307,7 +349,10 @@ def get_user_info(owner_id):
 # 사용자별 그룹핑
 # -------------------------
 def group_by_user(data):
-    """email 기준으로 데이터 그룹핑"""
+    """
+    email 기준으로 데이터 그룹핑
+    (메일 발송 단위)
+    """
     grouped = {}
 
     for d in data:
@@ -321,33 +366,104 @@ def group_by_user(data):
     return grouped
 
 # -------------------------
-# HTML 생성 (공통 템플릿)
+# 사용자 HTML 생성
 # -------------------------
-def build_html(data):
-    """관리자/사용자 공통 HTML 생성"""
+def build_html_per_user(data):
+    """
+    개인 메일용 HTML 생성
+    (Volume / Directory / Usage만 표시)
+    """
 
-    html = """<html><head><meta charset="UTF-8"></head><body>
-    <h2>Directory Usage Report</h2>
-    <table border="1">
-    <tr>
-        <th>Division</th><th>Volume</th><th>User Dir</th>
-        <th>User Name</th><th>Email</th><th>Usage (GB)</th>
-    </tr>"""
+    html = """
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h2>My Directory Usage</h2>
+<table border="1">
+<tr>
+    <th>Volume</th>
+    <th>Directory</th>
+    <th>Usage (GB)</th>
+</tr>
+"""
 
     for d in data:
         gb = d.get("bytes_used", 0) / (1024**3)
 
         html += f"""
-        <tr>
-            <td>{d.get('division')}</td>
-            <td>{d.get('volume')}</td>
-            <td>{d.get('user_dir')}</td>
-            <td>{d.get('user_name')}</td>
-            <td>{d.get('email')}</td>
-            <td>{gb:.2f}</td>
-        </tr>"""
+<tr>
+    <td>{d.get('volume')}</td>
+    <td>{d.get('full_path')}</td>
+    <td>{gb:.2f}</td>
+</tr>
+"""
 
     html += "</table></body></html>"
+
+    return html
+
+# -------------------------
+# 관리자 HTML 생성
+# -------------------------
+def build_html(data):
+    """
+    관리자 메일용 HTML 생성
+    (전체 사용자 정보 포함)
+    """
+
+    html = """
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+<h2>Directory Usage Report</h2>
+
+<table>
+<tr>
+    <th>Division</th>
+    <th>Volume</th>
+    <th>User Dir</th>
+    <th>User Name</th>
+    <th>Email</th>
+    <th>Usage (GB)</th>
+</tr>
+"""
+
+    for d in data:
+        gb = d.get("bytes_used", 0) / (1024**3)
+
+        html += f"""
+<tr>
+    <td>{d.get('division')}</td>
+    <td>{d.get('volume')}</td>
+    <td>{d.get('user_dir')}</td>
+    <td>{d.get('user_name')}</td>
+    <td>{d.get('email')}</td>
+    <td>{gb:.2f}</td>
+</tr>
+"""
+
+    html += """
+</table>
+</body>
+</html>
+"""
 
     return html
 
@@ -355,41 +471,66 @@ def build_html(data):
 # main
 # -------------------------
 def main():
-    """request 타입에 따라 기능 분기"""
+    """
+    request 값에 따라 기능 분기
+    """
 
     try:
+        # scan object 생성
         if args.request == "get_scan_object":
             data = read_json(args.file)
             config = check_yaml_integrity(args.config)
             result = get_scan_objects(data[args.file[0]], config)
-            print(yaml.safe_dump(result))
+            print(yaml.safe_dump(result, sort_keys=False))
 
+        # usage 수집
         elif args.request == "find_and_collect_usage":
             data = read_yaml(args.file[0])
             result = find_and_collect_usage(data)
-            print(yaml.safe_dump(result))
+            print(yaml.safe_dump(result, sort_keys=False))
 
+        # 관리자 + 사용자 메일 생성
         elif args.request == "build_all_mail":
             data = read_yaml(args.file[0])
 
-            total_html = build_html(data)
-            grouped = group_by_user(data)
+            total_html = build_html(data)        # 관리자 HTML
+            grouped = group_by_user(data)        # 사용자별 그룹핑
 
             result = {
                 "total_html": total_html,
                 "users": []
             }
 
+            # 사용자별 HTML 생성
             for email, items in grouped.items():
                 result["users"].append({
                     "email": email,
-                    "html": build_html(items)
+                    "html": build_html_per_user(items)
                 })
 
-            print(yaml.safe_dump(result))
+            print(yaml.safe_dump(result, sort_keys=False))
+
+        # 사용자별 메일만 생성
+        elif args.request == "build_mail_per_user":
+            data = read_yaml(args.file[0])
+
+            grouped = group_by_user(data)
+
+            result = []
+
+            for email, items in grouped.items():
+                html = build_html_per_user(items)
+
+                result.append({
+                    "email": email,
+                    "html": html
+                })
+
+            print(yaml.safe_dump(result, sort_keys=False))
 
         else:
             logger.error(f"invalid request: {args.request}")
+            print("invalid request")
 
     except Exception:
         logger.error(traceback.format_exc())
