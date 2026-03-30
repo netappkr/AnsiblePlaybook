@@ -325,6 +325,15 @@ def build_html_per_user(data):
 
     html = """
 <html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
 <body>
 <h2>My Directory Usage</h2>
 <table border="1">
