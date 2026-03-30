@@ -308,6 +308,48 @@ def get_user_info(owner_id):
         logger.error(f"[ERROR] get_user_info owner={owner_id} {str(e)}")
         return "unknown", "unknown"
 
+def group_by_user(data):
+    grouped = {}
+
+    for d in data:
+        email = d.get("email", "unknown")
+
+        if email not in grouped:
+            grouped[email] = []
+
+        grouped[email].append(d)
+
+    return grouped
+
+def build_html_per_user(data):
+
+    html = """
+<html>
+<body>
+<h2>My Directory Usage</h2>
+<table border="1">
+<tr>
+    <th>Volume</th>
+    <th>Directory</th>
+    <th>Usage (GB)</th>
+</tr>
+"""
+
+    for d in data:
+        gb = d.get("bytes_used", 0) / (1024**3)
+
+        html += f"""
+<tr>
+    <td>{d.get('volume')}</td>
+    <td>{d.get('full_path')}</td>
+    <td>{gb:.2f}</td>
+</tr>
+"""
+
+    html += "</table></body></html>"
+
+    return html
+
 # -------------------------
 # HTML
 # -------------------------
@@ -376,9 +418,22 @@ def main():
             result = find_and_collect_usage(data)
             print(yaml.safe_dump(result, sort_keys=False))
 
-        elif args.request == "build_mail":
+        elif args.request == "build_mail_per_user":
             data = read_yaml(args.file[0])
-            print(build_html(data))
+
+            grouped = group_by_user(data)
+
+            result = []
+
+            for email, items in grouped.items():
+                html = build_html_per_user(items)
+
+                result.append({
+                    "email": email,
+                    "html": html
+                })
+
+            print(yaml.safe_dump(result, sort_keys=False))
 
         else:
             logger.error(f"invalid request: {args.request}")

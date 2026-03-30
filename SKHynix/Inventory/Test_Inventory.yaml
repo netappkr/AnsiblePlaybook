@@ -97,7 +97,6 @@ all:
         task_server_1_flm:
           ansible_host: <<task server ip>>
       vars:
-        domain: "netappkr.com"
         clusters:
           - name: fsxn
             ip: 0.0.0.0
@@ -125,7 +124,7 @@ all:
           division:
             - name: "DRAM"
               fsa_option:
-                sanalytics_bytes_used: ">1G"
+                analytics_bytes_used: ">1G"
                 type: directory
                 path: 
                   - dir: USER

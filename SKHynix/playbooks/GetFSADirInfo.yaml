@@ -124,6 +124,19 @@
       register: html
 
     # -------------------------
+    # 관리자 메일 발송
+    # -------------------------
+    - name: send admin mail
+      mail:
+        host: smtp.server.com
+        port: 25
+        to: admin@company.com
+        subject: "[FSA] 전체 사용량 리포트"
+        subtype: html
+        body: "{{ lookup('file', 'total.html') }}"
+
+
+    # -------------------------
     # 메일 발송
     # -------------------------
     - name: Send usage report mail
