@@ -418,6 +418,25 @@ def main():
             result = find_and_collect_usage(data)
             print(yaml.safe_dump(result, sort_keys=False))
 
+        elif args.request == "build_all_mail":
+            data = read_yaml(args.file[0])
+
+            total_html = build_html(data)
+            grouped = group_by_user(data)
+
+            result = {
+                "total_html": total_html,
+                "users": []
+            }
+
+            for email, items in grouped.items():
+                result["users"].append({
+                    "email": email,
+                    "html": build_html_per_user(items)
+                })
+
+            print(yaml.safe_dump(result, sort_keys=False))
+
         elif args.request == "build_mail_per_user":
             data = read_yaml(args.file[0])
 
