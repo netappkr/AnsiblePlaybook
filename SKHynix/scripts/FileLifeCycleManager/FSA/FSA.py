@@ -258,9 +258,13 @@ def find_and_collect_usage(scan_objects):
                             "fields": "name,path,owner_id,analytics.bytes_used,type"
                         }
 
-                        # 🔥 config fsa_option 병합
+                        # config fsa_option 병합
+                        # fsa_option에서 path 제외하고 params 반영
                         if "fsa_option" in obj:
-                            params.update(obj["fsa_option"])
+                            for k, v in obj["fsa_option"].items():
+                                if k == "path":
+                                    continue
+                                params[k] = v
 
                         res2 = session.get(
                             url=sub_url,
