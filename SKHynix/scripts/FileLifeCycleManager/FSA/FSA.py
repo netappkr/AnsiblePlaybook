@@ -62,6 +62,48 @@ stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
+
+def parse_size_filter(expr: str):
+    """
+    ">1G" → (operator, bytes)
+    """
+    match = re.match(r"(>=|<=|>|<|==)?\s*(\d+)([KMGTP]?)", expr.strip(), re.IGNORECASE)
+    if not match:
+        raise ValueError(f"Invalid size filter: {expr}")
+
+    op, value, unit = match.groups()
+
+    value = int(value)
+    unit = unit.upper()
+
+    unit_map = {
+        "": 1,
+        "K": 1024,
+        "M": 1024**2,
+        "G": 1024**3,
+        "T": 1024**4,
+        "P": 1024**5,
+    }
+
+    bytes_value = value * unit_map.get(unit, 1)
+
+    return op or "==", bytes_value
+
+
+def check_condition(value, op, threshold):
+    if op == ">":
+        return value > threshold
+    elif op == ">=":
+        return value >= threshold
+    elif op == "<":
+        return value < threshold
+    elif op == "<=":
+        return value <= threshold
+    elif op == "==":
+        return value == threshold
+    else:
+        return False
+
 # -------------------------
 # JSON / YAML
 # -------------------------
@@ -191,7 +233,12 @@ def find_and_collect_usage(scan_objects):
         queue = deque([("/", 1)])
         visited = set()
         found_roots = set()
+        # config에서 필터 읽기
+        filter_expr = obj["fsa_option"].get("analytics_bytes_used")
 
+        if filter_expr:
+            op, threshold = parse_size_filter(filter_expr)
+            
         while queue:
             path, depth = queue.popleft()
 
@@ -264,6 +311,8 @@ def find_and_collect_usage(scan_objects):
                             for k, v in obj["fsa_option"].items():
                                 if k == "path":
                                     continue
+                                if k == "analytics_bytes_used":
+                                    continue
                                 params[k] = v
 
                         logger.debug(f"[REQUEST] {sub_url}")
@@ -279,6 +328,7 @@ def find_and_collect_usage(scan_objects):
                         sub_records = res2.json().get("records", [])
 
                         logger.debug(f"[USAGE API] path={full_path} count={len(sub_records)}")
+
 
                         for sr in sub_records:
                             sub_name = sr.get("name")
@@ -301,6 +351,12 @@ def find_and_collect_usage(scan_objects):
 
                             owner = sr.get("owner_id")
                             used = sr.get("analytics", {}).get("bytes_used", 0)
+
+
+                            # 🔥 여기 추가
+                            if filter_expr:
+                                if not check_condition(used, op, threshold):
+                                    continue
 
                             # owner_id → 사용자 정보 조회
                             username, email = get_user_info(owner)
