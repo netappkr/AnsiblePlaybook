@@ -62,7 +62,9 @@ stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
-
+# ----------------------------------------
+# analytics_bytes_used: ">1G" 옵션 계산을 위한 파싱 함수
+# --------------------------------------
 def parse_size_filter(expr: str):
     """
     ">1G" → (operator, bytes)
@@ -89,7 +91,9 @@ def parse_size_filter(expr: str):
 
     return op or "==", bytes_value
 
-
+# ----------------------------------------
+# analytics_bytes_used: ">1G" 옵션 계산을 위한 조건검사 함수
+# --------------------------------------
 def check_condition(value, op, threshold):
     if op == ">":
         return value > threshold
@@ -238,7 +242,7 @@ def find_and_collect_usage(scan_objects):
 
         if filter_expr:
             op, threshold = parse_size_filter(filter_expr)
-            
+
         while queue:
             path, depth = queue.popleft()
 
@@ -353,7 +357,7 @@ def find_and_collect_usage(scan_objects):
                             used = sr.get("analytics", {}).get("bytes_used", 0)
 
 
-                            # 🔥 여기 추가
+                            # analytics_bytes_used: ">1G" 옵션 필터링
                             if filter_expr:
                                 if not check_condition(used, op, threshold):
                                     continue
