@@ -106,7 +106,7 @@
         python3 {{ fsa_path }}
         -r find_and_collect_usage
         -f {{ work_dir }}/scan_objects.yaml
-        -prevfile {{ work_dir }}/usage_latest.yaml
+        --prevfile {{ work_dir }}/usage_latest.yaml
       register: usage_result
 
     - name: Save usage YAML
