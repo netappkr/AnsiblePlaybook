@@ -676,7 +676,7 @@ def main():
         if args.request == "get_scan_object":
             data = read_json(args.file)
             config = check_yaml_integrity(args.config)
-            result = get_scan_objects(data[args.file[0]], config)
+            result = get_scan_objects(data, config)
             print(yaml.safe_dump(result, sort_keys=False))
 
         # usage 수집
