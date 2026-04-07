@@ -221,13 +221,36 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
 
     prev_map = {}
 
-    if usage_latest_path and os.path.exists(usage_latest_path):
-        prev_data = read_yaml(usage_latest_path)
-        logger.info(f"[INFO] hit prev_data {usage_latest_path}")
-        logger.debug(f"[debug] count={len(prev_data)}")
-        for d in prev_data:
-            key = d.get("full_path")
-            prev_map[key] = d.get("bytes_used", 0)
+    try:
+        if usage_latest_path and os.path.exists(usage_latest_path):
+            prev_data = read_yaml(usage_latest_path)
+
+            if not prev_data:
+                logger.warning(f"[WARN] empty previous file: {usage_latest_path}")
+                prev_data = []
+
+            for d in prev_data:
+                try:
+                    key = d.get("full_path")
+                    used = d.get("bytes_used", 0)
+
+                    if not key:
+                        logger.error(f"[ERROR] {key}key does not exsit")
+                        continue
+                        
+                    if not isinstance(used, (int, float)):
+                        used = 0
+
+                    prev_map[key] = used
+
+                except Exception as e:
+                    logger.warning(f"[WARN] invalid record skipped: {str(e)}")
+
+        else:
+            logger.info(f"[FIRST RUN] no previous file")
+
+    except Exception as e:
+        logger.error(f"[ERROR] failed to load previous data: {str(e)}")
 
     
 
