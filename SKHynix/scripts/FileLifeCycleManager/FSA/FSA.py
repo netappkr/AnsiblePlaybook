@@ -113,12 +113,8 @@ def check_condition(value, op, threshold):
 # JSON / YAML
 # -------------------------
 def read_json(file):
-    """
-    여러 JSON 파일을 읽어서 dict 형태로 반환
-    key: 파일명
-    value: JSON 내용
-    """
-    data = json.load(file)
+    with open(file) as f:
+        data = json.load(f)
     return data
 
 def read_yaml(path):
