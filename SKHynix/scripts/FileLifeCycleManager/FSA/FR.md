@@ -208,6 +208,48 @@ Shell : /sbin/nologin
 -   사용자 정보
 -   정리 요청 안내
 
+각 디렉토리 별 이전 데이터와 비교하여 이전 데이터 증가량이 얼마나 증가했는지가 필요함
+이 증감량 기준은 이전에 스크립트가 실행된 시점으로 계산되어야 합니다.
+
+최상위 디렉토리는 auto.sim 명령으로 출력한 디렉토리 이름이 들어가야함
+메일 전송 관련 로그가 필요함 이력에 남길 내용 : 메일 전송 정보, 보낸 데이터
+
+<div class="title">auto.sim path 이름 출력</div>
+
+<table>
+    <!-- path row -->
+    <tr>
+        <th colspan="4">/wooyoung</th>
+        <th colspan="4">/hanmin</th>
+    </tr>
+
+    <!-- header row -->
+    <tr>
+        <th>total (GB)</th>
+        <th>diff (GB)</th>
+        <th>user</th>
+        <th>name</th>
+
+        <th>total (GB)</th>
+        <th>diff (GB)</th>
+        <th>user</th>
+        <th>name</th>
+    </tr>
+
+    <!-- data row -->
+    <tr>
+        <td>29</td>
+        <td>1</td>
+        <td>ㅇㅇㅇ</td>
+        <td>ㅇㅇㅇ</td>
+
+        <td>29</td>
+        <td>1</td>
+        <td>ㅇㅇㅇ</td>
+        <td>ㅇㅇㅇ</td>
+    </tr>
+</table>
+
 ------------------------------------------------------------------------
 
 # 전체 Workflow 요약
