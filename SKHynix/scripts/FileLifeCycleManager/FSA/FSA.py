@@ -25,7 +25,7 @@ from urllib.parse import quote # URL 인코딩
 # -------------------------
 # CLI 실행 시 입력받는 옵션 정의
 parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--file", type=str, nargs='+')   # 입력 파일 (JSON/YAML)
+parser.add_argument("-f", "--file", type=str)   # 입력 파일 (JSON/YAML)
 parser.add_argument("--prevfile", type=str)   # 입력 파일 (JSON/YAML)
 parser.add_argument("-r", "--request", type=str)           # 실행할 기능 (분기 처리용)
 parser.add_argument("--config", type=str)                  # config YAML 경로
@@ -602,9 +602,8 @@ def main():
 
         # usage 수집
         elif args.request == "find_and_collect_usage":
-            data = read_yaml(args.file[0])
-            path = read_yaml(args.prevfile)
-            result = find_and_collect_usage(data,path)
+            data = read_yaml(args.file)
+            result = find_and_collect_usage(data,args.prevfile)
             print(yaml.safe_dump(result, sort_keys=False))
 
         # 관리자 + 사용자 메일 생성
