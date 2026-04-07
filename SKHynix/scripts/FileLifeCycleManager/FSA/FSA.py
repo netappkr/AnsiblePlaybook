@@ -19,10 +19,6 @@ from requests.models import PreparedRequest
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from collections import deque
 from urllib.parse import quote # URL 인코딩
-from datetime import datetime
-
-now = datetime.now()
-date_str = now.strftime("%Y%m%d")
 
 # -------------------------
 # argparse
@@ -30,6 +26,7 @@ date_str = now.strftime("%Y%m%d")
 # CLI 실행 시 입력받는 옵션 정의
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--file", type=str, nargs='+')   # 입력 파일 (JSON/YAML)
+parser.add_argument("--prevfile", type=str)   # 입력 파일 (JSON/YAML)
 parser.add_argument("-r", "--request", type=str)           # 실행할 기능 (분기 처리용)
 parser.add_argument("--config", type=str)                  # config YAML 경로
 parser.add_argument("--debug", action="store_true", help="enable debug logging")
@@ -211,7 +208,7 @@ def get_scan_objects(data, config):
 # -------------------------
 # USER 디렉토리 찾기 + 사용량 수집
 # -------------------------
-def find_and_collect_usage(scan_objects):
+def find_and_collect_usage(scan_objects,usage_latest_path):
     """
     BFS 방식으로 디렉토리 탐색
     1. target 디렉토리(USER 등) 찾기
@@ -220,18 +217,19 @@ def find_and_collect_usage(scan_objects):
     # -----------------------
     # 이전 데이터 로딩
     # -----------------------
+    logger.info(f"[START] find_and_collect_usage count={len(scan_objects)}")
+
     prev_map = {}
 
-    prev_path = "/tmp/fsa/usage_latest.yaml"
-
-    if os.path.exists(prev_path):
-        prev_data = read_yaml(prev_path)
-
+    if usage_latest_path and os.path.exists(usage_latest_path):
+        prev_data = read_yaml(usage_latest_path)
+        logger.info(f"[INFO] hit prev_data {usage_latest_path}")
+        logger.debug(f"[debug] count={len(prev_data)}")
         for d in prev_data:
             key = d.get("full_path")
-        prev_map[key] = d.get("bytes_used", 0)
+            prev_map[key] = d.get("bytes_used", 0)
 
-    logger.info(f"[START] find_and_collect_usage count={len(scan_objects)}")
+    
 
     session = requests.Session()
     session.verify = False  # SSL 인증서 검증 비활성화
@@ -410,17 +408,6 @@ def find_and_collect_usage(scan_objects):
                 logger.error(f"[ERROR] path={path} {str(e)}")
 
     logger.info(f"[END] find_and_collect_usage result_count={len(results)}")
-    # -----------------------
-    # 현재 데이터를 다음 실행을 위한 previous로 저장
-    # -----------------------
-    prev_path = "./usage_latest.yaml"
-
-    tmp_path = prev_path + ".tmp"
-
-    with open(tmp_path, "w") as f:
-        yaml.safe_dump(results, f)
-
-    os.replace(tmp_path, prev_path)
     return results
 
 # -------------------------
@@ -593,7 +580,8 @@ def main():
         # usage 수집
         elif args.request == "find_and_collect_usage":
             data = read_yaml(args.file[0])
-            result = find_and_collect_usage(data)
+            path = read_yaml(args.prevfile)
+            result = find_and_collect_usage(data,path)
             print(yaml.safe_dump(result, sort_keys=False))
 
         # 관리자 + 사용자 메일 생성
