@@ -112,16 +112,13 @@ def check_condition(value, op, threshold):
 # -------------------------
 # JSON / YAML
 # -------------------------
-def read_json(filelist):
+def read_json(file):
     """
     여러 JSON 파일을 읽어서 dict 형태로 반환
     key: 파일명
     value: JSON 내용
     """
-    data = {}
-    for f in filelist:
-        with open(f) as file:
-            data[f] = json.load(file)
+    data = json.load(file)
     return data
 
 def read_yaml(path):
