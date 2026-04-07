@@ -214,39 +214,33 @@ Shell : /sbin/nologin
 최상위 디렉토리는 auto.sim 명령으로 출력한 디렉토리 이름이 들어가야함
 메일 전송 관련 로그가 필요함 이력에 남길 내용 : 메일 전송 정보, 보낸 데이터
 
-<div class="title">auto.sim path 이름 출력</div>
-
 <table>
-    <!-- path row -->
+   <tr>
+        <th colspan="8">auto.sim 출력 결과</th>
+    </tr>
     <tr>
         <th colspan="4">/wooyoung</th>
         <th colspan="4">/hanmin</th>
     </tr>
-
-    <!-- header row -->
     <tr>
         <th>total (GB)</th>
         <th>diff (GB)</th>
         <th>user</th>
         <th>name</th>
-
         <th>total (GB)</th>
         <th>diff (GB)</th>
         <th>user</th>
         <th>name</th>
     </tr>
-
-    <!-- data row -->
     <tr>
         <td>29</td>
         <td>1</td>
-        <td>ㅇㅇㅇ</td>
-        <td>ㅇㅇㅇ</td>
-
+        <td>1001</td>
+        <td>wooyoung</td>
         <td>29</td>
         <td>1</td>
-        <td>ㅇㅇㅇ</td>
-        <td>ㅇㅇㅇ</td>
+        <td>1002</td>
+        <td>hanmin</td>
     </tr>
 </table>
 
