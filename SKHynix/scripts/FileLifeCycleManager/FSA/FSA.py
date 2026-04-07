@@ -19,6 +19,10 @@ from requests.models import PreparedRequest
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from collections import deque
 from urllib.parse import quote # URL 인코딩
+from datetime import datetime
+
+now = datetime.now()
+date_str = now.strftime("%Y%m%d")
 
 # -------------------------
 # argparse
@@ -203,6 +207,7 @@ def get_scan_objects(data, config):
     logger.info(f"[END] get_scan_objects count={len(scan_objects)}")
     return scan_objects
 
+
 # -------------------------
 # USER 디렉토리 찾기 + 사용량 수집
 # -------------------------
@@ -212,6 +217,19 @@ def find_and_collect_usage(scan_objects):
     1. target 디렉토리(USER 등) 찾기
     2. 해당 하위 디렉토리 usage 수집
     """
+    # -----------------------
+    # 이전 데이터 로딩
+    # -----------------------
+    prev_map = {}
+
+    prev_path = "/tmp/fsa/usage_latest.yaml"
+
+    if os.path.exists(prev_path):
+        prev_data = read_yaml(prev_path)
+
+        for d in prev_data:
+            key = d.get("full_path")
+        prev_map[key] = d.get("bytes_used", 0)
 
     logger.info(f"[START] find_and_collect_usage count={len(scan_objects)}")
 
@@ -355,7 +373,12 @@ def find_and_collect_usage(scan_objects):
 
                             owner = sr.get("owner_id")
                             used = sr.get("analytics", {}).get("bytes_used", 0)
-
+                            # -----------------------
+                            # diff 계산
+                            # -----------------------
+                            key = sub_full_path
+                            prev_used = prev_map.get(key, 0)
+                            diff = used - prev_used
 
                             # analytics_bytes_used: ">1G" 옵션 필터링
                             if filter_expr:
@@ -374,7 +397,8 @@ def find_and_collect_usage(scan_objects):
                                 "owner_id": owner,
                                 "user_name": username,
                                 "email": email,
-                                "bytes_used": used
+                                "bytes_used": used,
+                                "diff_bytes": diff
                             })
 
                         continue
@@ -386,6 +410,17 @@ def find_and_collect_usage(scan_objects):
                 logger.error(f"[ERROR] path={path} {str(e)}")
 
     logger.info(f"[END] find_and_collect_usage result_count={len(results)}")
+    # -----------------------
+    # 현재 데이터를 다음 실행을 위한 previous로 저장
+    # -----------------------
+    prev_path = "./usage_latest.yaml"
+
+    tmp_path = prev_path + ".tmp"
+
+    with open(tmp_path, "w") as f:
+        yaml.safe_dump(results, f)
+
+    os.replace(tmp_path, prev_path)
     return results
 
 # -------------------------
