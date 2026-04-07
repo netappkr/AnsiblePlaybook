@@ -114,9 +114,13 @@
         dest: "{{ work_dir }}/usage_latest.yaml"
         content: "{{ usage_result.stdout }}"
 
+    - name: Get current timestamp
+      command: date +%Y%m%d_%H%M%S
+      register: current_time
+
     - name: Save usage history YAML
       copy:
-        dest: "{{ work_dir }}/usage_{{ ansible_date_time.iso8601_basic }}.yaml"
+        dest: "{{ work_dir }}/usage_{{ current_time.stdout }}.yaml"
         content: "{{ usage_result.stdout }}"
     # -------------------------ß
     # HTML 생성 (수정)
