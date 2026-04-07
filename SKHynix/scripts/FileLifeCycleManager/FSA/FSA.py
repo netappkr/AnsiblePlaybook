@@ -584,6 +584,88 @@ def build_html(data):
 
     return html
 
+
+def build_html_pivot(data):
+    """
+    pivot 형태 HTML 생성
+    """
+
+    html = """
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: Arial; }
+    table { border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+</style>
+</head>
+<body>
+
+<h2>Directory Usage Report</h2>
+
+<table>
+"""
+
+    # -----------------------
+    # 1. path row
+    # -----------------------
+    html += "<tr>"
+    for d in data:
+        html += f"<th colspan='4'>{d.get('full_path')}</th>"
+    html += "</tr>"
+
+    # -----------------------
+    # 2. header row
+    # -----------------------
+    html += "<tr>"
+    for _ in data:
+        html += """
+        <th>total (GB)</th>
+        <th>diff (GB)</th>
+        <th>user</th>
+        <th>name</th>
+        """
+    html += "</tr>"
+
+    # -----------------------
+    # 3. data row
+    # -----------------------
+    html += "<tr>"
+
+    for d in data:
+        total_gb = d.get("bytes_used", 0) / (1024**3)
+        diff_gb = d.get("diff_bytes", 0) / (1024**3)
+
+        # 🔥 색상 처리
+        if diff_gb > 0:
+            color = "red"
+            sign = "+"
+        elif diff_gb < 0:
+            color = "blue"
+            sign = ""
+        else:
+            color = "black"
+            sign = ""
+
+        html += f"""
+        <td>{total_gb:.2f}</td>
+        <td style='color:{color}'>{sign}{diff_gb:.2f}</td>
+        <td>{d.get("user_dir")}</td>
+        <td>{d.get("user_name")}</td>
+        """
+
+    html += "</tr>"
+
+    html += """
+</table>
+</body>
+</html>
+"""
+
+    return html
+
 # -------------------------
 # main
 # -------------------------
@@ -644,7 +726,13 @@ def main():
                 })
 
             print(yaml.safe_dump(result, sort_keys=False))
+        
+        elif args.request == "build_pivot_mail":
+            data = read_yaml(args.file[0])
 
+            html = build_html_pivot(data)
+
+            print(html)
         else:
             logger.error(f"invalid request: {args.request}")
             print("invalid request")
