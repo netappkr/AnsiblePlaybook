@@ -245,11 +245,12 @@ Shell : /sbin/nologin
 </table>
 
 
-> ! ### auto.sim 이란? ###
+> ### auto.sim 이란? ###
 > 하이닉스에 구성된 autofs 구성 정보를 출력 하는 명령어 
 > 에시 출력
 > ```
 > getauto auto.sim
+> ```
 > ```
 > === auto.sim ===
 > wooyoung_sim an_svm.nkic.netappkr.com:/wooyoung
