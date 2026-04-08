@@ -224,7 +224,7 @@ def get_scan_objects(data, config):
                 analytics = volume.get("analytics_state")
 
                 # export_policy 위치 여기 (중요)
-                export_policy = volume.get("nas", {}).get("export_policy", {}).get("name", "")
+                export_policy = volume.get("policy", "")
 
                 if not path or analytics != "on":
                     continue
