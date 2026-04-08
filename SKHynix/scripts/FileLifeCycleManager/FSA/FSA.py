@@ -683,7 +683,7 @@ def main():
 
         # 관리자 + 사용자 메일 생성
         elif args.request == "build_all_mail":
-            data = read_yaml(args.file[0])
+            data = read_yaml(args.file)
 
             total_html = build_html(data)        # 관리자 HTML
             grouped = group_by_user(data)        # 사용자별 그룹핑
@@ -704,7 +704,7 @@ def main():
 
         # 사용자별 메일만 생성
         elif args.request == "build_mail_per_user":
-            data = read_yaml(args.file[0])
+            data = read_yaml(args.file)
 
             grouped = group_by_user(data)
 
@@ -721,7 +721,7 @@ def main():
             print(yaml.safe_dump(result, sort_keys=False))
         
         elif args.request == "build_pivot_mail":
-            data = read_yaml(args.file[0])
+            data = read_yaml(args.file)
 
             html = build_html_pivot(data)
 
