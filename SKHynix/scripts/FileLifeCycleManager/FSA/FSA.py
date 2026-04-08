@@ -160,7 +160,7 @@ def get_scan_objects(data, config):
     scan_objects = []
     domain = config.get("domain")          # 현재 코드에서는 미사용 (확장 대비)
     division = config.get("division", [])  # division 설정
-
+    auto_map_cache = {}
     for cluster in data:
         try:
             cluster_info = cluster["cluster"]
@@ -175,7 +175,23 @@ def get_scan_objects(data, config):
                 # junction_path 없거나 analytics OFF인 경우 제외
                 if not path or analytics != "on":
                     continue
+                division_name = div["name"]
 
+                # auto_map 캐싱
+                if division_name not in auto_map_cache:
+                    auto_map_cache[division_name] = getauto_map(division_name)
+
+                auto_map = auto_map_cache[division_name]
+
+                # junction_path 기준 매칭
+                auto_alias = name
+                auto_full = path
+
+                for k in sorted(auto_map.keys(), key=len, reverse=True):
+                    if path.startswith(k):
+                        auto_alias = auto_map[k]["alias"]
+                        auto_full = auto_map[k]["full"]
+                        break
                 # division 기준으로 scan object 생성
                 for div in division:
                     if "fsa_option" not in div:
@@ -186,6 +202,9 @@ def get_scan_objects(data, config):
                         "volume": name,
                         "vol_uuid": uuid,
                         "div": div["name"],
+                        "junction_path": path,            
+                        "auto_alias": auto_alias,         
+                        "auto_full_path": auto_full,      
                         "fsa_option": div["fsa_option"]
                     })
 
@@ -471,7 +490,45 @@ def group_by_user(data):
         grouped[email].append(d)
 
     return grouped
+import subprocess
+# -------------------------
+# get auto
+# -------------------------
+def getauto_map(division):
+    result = subprocess.run(
+        ["getauto", f"auto.{division}"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
 
+    if result.returncode != 0:
+        return {}
+
+    mapping = {}
+
+    for line in result.stdout.splitlines():
+        line = line.strip()
+
+        if not line or line.startswith("="):
+            continue
+
+        parts = line.split()
+
+        if len(parts) != 2:
+            continue
+
+        alias = parts[0]
+        full = parts[1]
+
+        path = full.split(":")[-1]   # /fg02
+
+        mapping[path] = {
+            "alias": alias,
+            "full": full
+        }
+
+    return mapping
 # -------------------------
 # 사용자 HTML 생성
 # -------------------------
@@ -528,7 +585,7 @@ def build_mail(data):
     volume_map = collections.defaultdict(lambda: collections.defaultdict(list))
 
     for d in data:
-        volume = d["volume"]
+        volume = d.get("auto_alias", d["volume"])
 
         # /USER/jeehyun → USER 추출
         root = d["full_path"].split("/")[1]
