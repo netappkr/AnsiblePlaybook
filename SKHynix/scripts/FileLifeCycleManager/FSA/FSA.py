@@ -380,10 +380,6 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
 
                             sub_full_path = f"{sub_parent.rstrip('/')}/{sub_name}"
 
-                            # 중복 제거
-                            if sub_full_path in seen_paths:
-                                continue
-
                             seen_paths.add(sub_full_path)
 
                             owner = sr.get("owner_id")
