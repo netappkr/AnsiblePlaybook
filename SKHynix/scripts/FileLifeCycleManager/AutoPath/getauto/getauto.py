@@ -6,8 +6,8 @@ import sys
 
 BASE_DIR = "/etc/auto"   # 필요시 수정
 
-def read_auto_file(target):
-    file_path = os.path.join(BASE_DIR, target)
+def read_auto_file(target, base_dir):
+    file_path = os.path.join(base_dir, target)
 
     if not os.path.exists(file_path):
         print(f"getauto: {target}: not found", file=sys.stderr)
@@ -98,10 +98,7 @@ def main():
 
     args = parser.parse_args()
 
-    global BASE_DIR
-    BASE_DIR = args.base_dir
-
-    lines = read_auto_file(args.target)
+    lines = read_auto_file(args.target, args.base_dir)
 
     filtered = filter_lines(
         lines,
