@@ -60,7 +60,30 @@
       copy:
         dest: "{{ work_dir }}/config.yaml"
         content: "{{ config | to_nice_yaml }}"
+    # -------------------------
+    # getauto auto.{{division}}
+    # -------------------------
+    - name: Run getauto per division
+      command: "getauto auto.{{ item.name }}"
+      register: auto_result
+      loop: "{{ config.division }}"
 
+    - name: Save getauto raw result
+      copy:
+        dest: "{{ work_dir }}/auto_raw.json"
+        content: "{{ auto_result.results | to_nice_json }}"
+
+    - name: Convert getauto → YAML
+      command: >
+        python3 {{ fsa_path }}
+        -r build_auto_yaml
+        -f {{ work_dir }}/auto_raw.json
+      register: auto_yaml
+
+    - name: Save auto_db.yaml
+      copy:
+        dest: "{{ work_dir }}/auto_db.yaml"
+        content: "{{ auto_yaml.stdout }}"
     # -------------------------
     # FSA.py 찾기
     # -------------------------
@@ -90,6 +113,7 @@
         -r get_scan_object
         --config {{ work_dir }}/config.yaml
         -f {{ work_dir }}/volume.json
+        --auto-db {{ work_dir }}/auto_db.yaml
       register: scan_objects
 
     - name: Save scan_objects YAML

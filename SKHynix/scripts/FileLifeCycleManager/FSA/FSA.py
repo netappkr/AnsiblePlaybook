@@ -20,6 +20,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from collections import deque
 from urllib.parse import quote # URL 인코딩
 import collections
+import subprocess
 # -------------------------
 # argparse
 # -------------------------
@@ -30,6 +31,7 @@ parser.add_argument("--prevfile", type=str)   # 입력 파일 (JSON/YAML)
 parser.add_argument("-r", "--request", type=str)           # 실행할 기능 (분기 처리용)
 parser.add_argument("--config", type=str)                  # config YAML 경로
 parser.add_argument("--debug", action="store_true", help="enable debug logging")
+parser.add_argument("--auto-db", type=str, help="auto_db.yaml path")
 args = parser.parse_args()
 
 # -------------------------
@@ -147,68 +149,113 @@ def check_yaml_integrity(file_path):
         sys.exit(1)
 
 # -------------------------
+# auto_db.yaml 생성
+# -------------------------
+def build_auto_yaml_from_file(path):
+    data = read_json(path)
+
+    final = {}
+
+    for item in data:
+        division = item["item"]["name"]
+        stdout = item["stdout"]
+
+        mapping = {}
+
+        for line in stdout.splitlines():
+            line = line.strip()
+
+            if not line or line.startswith("="):
+                continue
+
+            parts = line.split()
+            if len(parts) != 2:
+                continue
+
+            alias = parts[0]
+            full = parts[1]
+
+            jpath = full.split(":")[-1]
+            volume = jpath.lstrip("/")
+
+            mapping[volume] = {
+                "alias": alias,
+                "full": full
+            }
+
+        final[division] = mapping
+
+    return final
+# -------------------------
 # scan object 생성
 # -------------------------
 def get_scan_objects(data, config):
     """
     ONTAP volume 정보를 기반으로
     FSA 스캔 대상(scan_objects) 생성
+    + auto_map(YAML) 기반 alias 매핑
     """
 
     logger.info("[START] get_scan_objects")
 
     scan_objects = []
-    domain = config.get("domain")          # 현재 코드에서는 미사용 (확장 대비)
-    division = config.get("division", [])  # division 설정
-    auto_map_cache = {}
+    division_cfg = config.get("division", [])
+    auto_db_path = args.auto_db
+
+    auto_map_yaml = {}
+
+    if args.auto_db:
+        try:
+            auto_map_yaml = read_yaml(args.auto_db) or {}
+            logger.info(f"[AUTO MAP] loaded: {args.auto_db}")
+        except Exception as e:
+            logger.error(f"[ERROR] auto_db load failed: {str(e)}")
+    else:
+        logger.warning("[WARN] auto_db not provided")
+
     for cluster in data:
         try:
             cluster_info = cluster["cluster"]
 
-            # ONTAP volume 목록 순회
             for volume in cluster["msg"]["records"]:
                 name = volume.get("volume")
                 path = volume.get("junction_path")
                 uuid = volume.get("instance_uuid")
                 analytics = volume.get("analytics_state")
 
-                # junction_path 없거나 analytics OFF인 경우 제외
                 if not path or analytics != "on":
                     continue
-                division_name = div["name"]
 
-                # auto_map 캐싱
-                if division_name not in auto_map_cache:
-                    auto_map_cache[division_name] = getauto_map(division_name)
-
-                auto_map = auto_map_cache[division_name]
-
-                # junction_path 기준 매칭
-                auto_alias = name
-                auto_full = path
-
-                for k in sorted(auto_map.keys(), key=len, reverse=True):
-                    if path.startswith(k):
-                        auto_alias = auto_map[k]["alias"]
-                        auto_full = auto_map[k]["full"]
-                        break
-                # division 기준으로 scan object 생성
-                for div in division:
+                for div in division_cfg:
                     if "fsa_option" not in div:
                         continue
+
+                    division_name = div["name"]
+
+                    # 🔥 auto alias 매핑 (volume 기준)
+                    auto_alias = name
+                    auto_full = path
+
+                    mapping = auto_map_yaml.get(division_name, {})
+
+                    auto_info = mapping.get(name)
+
+                    if auto_info:
+                        auto_alias = auto_info.get("alias", name)
+                        auto_full = auto_info.get("full", path)
 
                     scan_objects.append({
                         "cluster": cluster_info,
                         "volume": name,
                         "vol_uuid": uuid,
-                        "div": div["name"],
-                        "junction_path": path,            
-                        "auto_alias": auto_alias,         
-                        "auto_full_path": auto_full,      
+                        "div": division_name,
+                        "junction_path": path,
+                        "auto_alias": auto_alias,
+                        "auto_full_path": auto_full,
                         "fsa_option": div["fsa_option"]
                     })
 
-                    logger.debug(f"[ADD] volume={name}")
+                    logger.debug(f"[ADD] volume={name}, alias={auto_alias}")
 
         except Exception:
             logger.error(traceback.format_exc())
@@ -422,6 +469,7 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                             results.append({
                                 "division": obj["div"],
                                 "volume": obj["volume"],
+                                "auto_alias": obj.get("auto_alias"),   # 🔥 추가
                                 "user_dir": sub_name,
                                 "full_path": sub_full_path,
                                 "owner_id": owner,
@@ -490,45 +538,8 @@ def group_by_user(data):
         grouped[email].append(d)
 
     return grouped
-import subprocess
-# -------------------------
-# get auto
-# -------------------------
-def getauto_map(division):
-    result = subprocess.run(
-        ["getauto", f"auto.{division}"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
 
-    if result.returncode != 0:
-        return {}
 
-    mapping = {}
-
-    for line in result.stdout.splitlines():
-        line = line.strip()
-
-        if not line or line.startswith("="):
-            continue
-
-        parts = line.split()
-
-        if len(parts) != 2:
-            continue
-
-        alias = parts[0]
-        full = parts[1]
-
-        path = full.split(":")[-1]   # /fg02
-
-        mapping[path] = {
-            "alias": alias,
-            "full": full
-        }
-
-    return mapping
 # -------------------------
 # 사용자 HTML 생성
 # -------------------------
@@ -739,6 +750,10 @@ def main():
             data = read_yaml(args.file)
             result = find_and_collect_usage(data,args.prevfile)
             print(yaml.safe_dump(result, sort_keys=False))
+        # auto db_yaml 생성
+        elif args.request == "build_auto_yaml":
+            data = build_auto_yaml_from_file(args.file)
+            print(yaml.safe_dump(data, sort_keys=False))
 
         # 메일 생성
         elif args.request == "build_mail":
