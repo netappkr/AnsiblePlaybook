@@ -15,7 +15,6 @@ import os
 import sys
 import subprocess              # 외부 명령 실행 (finger2)
 from collections import deque  # BFS 탐색용 큐
-from requests.models import PreparedRequest
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from collections import deque
 from urllib.parse import quote # URL 인코딩
