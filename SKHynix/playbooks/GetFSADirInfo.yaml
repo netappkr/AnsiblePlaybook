@@ -151,10 +151,10 @@
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
-        to: "{{ item.1 }}"
-        subject: "[FSA][{{ item.0.volume }}] Usage Report"
-        body: "{{ item.0.html }}"
+        to: "{{ item.emails | join(',') }}"
+        subject: "[FSA][{{ item.volume }}] Usage Report"
+        body: "{{ item.html }}"
         subtype: html
         from: "{{ email_from }}"
         secure: starttls
-      loop: "{{ query('subelements', mail_list, 'emails') }}"
+      loop: "{{ mail_list }}"
