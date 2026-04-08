@@ -305,6 +305,7 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                 records = res.json().get("records", [])
 
                 logger.debug(f"[API] path={path} count={len(records)}")
+                logger.debug(f"[API] RES_RECODE={records}")
 
                 for r in records:
                     name = r.get("name")
@@ -364,7 +365,7 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                         sub_records = res2.json().get("records", [])
 
                         logger.debug(f"[USAGE API] path={full_path} count={len(sub_records)}")
-
+                        logger.debug(f"[USAGE API] RES_RECODE={sub_records}")
 
                         for sr in sub_records:
                             sub_name = sr.get("name")
