@@ -60,6 +60,27 @@
       copy:
         dest: "{{ work_dir }}/config.yaml"
         content: "{{ config | to_nice_yaml }}"
+
+    # -------------------------
+    # FSA.py 찾기
+    # -------------------------
+    - name: Find FSA.py
+      find:
+        paths: "{{ scripts_dir }}"
+        patterns: "FSA.py"
+        recurse: yes
+        file_type: file
+      register: fsa_script
+
+    - name: Validate FSA.py exists
+      fail:
+        msg: "FSA.py not found"
+      when: fsa_script.matched == 0
+
+    - name: Set script path
+      set_fact:
+        fsa_path: "{{ fsa_script.files[0].path }}"
+        
     # -------------------------
     # getauto auto.{{division}}
     # -------------------------
@@ -84,26 +105,6 @@
       copy:
         dest: "{{ work_dir }}/auto_db.yaml"
         content: "{{ auto_yaml.stdout }}"
-    # -------------------------
-    # FSA.py 찾기
-    # -------------------------
-    - name: Find FSA.py
-      find:
-        paths: "{{ scripts_dir }}"
-        patterns: "FSA.py"
-        recurse: yes
-        file_type: file
-      register: fsa_script
-
-    - name: Validate FSA.py exists
-      fail:
-        msg: "FSA.py not found"
-      when: fsa_script.matched == 0
-
-    - name: Set script path
-      set_fact:
-        fsa_path: "{{ fsa_script.files[0].path }}"
-
     # -------------------------
     # scan_object 생성
     # -------------------------
