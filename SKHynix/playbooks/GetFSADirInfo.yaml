@@ -127,7 +127,7 @@
     - name: Build HTML report
       command: >
         python3 {{ fsa_path }}
-        -r build_all_mail
+        -r build_mail
         -f {{ work_dir }}/usage_latest.yaml
       register: mail_result
 
@@ -141,42 +141,20 @@
     # -------------------------
     - name: Parse mail result
       set_fact:
-        mail_data: "{{ mail_result.stdout | from_yaml }}"
-
-    - debug:
-        var: mail_data
+        mail_list: "{{ mail_result.stdout | from_yaml }}"
     # -------------------------
-    # 관리자 메일 발송
+    # 메일 발송
     # -------------------------
-    - name: send admin mail
+    - name: Send volume mail
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
-        to: "{{ email_to }}"
-        subject: "[FSA] 전체 사용량 리포트"
+        to: "{{ item.1 }}"
+        subject: "[FSA][{{ item.0.volume }}] Usage Report"
+        body: "{{ item.0.html }}"
         subtype: html
-        body: "{{ mail_data.total_html }}"
         from: "{{ email_from }}"
         secure: starttls
-
-    # -------------------------
-    # 사용자별 메일 발송
-    # -------------------------
-    - name: Send usage report mail per user
-      mail:
-        host: "{{ smtp_server }}"
-        port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
-        to: "{{ item.email }}"
-        subject: "[FSA] 개인 사용량 리포트"
-        body: "{{ item.html }}"
-        from: "{{ email_from }}"
-        secure: starttls
-        subtype: html
-        headers:
-          - Content-Type="text/html"
-      loop: "{{ mail_data.users }}"
-      when: item.email != "unknown" and item.email != ""
+      loop: "{{ query('subelements', mail_list, 'emails') }}"

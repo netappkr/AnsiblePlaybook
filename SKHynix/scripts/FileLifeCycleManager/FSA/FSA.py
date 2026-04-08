@@ -518,143 +518,105 @@ def build_html_per_user(data):
     return html
 
 # -------------------------
-# 관리자 HTML 생성
+# HTML 생성
 # -------------------------
-def build_html(data):
-    """
-    관리자 메일용 HTML 생성
-    (전체 사용자 정보 포함)
-    """
+def build_mail(data):
+    import collections
 
-    html = """
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
+    volume_map = collections.defaultdict(list)
 
-<h2>Directory Usage Report</h2>
-
-<table>
-<tr>
-    <th>Division</th>
-    <th>Volume</th>
-    <th>User Dir</th>
-    <th>User Name</th>
-    <th>Email</th>
-    <th>Usage (GB)</th>
-</tr>
-"""
-
+    # -----------------------
+    # 1. volume 그룹핑
+    # -----------------------
     for d in data:
-        gb = d.get("bytes_used", 0) / (1024**3)
+        volume_map[d.get("volume")].append(d)
 
-        html += f"""
-<tr>
-    <td>{d.get('division')}</td>
-    <td>{d.get('volume')}</td>
-    <td>{d.get('user_dir')}</td>
-    <td>{d.get('user_name')}</td>
-    <td>{d.get('email')}</td>
-    <td>{gb:.2f}</td>
-</tr>
-"""
+    results = []
 
-    html += """
-</table>
-</body>
-</html>
-"""
+    # -----------------------
+    # 2. volume별 메일 생성
+    # -----------------------
+    for volume, items in volume_map.items():
 
-    return html
+        email_set = set()
 
+        for d in items:
+            email = d.get("email")
+            if email and email != "unknown":
+                email_set.add(email)
 
-def build_html_pivot(data):
-    """
-    pivot 형태 HTML 생성
-    """
-
-    html = """
+        # -----------------------
+        # HTML 생성
+        # -----------------------
+        html = f"""
 <html>
 <head>
 <meta charset="UTF-8">
 <style>
-    body { font-family: Arial; }
-    table { border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    th { background-color: #f2f2f2; }
+    body {{ font-family: Arial; background-color:#0b1220; color:white; }}
+    table {{ border-collapse: collapse; margin-top: 20px; width:100%; }}
+    th, td {{ border: 1px solid #444; padding: 8px; text-align: center; }}
+    th {{ background-color: #1f2a44; }}
 </style>
 </head>
 <body>
 
-<h2>Directory Usage Report</h2>
+<h2>Volume: {volume}</h2>
 
 <table>
 """
 
-    # -----------------------
-    # 1. path row
-    # -----------------------
-    html += "<tr>"
-    for d in data:
-        html += f"<th colspan='4'>{d.get('full_path')}</th>"
-    html += "</tr>"
+        # path row
+        html += "<tr>"
+        for d in items:
+            html += f"<th colspan='4'>{d.get('full_path')}</th>"
+        html += "</tr>"
 
-    # -----------------------
-    # 2. header row
-    # -----------------------
-    html += "<tr>"
-    for _ in data:
-        html += """
-        <th>total (GB)</th>
-        <th>diff (GB)</th>
-        <th>user</th>
-        <th>name</th>
-        """
-    html += "</tr>"
+        # header row
+        html += "<tr>"
+        for _ in items:
+            html += """
+            <th>total (GB)</th>
+            <th>diff (GB)</th>
+            <th>user</th>
+            <th>name</th>
+            """
+        html += "</tr>"
 
-    # -----------------------
-    # 3. data row
-    # -----------------------
-    html += "<tr>"
+        # data row
+        html += "<tr>"
 
-    for d in data:
-        total_gb = d.get("bytes_used", 0) / (1024**3)
-        diff_gb = d.get("diff_bytes", 0) / (1024**3)
+        for d in items:
+            total_gb = d.get("bytes_used", 0) / (1024**3)
+            diff_gb = d.get("diff_bytes", 0) / (1024**3)
 
-        # 🔥 색상 처리
-        if diff_gb > 0:
-            color = "red"
-            sign = "+"
-        elif diff_gb < 0:
-            color = "blue"
-            sign = ""
-        else:
-            color = "black"
-            sign = ""
+            if diff_gb > 0:
+                color = "red"
+                sign = "+"
+            elif diff_gb < 0:
+                color = "deepskyblue"
+                sign = ""
+            else:
+                color = "white"
+                sign = ""
 
-        html += f"""
-        <td>{total_gb:.2f}</td>
-        <td style='color:{color}'>{sign}{diff_gb:.2f}</td>
-        <td>{d.get("user_dir")}</td>
-        <td>{d.get("user_name")}</td>
-        """
+            html += f"""
+            <td>{total_gb:.2f}</td>
+            <td style='color:{color}'>{sign}{diff_gb:.2f}</td>
+            <td>{d.get("owner_id")}</td>
+            <td>{d.get("user_dir")}</td>
+            """
 
-    html += "</tr>"
+        html += "</tr>"
+        html += "</table></body></html>"
 
-    html += """
-</table>
-</body>
-</html>
-"""
+        results.append({
+            "volume": volume,
+            "emails": list(email_set),
+            "html": html
+        })
 
-    return html
+    return results
 
 # -------------------------
 # main
@@ -678,51 +640,13 @@ def main():
             result = find_and_collect_usage(data,args.prevfile)
             print(yaml.safe_dump(result, sort_keys=False))
 
-        # 관리자 + 사용자 메일 생성
-        elif args.request == "build_all_mail":
+        # 메일 생성
+        elif args.request == "build_mail":
             data = read_yaml(args.file)
 
-            total_html = build_html(data)        # 관리자 HTML
-            grouped = group_by_user(data)        # 사용자별 그룹핑
-
-            result = {
-                "total_html": total_html,
-                "users": []
-            }
-
-            # 사용자별 HTML 생성
-            for email, items in grouped.items():
-                result["users"].append({
-                    "email": email,
-                    "html": build_html_per_user(items)
-                })
+            result = build_mail(data)
 
             print(yaml.safe_dump(result, sort_keys=False))
-
-        # 사용자별 메일만 생성
-        elif args.request == "build_mail_per_user":
-            data = read_yaml(args.file)
-
-            grouped = group_by_user(data)
-
-            result = []
-
-            for email, items in grouped.items():
-                html = build_html_per_user(items)
-
-                result.append({
-                    "email": email,
-                    "html": html
-                })
-
-            print(yaml.safe_dump(result, sort_keys=False))
-        
-        elif args.request == "build_pivot_mail":
-            data = read_yaml(args.file)
-
-            html = build_html_pivot(data)
-
-            print(html)
         else:
             logger.error(f"invalid request: {args.request}")
             print("invalid request")
