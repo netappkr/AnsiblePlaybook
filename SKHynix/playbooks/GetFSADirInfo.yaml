@@ -128,7 +128,7 @@
       command: >
         python3 {{ fsa_path }}
         -r build_all_mail
-        -f {{ work_dir }}/usage.yaml
+        -f {{ work_dir }}/usage_latest.yaml
       register: mail_result
 
     - name: Save mail_result YAML
