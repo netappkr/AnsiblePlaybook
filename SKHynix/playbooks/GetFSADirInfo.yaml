@@ -80,12 +80,12 @@
     - name: Set script path
       set_fact:
         fsa_path: "{{ fsa_script.files[0].path }}"
-        
+
     # -------------------------
     # getauto auto.{{division}}
     # -------------------------
     - name: Run getauto per division
-      command: "getauto auto.{{ item.name }}"
+      command: "getauto auto.{{ item.autopath.automap }}"
       register: auto_result
       loop: "{{ config.division }}"
 

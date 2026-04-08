@@ -121,8 +121,22 @@ all:
             datacenter: nkic
         config:
           domain: "netappkr.com"
-          division:
-            - name: "DRAM"
+          division:                   # 클러스터들이 바라보는 운영 DNS 이름           
+            - name: "soc"  # 부서별 설정 별도 설정을 위한 분기
+              autopath:
+                automap: sim
+              fsa_option:
+                analytics_bytes_used: ">1G"
+                type: directory
+                path: 
+                  - dir: USER
+                  - dir: BE
+                  - dir: user
+                  - dir: FE
+                  - dir: INTERFACE
+                  - dir: WORK_DIR
+                  - dir: DK
+            - name: "soc"  # 부서별 설정 별도 설정을 위한 분기
               fsa_option:
                 analytics_bytes_used: ">1G"
                 type: directory

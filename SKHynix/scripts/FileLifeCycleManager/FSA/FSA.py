@@ -194,16 +194,16 @@ def get_scan_objects(data, config):
     ONTAP volume 정보를 기반으로
     FSA 스캔 대상(scan_objects) 생성
     + auto_map(YAML) 기반 alias 매핑
+    + division 자동 매핑 (정규식 + export policy)
     """
 
     logger.info("[START] get_scan_objects")
 
     scan_objects = []
     division_cfg = config.get("division", [])
-    auto_db_path = args.auto_db
 
+    # auto_db 로딩
     auto_map_yaml = {}
-
     if args.auto_db:
         try:
             auto_map_yaml = read_yaml(args.auto_db) or {}
@@ -223,39 +223,66 @@ def get_scan_objects(data, config):
                 uuid = volume.get("instance_uuid")
                 analytics = volume.get("analytics_state")
 
+                # export_policy 위치 여기 (중요)
+                export_policy = volume.get("nas", {}).get("export_policy", {}).get("name", "")
+
                 if not path or analytics != "on":
                     continue
+
+                # =========================
+                # division 매핑 시작
+                # =========================
+                matched_div = None
 
                 for div in division_cfg:
                     if "fsa_option" not in div:
                         continue
 
-                    division_name = div["name"]
+                    vol_name_regexp = div.get("vol_name_regexp", ".*")
+                    exportpolicy_names = [e["name"] for e in div.get("exportpolicy", [])]
 
-                    # 🔥 auto alias 매핑 (volume 기준)
-                    auto_alias = name
-                    auto_full = path
+                    if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
+                        matched_div = div
+                        break
 
-                    mapping = auto_map_yaml.get(division_name, {})
+                # 매칭 실패
+                if not matched_div:
+                    logger.debug(f"[SKIP] no division matched volume={name}, export_policy={export_policy}")
+                    continue
 
-                    auto_info = mapping.get(name)
+                division_name = matched_div["name"]
+                automap_name = matched_div.get("autopath", {}).get("automap")
 
-                    if auto_info:
-                        auto_alias = auto_info.get("alias", name)
-                        auto_full = auto_info.get("full", path)
+                if not automap_name:
+                    logger.warning(f"[WARN] no automap for division={division_name}")
+                    automap_name = None
 
-                    scan_objects.append({
-                        "cluster": cluster_info,
-                        "volume": name,
-                        "vol_uuid": uuid,
-                        "div": division_name,
-                        "junction_path": path,
-                        "auto_alias": auto_alias,
-                        "auto_full_path": auto_full,
-                        "fsa_option": div["fsa_option"]
-                    })
+                # auto alias 매핑
+                auto_alias = name
+                auto_full = path
 
-                    logger.debug(f"[ADD] volume={name}, alias={auto_alias}")
+                mapping = auto_map_yaml.get(automap_name, {})
+
+                auto_info = mapping.get(name)
+
+                if auto_info:
+                    auto_alias = auto_info.get("alias", name)
+                    auto_full = auto_info.get("full", path)
+                else:
+                    logger.debug(f"[AUTO MAP MISS] division={division_name}, volume={name}")
+
+                scan_objects.append({
+                    "cluster": cluster_info,
+                    "volume": name,
+                    "vol_uuid": uuid,
+                    "div": division_name,
+                    "junction_path": path,
+                    "auto_alias": auto_alias,
+                    "auto_full_path": auto_full,
+                    "fsa_option": matched_div["fsa_option"]
+                })
+
+                logger.debug(f"[ADD] volume={name}, div={division_name}, alias={auto_alias}")
 
         except Exception:
             logger.error(traceback.format_exc())
@@ -541,51 +568,6 @@ def group_by_user(data):
 
 
 # -------------------------
-# 사용자 HTML 생성
-# -------------------------
-def build_html_per_user(data):
-    """
-    개인 메일용 HTML 생성
-    (Volume / Directory / Usage만 표시)
-    """
-
-    html = """
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
-<h2>My Directory Usage</h2>
-<table border="1">
-<tr>
-    <th>Volume</th>
-    <th>Directory</th>
-    <th>Usage (GB)</th>
-</tr>
-"""
-
-    for d in data:
-        gb = d.get("bytes_used", 0) / (1024**3)
-
-        html += f"""
-<tr>
-    <td>{d.get('volume')}</td>
-    <td>{d.get('full_path')}</td>
-    <td>{gb:.2f}</td>
-</tr>
-"""
-
-    html += "</table></body></html>"
-
-    return html
-
-# -------------------------
 # HTML 생성
 # -------------------------
 def build_mail(data):
@@ -635,24 +617,27 @@ def build_mail(data):
         # -----------------------
         # HTML 시작
         # -----------------------
+        # auto_full_path 추출 (volume 기준으로 하나만 가져오면 됨)
+        sample = next(iter(root_map.values()))[0]
+        auto_full_path = sample.get("auto_full_path", volume)
+
         html = f"""
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-    body {{ font-family: Arial; background-color:#0b1220; color:white; }}
-    table {{ border-collapse: collapse; margin-top: 20px; width:100%; }}
-    th, td {{ border: 1px solid #444; padding: 8px; text-align: center; }}
-    th {{ background-color: #1f2a44; }}
-</style>
-</head>
-<body>
+        <html>
+        <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: Arial; background-color:#0b1220; color:white; }}
+            table {{ border-collapse: collapse; margin-top: 20px; width:100%; }}
+            th, td {{ border: 1px solid #444; padding: 8px; text-align: center; }}
+            th {{ background-color: #1f2a44; }}
+        </style>
+        </head>
+        <body>
 
-<h2>auto.sim 출력 결과</h2>
-<h3>Volume: {volume}</h3>
+        <h2>{auto_full_path}</h2>
 
-<table>
-"""
+        <table>
+        """
 
         # -----------------------
         # 1행: root header
