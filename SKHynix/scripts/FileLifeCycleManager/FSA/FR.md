@@ -219,8 +219,8 @@ Shell : /sbin/nologin
         <th colspan="8">auto.sim 출력 결과</th>
     </tr>
     <tr>
-        <th colspan="4">/wooyoung</th>
-        <th colspan="4">/hanmin</th>
+        <th colspan="4">/USER</th>
+        <th colspan="4">/FE</th>
     </tr>
     <tr>
         <th>total (GB)</th>
@@ -230,17 +230,27 @@ Shell : /sbin/nologin
         <th>total (GB)</th>
         <th>diff (GB)</th>
         <th>user</th>
-        <th>name</th>
+        <th>dirname</th>
     </tr>
     <tr>
         <td>29</td>
         <td>1</td>
         <td>1001</td>
-        <td>wooyoung</td>
+        <td>/wooyoung</td>
         <td>29</td>
         <td>1</td>
         <td>1002</td>
-        <td>hanmin</td>
+        <td>/hanmin</td>
+    </tr>
+    <tr>
+        <td>29</td>
+        <td>1</td>
+        <td>1001</td>
+        <td>/wooyoung</td>
+        <td>29</td>
+        <td>1</td>
+        <td>1002</td>
+        <td>/hanmin</td>
     </tr>
 </table>
 
