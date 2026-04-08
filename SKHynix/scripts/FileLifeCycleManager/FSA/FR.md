@@ -246,11 +246,11 @@ Shell : /sbin/nologin
         <td>29</td>
         <td>1</td>
         <td>1001</td>
-        <td>/wooyoung</td>
+        <td>/hanmin</td>
         <td>29</td>
         <td>1</td>
         <td>1002</td>
-        <td>/hanmin</td>
+        <td>/wooyoung</td>
     </tr>
 </table>
 

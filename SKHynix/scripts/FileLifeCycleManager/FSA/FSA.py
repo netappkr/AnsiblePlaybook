@@ -19,7 +19,7 @@ from requests.models import PreparedRequest
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from collections import deque
 from urllib.parse import quote # URL 인코딩
-
+import collections
 # -------------------------
 # argparse
 # -------------------------
@@ -521,32 +521,51 @@ def build_html_per_user(data):
 # HTML 생성
 # -------------------------
 def build_mail(data):
-    import collections
-
-    volume_map = collections.defaultdict(list)
 
     # -----------------------
-    # 1. volume 그룹핑
+    # volume → root → user 구조
     # -----------------------
+    volume_map = collections.defaultdict(lambda: collections.defaultdict(list))
+
     for d in data:
-        volume_map[d.get("volume")].append(d)
+        volume = d["volume"]
+
+        # /USER/jeehyun → USER 추출
+        root = d["full_path"].split("/")[1]
+
+        volume_map[volume][root].append(d)
 
     results = []
 
     # -----------------------
-    # 2. volume별 메일 생성
+    # volume별 메일 생성
     # -----------------------
-    for volume, items in volume_map.items():
-
-        email_set = set()
-
-        for d in items:
-            email = d.get("email")
-            if email and email != "unknown":
-                email_set.add(email)
+    for volume, root_map in volume_map.items():
 
         # -----------------------
-        # HTML 생성
+        # 이메일 수집 (중복 제거)
+        # -----------------------
+        email_set = set()
+        for roots in root_map.values():
+            for d in roots:
+                email = d.get("email")
+                if email and email != "unknown":
+                    email_set.add(email.lower())
+
+        # -----------------------
+        # root 정렬
+        # -----------------------
+        roots = sorted(root_map.keys())
+
+        # 각 root 내부 정렬 (사용량 기준)
+        for r in roots:
+            root_map[r] = sorted(root_map[r], key=lambda x: x["bytes_used"], reverse=True)
+
+        # 최대 row 길이
+        max_len = max(len(root_map[r]) for r in roots)
+
+        # -----------------------
+        # HTML 시작
         # -----------------------
         html = f"""
 <html>
@@ -561,20 +580,25 @@ def build_mail(data):
 </head>
 <body>
 
-<h2>Volume: {volume}</h2>
+<h2>auto.sim 출력 결과</h2>
+<h3>Volume: {volume}</h3>
 
 <table>
 """
 
-        # path row
+        # -----------------------
+        # 1행: root header
+        # -----------------------
         html += "<tr>"
-        for d in items:
-            html += f"<th colspan='4'>{d.get('full_path')}</th>"
+        for r in roots:
+            html += f"<th colspan='4'>/{r}</th>"
         html += "</tr>"
 
-        # header row
+        # -----------------------
+        # 2행: column header
+        # -----------------------
         html += "<tr>"
-        for _ in items:
+        for _ in roots:
             html += """
             <th>total (GB)</th>
             <th>diff (GB)</th>
@@ -583,31 +607,50 @@ def build_mail(data):
             """
         html += "</tr>"
 
-        # data row
-        html += "<tr>"
+        # -----------------------
+        # 데이터 row
+        # -----------------------
+        for i in range(max_len):
 
-        for d in items:
-            total_gb = d.get("bytes_used", 0) / (1024**3)
-            diff_gb = d.get("diff_bytes", 0) / (1024**3)
+            html += "<tr>"
 
-            if diff_gb > 0:
-                color = "red"
-                sign = "+"
-            elif diff_gb < 0:
-                color = "deepskyblue"
-                sign = ""
-            else:
-                color = "white"
-                sign = ""
+            for r in roots:
+                items = root_map[r]
 
-            html += f"""
-            <td>{total_gb:.2f}</td>
-            <td style='color:{color}'>{sign}{diff_gb:.2f}</td>
-            <td>{d.get("owner_id")}</td>
-            <td>{d.get("user_dir")}</td>
-            """
+                if i < len(items):
+                    d = items[i]
 
-        html += "</tr>"
+                    total_gb = d["bytes_used"] / (1024**3)
+                    diff_gb = d["diff_bytes"] / (1024**3)
+
+                    # 색상 처리
+                    if diff_gb > 0:
+                        color = "red"
+                        sign = "+"
+                    elif diff_gb < 0:
+                        color = "deepskyblue"
+                        sign = ""
+                    else:
+                        color = "white"
+                        sign = ""
+
+                    html += f"""
+                    <td>{total_gb:.2f}</td>
+                    <td style="color:{color}">{sign}{diff_gb:.2f}</td>
+                    <td>{d["owner_id"]}</td>
+                    <td>{d["user_dir"]}</td>
+                    """
+                else:
+                    # 🔥 빈칸 처리
+                    html += """
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    """
+
+            html += "</tr>"
+
         html += "</table></body></html>"
 
         results.append({
