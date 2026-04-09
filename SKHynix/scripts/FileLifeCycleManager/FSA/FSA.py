@@ -592,9 +592,12 @@ def group_by_user(data):
 # -------------------------
 def build_mail(data):
 
-    # -----------------------
-    # volume → root → user 구조
-    # -----------------------
+    # volume_map 구조
+    # {
+    #   volume(alias): {
+    #       root(USER/FE): [user data...]
+    #   }
+    # }
     volume_map = collections.defaultdict(lambda: collections.defaultdict(list))
 
     for d in data:
