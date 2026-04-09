@@ -656,7 +656,7 @@ def build_mail(data):
         </head>
         <body>
 
-        <h2><디렉토리 사용량 / 사용자 정보 / 증감량 분석</h2>
+        <h2>디렉토리 사용량 / 사용자 정보 / 증감량 분석</h2>
         <table>
         <tr>
             <th colspan="{len(root_map)*4}">{top_path}</th>
