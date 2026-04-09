@@ -156,8 +156,14 @@ def build_auto_yaml_from_file(path):
     final = {}
 
     for item in data:
-        division = item["item"]["name"]
-        stdout = item["stdout"]
+        # 🔥 핵심: automap 추출
+        automap_name = item["item"].get("autopath", {}).get("automap")
+
+        if not automap_name:
+            logger.warning(f"[WARN] automap not found for item={item['item']}")
+            continue
+
+        stdout = item.get("stdout", "")
 
         mapping = {}
 
@@ -174,15 +180,19 @@ def build_auto_yaml_from_file(path):
             alias = parts[0]
             full = parts[1]
 
-            jpath = full.split(":")[-1]
-            volume = jpath.lstrip("/")
+            # 🔥 path 기준 추출
+            jpath = full.split(":")[-1]   # /fgvol
+            volume_key = jpath.lstrip("/")  # fgvol
 
-            mapping[volume] = {
+            mapping[volume_key] = {
                 "alias": alias,
                 "full": full
             }
 
-        final[division] = mapping
+        # 🔥 automap 기준으로 저장
+        final[automap_name] = mapping
+
+        logger.debug(f"[AUTO_DB] built automap={automap_name}, count={len(mapping)}")
 
     return final
 # -------------------------
