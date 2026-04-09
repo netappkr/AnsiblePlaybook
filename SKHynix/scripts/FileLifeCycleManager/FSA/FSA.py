@@ -180,16 +180,19 @@ def build_auto_yaml_from_file(path):
             alias = parts[0]
             full = parts[1]
 
-            # 🔥 path 기준 추출
-            jpath = full.split(":")[-1]   # /fgvol
-            volume_key = jpath.lstrip("/")  # fgvol
+            # path 기준 추출
+            svm_full = full.split(":")[0]        # svm_CVO2.aws.wyahn.com
+            svm = svm_full.split(".")[0]         # svm_CVO2
+            realpath = full.split(":")[-1]           # /fg2
 
-            mapping[volume_key] = {
-                "alias": alias,
-                "full": full
+            lookup_key = f"{svm}:{realpath}"
+
+            mapping[lookup_key] = {
+                "autopath": alias,
+                "mountpath": full
             }
 
-        # 🔥 automap 기준으로 저장
+        # automap 기준으로 저장
         final[automap_name] = mapping
 
         logger.debug(f"[AUTO_DB] built automap={automap_name}, count={len(mapping)}")
@@ -228,14 +231,15 @@ def get_scan_objects(data, config):
 
             for volume in cluster["msg"]["records"]:
                 name = volume.get("volume")
-                path = volume.get("junction_path")
+                realpath = volume.get("junction_path")
+                svm = volume.get("vserver")
                 uuid = volume.get("instance_uuid")
                 analytics = volume.get("analytics_state")
 
                 # export_policy 위치 여기 (중요)
                 export_policy = volume.get("policy", "")
 
-                if not path or analytics != "on":
+                if not realpath or analytics != "on":
                     continue
 
                 # =========================
@@ -268,15 +272,18 @@ def get_scan_objects(data, config):
 
                 # auto alias 매핑
                 auto_alias = name
-                auto_full = path
+                autopath = realpath
 
                 mapping = auto_map_yaml.get(automap_name, {})
+                lookup_key = f"{svm}:{realpath}"
+                auto_info = mapping.get(lookup_key)
 
-                auto_info = mapping.get(name)
+                logger.debug(f"[LOOKUP] key={lookup_key}")
+                logger.debug(f"[MATCH] autopath={autopath}")
 
                 if auto_info:
                     auto_alias = auto_info.get("alias", name)
-                    auto_full = auto_info.get("full", path)
+                    autopath = auto_info.get("full", realpath)
                 else:
                     logger.debug(f"[AUTO MAP MISS] division={division_name}, volume={name}")
 
@@ -285,9 +292,9 @@ def get_scan_objects(data, config):
                     "volume": name,
                     "vol_uuid": uuid,
                     "div": division_name,
-                    "junction_path": path,
+                    "junction_path": realpath,
                     "auto_alias": auto_alias,
-                    "auto_full_path": auto_full,
+                    "autopath": autopath,
                     "fsa_option": matched_div["fsa_option"]
                 })
 
@@ -587,7 +594,7 @@ def build_mail(data):
     volume_map = collections.defaultdict(lambda: collections.defaultdict(list))
 
     for d in data:
-        volume = d.get("auto_alias", d["volume"])
+        volume = d.get("autopath") or d.get("volume")
 
         # /USER/jeehyun → USER 추출
         root = d["full_path"].split("/")[1]
@@ -626,9 +633,9 @@ def build_mail(data):
         # -----------------------
         # HTML 시작
         # -----------------------
-        # auto_full_path 추출 (volume 기준으로 하나만 가져오면 됨)
+        
         sample = next(iter(root_map.values()))[0]
-        auto_full_path = sample.get("auto_full_path", volume)
+        top_path = sample.get("autopath", sample.get("volume"))
 
         html = f"""
         <html>
@@ -643,29 +650,32 @@ def build_mail(data):
         </head>
         <body>
 
-        <h2>{auto_full_path}</h2>
-
+        <h2><디렉토리 사용량 / 사용자 정보 / 증감량 분석</h2>
         <table>
+        <tr>
+            <th colspan="{len(root_map)*4}">{top_path}</th>
+        </tr>
+
         """
 
         # -----------------------
         # 1행: root header
         # -----------------------
         html += "<tr>"
-        for r in roots:
-            html += f"<th colspan='4'>/{r}</th>"
+        for root in root_map:
+            html += f"<th colspan='4'>{root}</th>"
         html += "</tr>"
 
         # -----------------------
         # 2행: column header
         # -----------------------
         html += "<tr>"
-        for _ in roots:
+        for _ in root_map:
             html += """
-            <th>total (GB)</th>
-            <th>diff (GB)</th>
-            <th>user</th>
-            <th>name</th>
+                <th>total (GB)</th>
+                <th>diff (GB)</th>
+                <th>user</th>
+                <th>name</th>
             """
         html += "</tr>"
 

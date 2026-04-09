@@ -216,7 +216,7 @@ Shell : /sbin/nologin
 
 <table>
    <tr>
-        <th colspan="8">auto.sim 출력 결과</th>
+        <th colspan="8">an_svm.netappKR.com:/wy_vol2</th>
     </tr>
     <tr>
         <th colspan="4">/USER</th>
