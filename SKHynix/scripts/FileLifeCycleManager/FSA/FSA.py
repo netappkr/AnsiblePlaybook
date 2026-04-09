@@ -231,7 +231,7 @@ def get_scan_objects(data, config):
 
             for volume in cluster["msg"]["records"]:
                 name = volume.get("volume")
-                realpath = volume.get("junction_path")
+                junction_path = volume.get("junction_path")
                 svm = volume.get("vserver")
                 uuid = volume.get("instance_uuid")
                 analytics = volume.get("analytics_state")
@@ -239,7 +239,7 @@ def get_scan_objects(data, config):
                 # export_policy 위치 여기 (중요)
                 export_policy = volume.get("policy", "")
 
-                if not realpath or analytics != "on":
+                if not junction_path or analytics != "on":
                     continue
 
                 # =========================
@@ -272,29 +272,32 @@ def get_scan_objects(data, config):
 
                 # auto alias 매핑
                 auto_alias = name
-                autopath = realpath
 
                 mapping = auto_map_yaml.get(automap_name, {})
-                lookup_key = f"{svm}:{realpath}"
+                lookup_key = f"{svm}:{junction_path}"
                 auto_info = mapping.get(lookup_key)
 
                 logger.debug(f"[LOOKUP] key={lookup_key}")
-                logger.debug(f"[MATCH] autopath={autopath}")
+                logger.debug(f"[MATCH] junction_path={junction_path}")
 
                 if auto_info:
                     auto_alias = auto_info.get("alias", name)
-                    autopath = auto_info.get("full", realpath)
+                    mountpath = auto_info.get("mountpath", None)
                 else:
                     logger.debug(f"[AUTO MAP MISS] division={division_name}, volume={name}")
+                svm_domain = None
 
+                if mountpath:
+                    svm_domain = mountpath.split(":")[0]  # fsx01.aws.wyahn.com
                 scan_objects.append({
                     "cluster": cluster_info,
+                    "vserver": svm,
+                    "svm_domain": svm_domain,
                     "volume": name,
                     "vol_uuid": uuid,
                     "div": division_name,
-                    "junction_path": realpath,
+                    "junction_path": junction_path,
                     "auto_alias": auto_alias,
-                    "autopath": autopath,
                     "fsa_option": matched_div["fsa_option"]
                 })
 
@@ -511,8 +514,9 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                             # 결과 저장
                             results.append({
                                 "division": obj["div"],
+                                "svm_domain": obj.get("svm_domain"),
                                 "volume": obj["volume"],
-                                "auto_alias": obj.get("auto_alias"),   # 🔥 추가
+                                "auto_alias": obj.get("auto_alias"),
                                 "user_dir": sub_name,
                                 "full_path": sub_full_path,
                                 "owner_id": owner,
@@ -594,7 +598,7 @@ def build_mail(data):
     volume_map = collections.defaultdict(lambda: collections.defaultdict(list))
 
     for d in data:
-        volume = d.get("autopath") or d.get("volume")
+        volume = d.get("auto_alias") or d.get("volume")
 
         # /USER/jeehyun → USER 추출
         root = d["full_path"].split("/")[1]
@@ -635,7 +639,9 @@ def build_mail(data):
         # -----------------------
         
         sample = next(iter(root_map.values()))[0]
-        top_path = sample.get("autopath", sample.get("volume"))
+        svm_domain = sample.get("svm_domain")
+        alias = sample.get("auto_alias")
+        top_path = f"{svm_domain}:/{alias}" if alias else f"{svm_domain}:/{volume}"
 
         html = f"""
         <html>
