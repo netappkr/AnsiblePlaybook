@@ -107,7 +107,7 @@ fg02_dram fsx01.aws.wyahn.com:/fg2
 ## 🔹 3. auto_db 생성
 
 ```bash
-python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r build_auto_yaml -f /tmp/fsa/auto_raw.json --debug
+python3 FSA.py -r build_auto_yaml -f /tmp/fsa/auto_raw.json --debug
 ```
 ### 출력예시
 ```yaml
@@ -132,7 +132,7 @@ sim:
 ## 🔹 4. scan_objects 생성
 
 ```bash
-python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r get_scan_object --config /tmp/fsa/config.yaml -f /tmp/fsa/volume.json --auto-db /tmp/fsa/auto_db.yaml --debug
+python3 FSA.py -r get_scan_object --config /tmp/fsa/config.yaml -f /tmp/fsa/volume.json --auto-db /tmp/fsa/auto_db.yaml --debug
 ```
 
 👉 volume + auto_db → 스캔 대상 생성
@@ -142,7 +142,7 @@ python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManage
 ## 🔹 5. usage 수집
 
 ```bash
-python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r find_and_collect_usage -f /tmp/fsa/scan_objects.yaml --prevfile /tmp/fsa/usage_latest.yaml
+python3 FSA.py -r find_and_collect_usage -f /tmp/fsa/scan_objects.yaml --prevfile /tmp/fsa/usage_latest.yaml
 ```
 
 👉 BFS 기반 디렉토리 탐색
@@ -152,7 +152,7 @@ python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManage
 ## 🔹 6. HTML 생성
 
 ```bash
-python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r build_mail -f /tmp/fsa/usage.yaml
+python3 FSA.py -r build_mail -f /tmp/fsa/usage.yaml
 ```
 
 👉 volume 단위 HTML 생성
