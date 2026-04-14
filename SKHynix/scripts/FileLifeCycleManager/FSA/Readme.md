@@ -1,15 +1,3 @@
-좋다 👍 이건 그냥 README가 아니라
-👉 **“엔서블 연동 관점에서 이해 가능한 문서”**로 만들어야 한다
-
-지금 플레이북 구조까지 포함해서
-👉 실무용 README 완성본 만들어줄게
-
----
-
-# 📘 README (Ansible 연동 포함 완성본)
-
----
-
 ## 📌 개요
 
 이 프로젝트는 **ONTAP FSA(File System Analytics)** 데이터를 기반으로
@@ -76,12 +64,7 @@ mail.yaml
    ↓
 [Ansible mail module]
 ```
-
----
-
-# 🧠 핵심 설계 (중요)
-
-## 1️⃣ 역할 분리 구조
+## 역할 분리 구조
 
 | 단계    | 역할        |
 | ----- | --------- |
@@ -89,80 +72,67 @@ mail.yaml
 | usage | 실제 데이터 수집 |
 | mail  | HTML 생성   |
 
-👉 **각 단계는 서로 독립적으로 동작**
+**각 단계는 서로 독립적으로 동작합니다*
 
----
-
-## 2️⃣ auto_db.yaml 역할
-
-```yaml
-fsx01:/fg2:
-  autopath: fg02_dram
-  mountpath: fsx01.aws.wyahn.com:/fg2
-```
+## auto_db.yaml
+사내 autopath 명령어 출력결과를 가공하여 저장합니다. 
 
 👉 역할:
-
 * SVM + Junction Path → alias 매핑
 * mountpath → 도메인 정보 제공
 
----
-
-## 3️⃣ 메일 경로 생성 방식 (핵심)
-
-최종 메일 상단:
-
-```
-fsx01.aws.wyahn.com:/fg02_dram
-```
-
-생성 방식:
-
-```
-svm_domain + auto_alias
-```
-
-👉 svm_domain은 mountpath에서 추출
-
----
 
 # 🛠 Ansible Playbook 연동 설명
-
 ## 🔹 1. ONTAP Volume 조회
-
 ```yaml
 na_ontap_rest_cli:
 ```
-
-* 조건 기반 volume 필터링
+* cli 명령어, 조건 기반 volume 필터링
 * analytics_state = on 필수
 
----
-
 ## 🔹 2. getauto 실행
-
 ```yaml
 command: "getauto auto.{{ item.autopath.automap }}"
 ```
-
+### 출력예시
+```sh
+=== auto.sim ===
+fg_vol_dram svm_CVO2.aws.wyahn.com:/fgvol
+vol1_dram svm_CVO2.aws.wyahn.com:/vol1
+vol2_dram svm_CVO2.aws.wyahn.com:/vol2
+fg02_dram fsx01.aws.wyahn.com:/fg2
+```
 👉 automount 정보 조회
-
----
 
 ## 🔹 3. auto_db 생성
 
-```yaml
--r build_auto_yaml
+```bash
+python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r build_auto_yaml -f /tmp/fsa/auto_raw.json --debug
 ```
-
+### 출력예시
+```yaml
+sim:
+  svm_CVO2:/fgvol:
+    autopath: fg_vol_dram
+    mountpath: svm_CVO2.aws.wyahn.com:/fgvol
+  svm_CVO2:/vol1:
+    autopath: vol1_dram
+    mountpath: svm_CVO2.aws.wyahn.com:/vol1
+  svm_CVO2:/vol2:
+    autopath: vol2_dram
+    mountpath: svm_CVO2.aws.wyahn.com:/vol2
+  fsx01:/fg2:
+    autopath: fg02_dram
+    mountpath: fsx01.aws.wyahn.com:/fg2
+```
 👉 getauto 결과 → YAML 변환
 
 ---
 
 ## 🔹 4. scan_objects 생성
 
-```yaml
--r get_scan_object
+```bash
+python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r get_scan_object --config /tmp/fsa/config.yaml -f /tmp/fsa/volume.json --auto-db /tmp/fsa/auto_db.yaml --debug
 ```
 
 👉 volume + auto_db → 스캔 대상 생성
@@ -171,8 +141,8 @@ command: "getauto auto.{{ item.autopath.automap }}"
 
 ## 🔹 5. usage 수집
 
-```yaml
--r find_and_collect_usage
+```bash
+python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r find_and_collect_usage -f /tmp/fsa/scan_objects.yaml --prevfile /tmp/fsa/usage_latest.yaml
 ```
 
 👉 BFS 기반 디렉토리 탐색
@@ -181,23 +151,14 @@ command: "getauto auto.{{ item.autopath.automap }}"
 
 ## 🔹 6. HTML 생성
 
-```yaml
--r build_mail
+```bash
+python3 /opt/awx/projects/_12__netappkr_repo/SKHynix/scripts/FileLifeCycleManager/FSA/FSA.py -r build_mail -f /tmp/fsa/usage.yaml
 ```
 
 👉 volume 단위 HTML 생성
 
 ---
 
-## 🔹 7. 메일 발송
-
-```yaml
-mail:
-```
-
-👉 volume별 메일 발송
-
----
 
 # 📂 주요 파일 설명
 
@@ -249,59 +210,11 @@ mail:
 ---
 
 # 🚀 실행 방식
-
 👉 사용자는 직접 실행하지 않음
 👉 **Ansible Playbook을 통해 자동 실행됨**
 
 ```bash
 ansible-playbook fsa.yml
 ```
-
----
-
-# ⚠️ 중요 포인트
-
-## 1. auto_db.yaml 필수
-
-없으면 alias 매핑 안됨
-
----
-
-## 2. key 형식 반드시 유지
-
-```
-svm:/junction_path
-```
-
----
-
-## 3. analytics_state = on 필수
-
-FSA API 동작 조건
-
----
-
-## 4. finger2 필요
-
-```bash
-finger2 <uid>
-```
-
-👉 사용자 정보 조회
-
----
-
-# 🔥 설계 의도
-
-* File Lifecycle 관리
-* 사용자별 용량 분석
-* 불필요 데이터 식별
-* 자동 리포트 생성
-
----
-
-# 🎯 한줄 요약
-
-👉 **Ansible이 전체 파이프라인을 실행하고, Python은 분석 엔진 역할을 한다**
 
 
