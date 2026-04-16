@@ -272,7 +272,8 @@ def get_scan_objects(data, config):
 
                 # auto alias 매핑
                 auto_alias = name
-
+                mountpath = None
+                
                 mapping = auto_map_yaml.get(automap_name, {})
                 lookup_key = f"{svm}:{junction_path}"
                 auto_info = mapping.get(lookup_key)
@@ -281,7 +282,7 @@ def get_scan_objects(data, config):
                 logger.debug(f"[MATCH] junction_path={junction_path}")
 
                 if auto_info:
-                    auto_alias = auto_info.get("alias", name)
+                    auto_alias = auto_info.get("autopath", name)
                     mountpath = auto_info.get("mountpath", None)
                 else:
                     logger.debug(f"[AUTO MAP MISS] division={division_name}, volume={name}")
