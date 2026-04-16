@@ -548,7 +548,7 @@ def get_user_info(owner_id):
     """
     try:
         res = subprocess.run(
-            ["finger2", str(owner_id)],
+            ["/sw/bin/finger2", str(owner_id)],
             capture_output=True,
             text=True
         )
@@ -766,7 +766,7 @@ def main():
         elif args.request == "find_and_collect_usage":
             data = read_yaml(args.file)
             result = find_and_collect_usage(data,args.prevfile)
-            print(yaml.safe_dump(result, sort_keys=False))
+            print(yaml.safe_dump(result, sort_keys=False, allow_unicode=True))
         # auto db_yaml 생성
         elif args.request == "build_auto_yaml":
             data = build_auto_yaml_from_file(args.file)
