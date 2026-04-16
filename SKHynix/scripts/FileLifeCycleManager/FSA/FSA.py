@@ -273,7 +273,7 @@ def get_scan_objects(data, config):
                 # auto alias 매핑
                 auto_alias = name
                 mountpath = None
-                
+
                 mapping = auto_map_yaml.get(automap_name, {})
                 lookup_key = f"{svm}:{junction_path}"
                 auto_info = mapping.get(lookup_key)
@@ -552,6 +552,8 @@ def get_user_info(owner_id):
             capture_output=True,
             text=True
         )
+        logger.debug(f"[FINGER2 OUTPUT] owner_id={owner_id} stdout={res.stdout.strip()}")
+        logger.debug(f"[FINGER2 STDERR] owner_id={owner_id} stderr={res.stderr.strip()}")
 
         name = "unknown"
         email = "unknown"
@@ -561,10 +563,11 @@ def get_user_info(owner_id):
                 name = line.split(":")[1].strip()
             if "E-mail" in line:
                 email = line.split(":")[1].strip()
-
+        logger.debug(f"[USER PARSED] owner_id={owner_id}, name={name}, email={email}")
         return name, email
 
     except Exception:
+        logger.error(f"[ERROR] Failed to get user info for owner_id={owner_id}")
         return "unknown", "unknown"
 
 # -------------------------
