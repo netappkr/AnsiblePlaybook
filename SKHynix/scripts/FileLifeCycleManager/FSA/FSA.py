@@ -299,6 +299,7 @@ def get_scan_objects(data, config):
                     "div": division_name,
                     "junction_path": junction_path,
                     "auto_alias": auto_alias,
+                    "automap": automap_name,
                     "fsa_option": matched_div["fsa_option"]
                 })
 
@@ -524,6 +525,7 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                                 "user_name": username,
                                 "email": email,
                                 "bytes_used": used,
+                                "automap": obj.get("automap"),
                                 "diff_bytes": diff
                             })
 
@@ -646,9 +648,9 @@ def build_mail(data):
         # -----------------------
         
         sample = next(iter(root_map.values()))[0]
-        svm_domain = sample.get("svm_domain")
+        automap = sample.get("automap")
         alias = sample.get("auto_alias")
-        top_path = f"{svm_domain}:/{alias}" if alias else f"{svm_domain}:/{volume}"
+        top_path = f"{automap}:/{alias}" if alias else f"{automap}:/{volume}"
 
         html = f"""
         <html>

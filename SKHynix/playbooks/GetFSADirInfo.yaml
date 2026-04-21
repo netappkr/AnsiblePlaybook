@@ -182,4 +182,4 @@
         subtype: html
         from: "{{ email_from }}"
         secure: starttls
-      loop: "{{ mail_list }}"
+      loop: "{{ mail_list }}"$
