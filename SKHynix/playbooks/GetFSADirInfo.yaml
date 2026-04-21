@@ -12,16 +12,25 @@
     - name: Get current date
       command: date +%Y-%m-%d
       register: current_date
-      
-    - name: Set work directory with date
+
+    - name: Set work directory with today
       set_fact:
-        work_dir: "/tmp/fsa/{{ current_date.stdout }}"
+        today_dir: "{{ work_dir }}/{{ current_date.stdout }}"
+
+    - name: Get yesterday date
+      command: date -d "yesterday" +%Y-%m-%d
+      register: yesterday_date
+
+    - name: Set work directory with yesterday
+      set_fact:
+        yesterday_dir: "{{ work_dir }}/{{ yesterday_date.stdout }}"
+
     # -------------------------
     # 작업 디렉토리 생성
     # -------------------------
     - name: Create work directory
       file:
-        path: "{{ work_dir }}"
+        path: "{{ today_dir }}"
         state: directory
         mode: "0755"
 
@@ -56,7 +65,7 @@
     # -------------------------
     - name: Save volume JSON
       copy:
-        dest: "{{ work_dir }}/volume.json"
+        dest: "{{ today_dir }}/volume.json"
         content: "{{ ontap_volumes.results | to_nice_json }}"
 
     # -------------------------
@@ -64,7 +73,7 @@
     # -------------------------
     - name: Save config YAML
       copy:
-        dest: "{{ work_dir }}/config.yaml"
+        dest: "{{ today_dir }}/config.yaml"
         content: "{{ config | to_nice_yaml }}"
 
     # -------------------------
@@ -97,19 +106,19 @@
 
     - name: Save getauto raw result
       copy:
-        dest: "{{ work_dir }}/auto_raw.json"
+        dest: "{{ today_dir }}/auto_raw.json"
         content: "{{ auto_result.results | to_nice_json }}"
 
     - name: Convert getauto → YAML
       command: >
         python3 {{ fsa_path }}
         -r build_auto_yaml
-        -f {{ work_dir }}/auto_raw.json
+        -f {{ today_dir }}/auto_raw.json
       register: auto_yaml
 
     - name: Save auto_db.yaml
       copy:
-        dest: "{{ work_dir }}/auto_db.yaml"
+        dest: "{{ today_dir }}/auto_db.yaml"
         content: "{{ auto_yaml.stdout }}"
     # -------------------------
     # scan_object 생성
@@ -118,14 +127,14 @@
       command: >
         python3 {{ fsa_path }}
         -r get_scan_object
-        --config {{ work_dir }}/config.yaml
-        -f {{ work_dir }}/volume.json
-        --auto-db {{ work_dir }}/auto_db.yaml
+        --config {{ today_dir }}/config.yaml
+        -f {{ today_dir }}/volume.json
+        --auto-db {{ today_dir }}/auto_db.yaml
       register: scan_objects
 
     - name: Save scan_objects YAML
       copy:
-        dest: "{{ work_dir }}/scan_objects.yaml"
+        dest: "{{ today_dir }}/scan_objects.yaml"
         content: "{{ scan_objects.stdout }}"
 
     # -------------------------
@@ -135,13 +144,13 @@
       command: >
         python3 {{ fsa_path }}
         -r find_and_collect_usage
-        -f {{ work_dir }}/scan_objects.yaml
-        --prevfile {{ work_dir }}/usage_latest.yaml
+        -f {{ today_dir }}/scan_objects.yaml
+        --prevfile {{ yesterday_dir }}/usage_latest.yaml
       register: usage_result
 
     - name: Save usage YAML
       copy:
-        dest: "{{ work_dir }}/usage_latest.yaml"
+        dest: "{{ today_dir }}/usage_latest.yaml"
         content: "{{ usage_result.stdout }}"
 
     - name: Get current timestamp
@@ -150,7 +159,7 @@
 
     - name: Save usage history YAML
       copy:
-        dest: "{{ work_dir }}/usage_{{ current_time.stdout }}.yaml"
+        dest: "{{ today_dir }}/usage_{{ current_time.stdout }}.yaml"
         content: "{{ usage_result.stdout }}"
     # -------------------------ß
     # HTML 생성 (수정)
@@ -159,12 +168,12 @@
       command: >
         python3 {{ fsa_path }}
         -r build_mail
-        -f {{ work_dir }}/usage_latest.yaml
+        -f {{ today_dir }}/usage_latest.yaml
       register: mail_result
 
     - name: Save mail_result YAML
       copy:
-        dest: "{{ work_dir }}/mail.yaml"
+        dest: "{{ today_dir }}/mail.yaml"
         content: "{{ mail_result.stdout }}"
 
     # -------------------------
