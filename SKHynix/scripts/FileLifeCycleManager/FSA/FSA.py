@@ -654,7 +654,7 @@ def build_mail(data):
             top_path = f"/{automap}/{alias}"  
         else: 
             f"{automap}:/{volume}"
-            logger.debug(f"{automap}:/{volume} is not mapped alias.")
+            logger.debug(f"{automap}:/{volume} is not mapped to alias.")
 
         html = f"""
         <html>
