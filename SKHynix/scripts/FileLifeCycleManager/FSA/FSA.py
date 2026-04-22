@@ -610,7 +610,7 @@ def build_mail(data):
         volume = d.get("auto_alias") or d.get("volume")
 
         # /USER/jeehyun → USER 추출
-        root = d["full_path"].split("/")[1]
+        root = d["full_path"].rsplit("/", 1)[0]
 
         volume_map[volume][root].append(d)
 
