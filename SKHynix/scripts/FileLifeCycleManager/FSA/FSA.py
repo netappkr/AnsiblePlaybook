@@ -650,7 +650,11 @@ def build_mail(data):
         sample = next(iter(root_map.values()))[0]
         automap = sample.get("automap")
         alias = sample.get("auto_alias")
-        top_path = f"/{automap}/{alias}" if alias else f"{automap}:/{volume}"
+        if alias:
+            top_path = f"/{automap}/{alias}"  
+        else: 
+            f"{automap}:/{volume}"
+            logger.debug(f"{automap}:/{volume} is not mapped alias.")
 
         html = f"""
         <html>
