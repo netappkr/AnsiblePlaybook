@@ -192,7 +192,7 @@
         username: "{{ smtp_username }}"
         password: "{{ smtp_password }}"
         to: "{{ item.emails | join(',') }}"
-        subject: "[FSA][{{ item.volume }}] Usage Report"
+        subject: "[FSA][{{ item.subject }}] Usage Report"
         body: "{{ item.html }}"
         subtype: html
         from: "{{ email_from }}"

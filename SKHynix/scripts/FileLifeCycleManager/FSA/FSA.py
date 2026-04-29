@@ -766,6 +766,7 @@ def build_mail(data):
 
         results.append({
             "volume": volume,
+            "subject": f"{top_path}",
             "emails": list(email_set),
             "html": html
         })
