@@ -181,11 +181,11 @@ def build_auto_yaml_from_file(path):
             full = parts[1]
 
             # path 기준 추출
-            svm_full = full.split(":")[0]        # svm_CVO2.aws.wyahn.com
-            svm = svm_full.split(".")[0]         # svm_CVO2
+            cluster_full = full.split(":")[0]        # CVO2.aws.wyahn.com
+            cluster = cluster_full.split(".")[0]     # CVO2
             realpath = full.split(":")[-1]           # /fg2
 
-            lookup_key = f"{svm}:{realpath}"
+            lookup_key = f"{cluster}:{realpath}"
 
             mapping[lookup_key] = {
                 "autopath": alias,
@@ -228,6 +228,7 @@ def get_scan_objects(data, config):
     for cluster in data:
         try:
             cluster_info = cluster["cluster"]
+            cluster_name = cluster_info.get("name", "unknown")
 
             for volume in cluster["msg"]["records"]:
                 name = volume.get("volume")
@@ -275,7 +276,7 @@ def get_scan_objects(data, config):
                 mountpath = None
 
                 mapping = auto_map_yaml.get(automap_name, {})
-                lookup_key = f"{svm}:{junction_path}"
+                lookup_key = f"{cluster_name}:{junction_path}"
                 auto_info = mapping.get(lookup_key)
 
                 logger.debug(f"[LOOKUP] key={lookup_key}")
