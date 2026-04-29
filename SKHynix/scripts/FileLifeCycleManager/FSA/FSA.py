@@ -733,7 +733,7 @@ def build_mail(data):
                         color = "white"
                         sign = ""
                     username = d.get("user_name", "unknown")
-                    if len(username) > 10: # user_name: 홍길동(TL),Hong GilDONG
+                    if len(username) > 4: # user_name: 홍길동(TL),Hong GilDONG
                         username = username.split(",")[0] # 홍길동(TL)만 표시
                     html += f"""
                     <td>{total_gb:.2f}</td>
