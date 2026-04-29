@@ -338,17 +338,21 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
 
             for d in prev_data:
                 try:
+                    volume = d.get("volume")
                     key = d.get("full_path")
                     used = d.get("bytes_used", 0)
 
                     if not key:
                         logger.error(f"[ERROR] {key}key does not exsit")
                         continue
-                        
+
                     if not isinstance(used, (int, float)):
                         used = 0
 
-                    prev_map[key] = used
+                    if volume not in prev_map:
+                        prev_map[volume] = {}
+
+                    prev_map[volume][key] = used
 
                 except Exception as e:
                     logger.warning(f"[WARN] invalid record skipped: {str(e)}")
@@ -358,6 +362,9 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
 
     except Exception as e:
         logger.error(f"[ERROR] failed to load previous data: {str(e)}")
+
+    logger.debug("[prev_map]")
+    logger.debug(json.dumps(prev_map, indent=2, ensure_ascii=False))
 
     
 
@@ -502,8 +509,10 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                             # diff 계산
                             # -----------------------
                             key = sub_full_path
-                            prev_used = prev_map.get(key, 0)
+                            prev_used = prev_map.get(obj["volume"], {}).get(key, 0)
                             diff = used - prev_used
+                            volume = obj["volume"]
+                            logger.debug(f"[diff show] sub_full_path={volume}/{sub_full_path}, used={used}, prev_used={prev_used}")
 
                             # analytics_bytes_used: ">1G" 옵션 필터링
                             if filter_expr:
@@ -615,7 +624,7 @@ def build_mail(data):
         volume_map[volume][root].append(d)
 
     results = []
-
+    logger.debug(f"[VOLUME_MAP] {json.dumps(volume_map, indent=2, ensure_ascii=False)}")
     # -----------------------
     # volume별 메일 생성
     # -----------------------
@@ -651,7 +660,7 @@ def build_mail(data):
         automap = sample.get("automap")
         alias = sample.get("auto_alias")
         if alias:
-            top_path = f"/{automap}/{alias}"  
+            top_path = f"{automap}:/{volume}" 
         else: 
             f"{automap}:/{volume}"
             logger.debug(f"{automap}:/{volume} is not mapped to alias.")
@@ -681,21 +690,20 @@ def build_mail(data):
         # 1행: root header
         # -----------------------
         html += "<tr>"
-        for root in root_map:
+        for root in roots:
             html += f"<th colspan='4'>{root}</th>"
         html += "</tr>"
-
         # -----------------------
         # 2행: column header
         # -----------------------
         html += "<tr>"
-        for _ in root_map:
+        for _ in roots:  
             html += """
-                <th>total (GB)</th>
-                <th>diff (GB)</th>
-                <th>user</th>
-                <th>name</th>
-            """
+        <th>total (GB)</th>
+        <th>diff (GB)</th>
+        <th>dirname</th>
+        <th>user</th>
+        """
         html += "</tr>"
 
         # -----------------------
@@ -728,8 +736,8 @@ def build_mail(data):
                     html += f"""
                     <td>{total_gb:.2f}</td>
                     <td style="color:{color}">{sign}{diff_gb:.2f}</td>
-                    <td>{d["owner_id"]}</td>
                     <td>{d["user_dir"]}</td>
+                    <td>{d["user_name"]}</td>
                     """
                 else:
                     # 🔥 빈칸 처리
