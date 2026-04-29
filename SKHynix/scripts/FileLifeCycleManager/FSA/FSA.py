@@ -670,11 +670,20 @@ def build_mail(data):
         <head>
         <meta charset="UTF-8">
         <style>
-            body {{ font-family: Arial; background-color:#0b1220; color:white; }}
-            table {{ border-collapse: collapse; margin-top: 20px; width:100%; }}
-            th, td {{ border: 1px solid #444; padding: 8px; text-align: center; }}
+            body {{ font-family: Arial; background-color:white; color:block; font-size: 12px }}
+            table {{ border-collapse: collapse; margin-top: 20px; width:100%; table-layout:fixed }}
+            th, td {{ border: 1px solid #ccc; padding: 8px; text-align: center; }}
             th {{ background-color: #1f2a44; }}
         </style>
+        </head>
+        <body>
+
+        <h3 style="font-family: Arial, Helvetica, sans-serif;">
+            현재 해당 Storage의 사용량이 80% 를 초과하여 사용중이며 현재 상태가 지속될 경우<br>
+            Full 발생 및 Data 접근 불가 상황이 예상되오니 아래 내용 참조하시어 빠른 시일 내에 Data 정리 부탁드립니다.<br>
+            공용 Storage의 안정적 사용을 위하여 하위 사용 현황 정보 확인 및 Data 삭제 진행 안내드립니다.
+
+        </h3>
         </head>
         <body>
 
