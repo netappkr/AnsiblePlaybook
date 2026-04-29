@@ -732,12 +732,14 @@ def build_mail(data):
                     else:
                         color = "white"
                         sign = ""
-
+                    username = d.get("user_name", "unknown")
+                    if len(username) > 10: # user_name: 홍길동(TL),Hong GilDONG
+                        username = username.split(",")[0] # 홍길동(TL)만 표시
                     html += f"""
                     <td>{total_gb:.2f}</td>
                     <td style="color:{color}">{sign}{diff_gb:.2f}</td>
                     <td>{d["user_dir"]}</td>
-                    <td>{d["user_name"]}</td>
+                    <td>{username}</td>
                     """
                 else:
                     # 🔥 빈칸 처리
