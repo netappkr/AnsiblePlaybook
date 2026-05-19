@@ -102,7 +102,7 @@
     - name: Run getauto
       command: "getauto auto.{{ item }}"
       register: auto_result
-      loop: "{{ config.config.autopath.automap }}"
+      loop: "{{ config.autopath.automap }}"
 
     - name: Save getauto raw result
       copy:
