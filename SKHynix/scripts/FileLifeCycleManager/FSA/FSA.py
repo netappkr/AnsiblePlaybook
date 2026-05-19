@@ -152,79 +152,74 @@ def check_yaml_integrity(file_path):
 # auto_db.yaml 생성
 # -------------------------
 def build_auto_yaml_from_file(path):
+
     data = read_json(path)
 
     final = {}
 
     for item in data:
-        # 🔥 핵심: automap 추출
         automap_name = item["item"].get("autopath", {}).get("automap")
 
         if not automap_name:
-            logger.warning(f"[WARN] automap not found for item={item['item']}")
             continue
 
         stdout = item.get("stdout", "")
 
-        mapping = {}
-
         for line in stdout.splitlines():
             line = line.strip()
 
-            if not line or line.startswith("="):
+            if not line:
+                continue
+
+            if line.startswith("="):
                 continue
 
             parts = line.split()
+
             if len(parts) != 2:
                 continue
 
             alias = parts[0]
             full = parts[1]
-
-            # path 기준 추출
-            cluster_full = full.split(":")[0]        # CVO2.aws.wyahn.com
-            cluster = cluster_full.split(".")[0]     # CVO2
-            realpath = full.split(":")[-1]           # /fg2
-
+            cluster_full = full.split(":")[0]
+            cluster = cluster_full.split(".")[0]
+            realpath = full.split(":")[-1]
             lookup_key = f"{cluster}:{realpath}"
 
-            mapping[lookup_key] = {
+            final[lookup_key] = {
                 "autopath": alias,
-                "mountpath": full
+                "mountpath": full,
+                "autokey": automap_name
             }
 
-        # automap 기준으로 저장
-        final[automap_name] = mapping
-
-        logger.debug(f"[AUTO_DB] built automap={automap_name}, count={len(mapping)}")
+            logger.debug(
+                f"[AUTO_DB] key={lookup_key}, alias={alias}"
+            )
 
     return final
 # -------------------------
 # scan object 생성
 # -------------------------
 def get_scan_objects(data, config):
-    """
-    ONTAP volume 정보를 기반으로
-    FSA 스캔 대상(scan_objects) 생성
-    + auto_map(YAML) 기반 alias 매핑
-    + division 자동 매핑 (정규식 + export policy)
-    """
 
     logger.info("[START] get_scan_objects")
-
     scan_objects = []
-    division_cfg = config.get("division", [])
+    cfg = config["config"]
+    exportpolicy_names = [
+        e["name"]
+        for e in cfg.get("exportpolicy", [])
+    ]
 
-    # auto_db 로딩
+    test_volumes = config.get("test_volume", [])
     auto_map_yaml = {}
+
     if args.auto_db:
         try:
             auto_map_yaml = read_yaml(args.auto_db) or {}
             logger.info(f"[AUTO MAP] loaded: {args.auto_db}")
+
         except Exception as e:
             logger.error(f"[ERROR] auto_db load failed: {str(e)}")
-    else:
-        logger.warning("[WARN] auto_db not provided")
 
     for cluster in data:
         try:
@@ -237,80 +232,110 @@ def get_scan_objects(data, config):
                 svm = volume.get("vserver")
                 uuid = volume.get("instance_uuid")
                 analytics = volume.get("analytics_state")
-
-                # export_policy 위치 여기 (중요)
                 export_policy = volume.get("policy", "")
 
-                if not junction_path or analytics != "on":
+                # -------------------------
+                # 기본 조건
+                # -------------------------
+                if not junction_path:
                     continue
 
-                # =========================
-                # division 매핑 시작
-                # =========================
-                matched_div = None
-
-                for div in division_cfg:
-                    if "fsa_option" not in div:
-                        continue
-
-                    vol_name_regexp = div.get("vol_name_regexp", ".*")
-                    exportpolicy_names = [e["name"] for e in div.get("exportpolicy", [])]
-
-                    if re.search(vol_name_regexp, name) and export_policy in exportpolicy_names:
-                        matched_div = div
-                        break
-
-                # 매칭 실패
-                if not matched_div:
-                    logger.debug(f"[SKIP] no division matched volume={name}, export_policy={export_policy}")
+                if analytics != "on":
                     continue
 
-                division_name = matched_div["name"]
-                automap_name = matched_div.get("autopath", {}).get("automap")
+                # -------------------------
+                # export policy filter
+                # -------------------------
+                if export_policy not in exportpolicy_names:
+                    logger.debug(
+                        f"[SKIP] export policy mismatch "
+                        f"volume={name}, policy={export_policy}"
+                    )
+                    continue
 
-                if not automap_name:
-                    logger.warning(f"[WARN] no automap for division={division_name}")
-                    automap_name = None
+                # -------------------------
+                # test volume filter
+                # -------------------------
+                if test_volumes and name not in test_volumes:
+                    logger.debug(
+                        f"[SKIP] test_volume mismatch volume={name}"
+                    )
+                    continue
 
-                # auto alias 매핑
-                auto_alias = name
-                mountpath = None
-
-                mapping = auto_map_yaml.get(automap_name, {})
+                # -------------------------
+                # auto_db lookup
+                # key:
+                # nsim2m14:/sim_nand_he1ttlcdv
+                # -------------------------
                 lookup_key = f"{cluster_name}:{junction_path}"
-                auto_info = mapping.get(lookup_key)
 
                 logger.debug(f"[LOOKUP] key={lookup_key}")
-                logger.debug(f"[MATCH] junction_path={junction_path}")
+
+                auto_info = auto_map_yaml.get(lookup_key)
+
+                auto_alias = name
+                mountpath = None
+                automap_key = None
 
                 if auto_info:
-                    auto_alias = auto_info.get("autopath", name)
-                    mountpath = auto_info.get("mountpath", None)
+
+                    auto_alias = auto_info.get(
+                        "autopath",
+                        name
+                    )
+
+                    mountpath = auto_info.get(
+                        "mountpath"
+                    )
+
+                    automap_key = auto_info.get(
+                        "autokey"
+                    )
+
+                    logger.debug(
+                        f"[AUTO MAP HIT] "
+                        f"volume={name}, "
+                        f"alias={auto_alias}, "
+                        f"automap={automap_key}"
+                    )
+
                 else:
-                    logger.debug(f"[AUTO MAP MISS] division={division_name}, volume={name}")
+
+                    logger.debug(
+                        f"[AUTO MAP MISS] "
+                        f"lookup_key={lookup_key}"
+                    )
+
                 svm_domain = None
 
                 if mountpath:
-                    svm_domain = mountpath.split(":")[0]  # fsx01.aws.wyahn.com
+                    svm_domain = mountpath.split(":")[0]
+
                 scan_objects.append({
                     "cluster": cluster_info,
                     "vserver": svm,
                     "svm_domain": svm_domain,
                     "volume": name,
                     "vol_uuid": uuid,
-                    "div": division_name,
                     "junction_path": junction_path,
                     "auto_alias": auto_alias,
-                    "automap": automap_name,
-                    "fsa_option": matched_div["fsa_option"]
+                    "automap": automap_key,
+                    "fsa_option": cfg["fsa_option"]
                 })
 
-                logger.debug(f"[ADD] volume={name}, div={division_name}, alias={auto_alias}")
+                logger.debug(
+                    f"[ADD] volume={name}, "
+                    f"alias={auto_alias}, "
+                    f"automap={automap_key}"
+                )
 
         except Exception:
             logger.error(traceback.format_exc())
 
-    logger.info(f"[END] get_scan_objects count={len(scan_objects)}")
+    logger.info(
+        f"[END] get_scan_objects count={len(scan_objects)}"
+    )
+
     return scan_objects
 
 
@@ -388,32 +413,26 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
 
         logger.info(f"[SEARCH] volume={obj['volume']} targets={targets}")
 
-        # BFS 초기값 (루트부터 시작)
-        queue = deque([("/", 1)])
-        visited = set()
-        found_roots = set()
-        # config에서 필터 읽기
-        filter_expr = obj["fsa_option"].get("analytics_bytes_used")
+        search_roots = [
+            "/" + d["dir"].strip("/")
+            for d in obj["fsa_option"].get("listdir", [])
+        ]
 
-        if filter_expr:
-            op, threshold = parse_size_filter(filter_expr)
+        targets = [
+            p.get("dir")
+            for p in obj["fsa_option"].get("path", [])
+        ]
 
-        while queue:
-            path, depth = queue.popleft()
-
-            # depth 제한 및 방문 여부 체크
-            if depth > 2 or path in visited:
-                continue
-
-            visited.add(path)
+        for root_path in search_roots:
 
             try:
-                encoded_path = quote(path if path else "/", safe="")
+
+                encoded_path = quote(root_path, safe="")
+
                 url = f"{base_url}/{encoded_path}"
 
-                logger.debug(f"[REQUEST] {url}")
+                logger.debug(f"[DIRECT SEARCH] {url}")
 
-                # 디렉토리 목록 조회
                 res = session.get(
                     url,
                     auth=auth,
@@ -425,163 +444,103 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                 )
 
                 res.raise_for_status()
+
                 records = res.json().get("records", [])
 
-                logger.debug(f"[API] path={path} count={len(records)}")
-                logger.debug(f"[API] RES_RECODE={records}")
-
                 for r in records:
+
                     name = r.get("name")
-                    parent = r.get("path") or "/"
-                    r_type = r.get("type")
 
-                    # 불필요 디렉토리 제외
-                    if name in [".", "..", ".snapshot"]:
+                    if name not in targets:
                         continue
 
-                    if r_type != "directory":
-                        continue
+                    full_path = f"{root_path}/{name}"
+                    logger.info(f"[FOUND ROOT] {full_path}")
+                    encoded_sub = quote(full_path, safe="")
+                    sub_url = f"{base_url}/{encoded_sub}"
+                    params = {
+                        "fields": "name,path,owner_id,analytics.bytes_used,type"
+                    }
 
-                    # full path 생성
-                    full_path = f"{parent.rstrip('/')}/{name}"
+                    res2 = session.get(
+                        url=sub_url,
+                        auth=auth,
+                        params=params,
+                        timeout=30
+                    )
 
-                    logger.debug(f"[PATH] {full_path}")
+                    res2.raise_for_status()
 
-                    # target 디렉토리 발견
-                    if name in targets:
+                    sub_records = res2.json().get("records", [])
 
-                        if full_path in found_roots:
+                    for sr in sub_records:
+
+                        sub_name = sr.get("name")
+
+                        sub_parent = sr.get("path") or full_path
+
+                        sub_type = sr.get("type")
+
+                        if sub_type != "directory":
                             continue
 
-                        logger.info(f"[FOUND ROOT] {full_path}")
-                        found_roots.add(full_path)
+                        used = sr.get("analytics", {}).get("bytes_used", 0)
 
-                        # 하위 디렉토리 usage 조회
-                        encoded_sub = quote(full_path, safe="")
-                        sub_url = f"{base_url}/{encoded_sub}"
-
-                        # 기본 params
-                        params = {
-                            "fields": "name,path,owner_id,analytics.bytes_used,type"
-                        }
-
-                        # config fsa_option 병합
-                        # fsa_option에서 path 제외하고 params 반영
-                        if "fsa_option" in obj:
-                            for k, v in obj["fsa_option"].items():
-                                if k == "path":
-                                    continue
-                                if k == "analytics_bytes_used":
-                                    continue
-                                params[k] = v
-
-                        logger.debug(f"[REQUEST] {sub_url}")
-                        logger.debug(f"[REQUEST_PARAMS] {params}")
-                        res2 = session.get(
-                            url=sub_url,
-                            auth=auth,
-                            params=params,
-                            timeout=30
-                        )
-
-                        res2.raise_for_status()
-                        sub_records = res2.json().get("records", [])
-
-                        logger.debug(f"[USAGE API] path={full_path} count={len(sub_records)}")
-                        logger.debug(f"[USAGE API] RES_RECODE={sub_records}")
-
-                        for sr in sub_records:
-                            sub_name = sr.get("name")
-                            sub_parent = sr.get("path") or full_path
-                            sub_type = sr.get("type")
-
-                            if sub_name in [".", "..", ".snapshot"]:
+                        if filter_expr:
+                            if not check_condition(used, op, threshold):
                                 continue
 
-                            if sub_type != "directory":
-                                continue
+                        owner = sr.get("owner_id")
 
-                            sub_full_path = f"{sub_parent.rstrip('/')}/{sub_name}"
+                        username, email = get_user_info(owner)
 
-                            seen_paths.add(sub_full_path)
-
-                            owner = sr.get("owner_id")
-                            used = sr.get("analytics", {}).get("bytes_used", 0)
-                            # -----------------------
-                            # diff 계산
-                            # -----------------------
-                            key = sub_full_path
-                            prev_used = prev_map.get(obj["volume"], {}).get(key, 0)
-                            diff = used - prev_used
-                            volume = obj["volume"]
-                            logger.debug(f"[diff show] sub_full_path={volume}/{sub_full_path}, used={used}, prev_used={prev_used}")
-
-                            # analytics_bytes_used: ">1G" 옵션 필터링
-                            if filter_expr:
-                                if not check_condition(used, op, threshold):
-                                    continue
-
-                            # owner_id → 사용자 정보 조회
-                            username, email = get_user_info(owner)
-
-                            # 결과 저장
-                            results.append({
-                                "division": obj["div"],
-                                "svm_domain": obj.get("svm_domain"),
-                                "volume": obj["volume"],
-                                "auto_alias": obj.get("auto_alias"),
-                                "user_dir": sub_name,
-                                "full_path": sub_full_path,
-                                "owner_id": owner,
-                                "user_name": username,
-                                "email": email,
-                                "bytes_used": used,
-                                "automap": obj.get("automap"),
-                                "diff_bytes": diff
-                            })
-
-                        continue
-
-                    # BFS 확장 (하위 디렉토리 탐색)
-                    queue.append((full_path, depth + 1))
+                        results.append({
+                            "svm_domain": obj.get("svm_domain"),
+                            "volume": obj["volume"],
+                            "auto_alias": obj.get("auto_alias"),
+                            "user_dir": sub_name,
+                            "full_path": f"{sub_parent}/{sub_name}",
+                            "owner_id": owner,
+                            "user_name": username,
+                            "email": email,
+                            "bytes_used": used
+                        })
 
             except Exception as e:
-                logger.error(f"[ERROR] path={path} {str(e)}")
 
-    logger.info(f"[END] find_and_collect_usage result_count={len(results)}")
-    return results
+                logger.error(f"[ERROR] root_path={root_path} {str(e)}")
 
-# -------------------------
-# 사용자 정보 조회
-# -------------------------
-def get_user_info(owner_id):
-    """
-    owner_id → 사용자 이름 / 이메일 변환
-    (finger2 명령어 활용)
-    """
-    try:
-        res = subprocess.run(
-            ["/sw/bin/finger2", str(owner_id)],
-            capture_output=True,
-            text=True
-        )
-        logger.debug(f"[FINGER2 OUTPUT] owner_id={owner_id} stdout={res.stdout.strip()}")
-        logger.debug(f"[FINGER2 STDERR] owner_id={owner_id} stderr={res.stderr.strip()}")
+        # -------------------------
+        # 사용자 정보 조회
+        # -------------------------
+        def get_user_info(owner_id):
+            """
+            owner_id → 사용자 이름 / 이메일 변환
+            (finger2 명령어 활용)
+            """
+            try:
+                res = subprocess.run(
+                    ["/sw/bin/finger2", str(owner_id)],
+                    capture_output=True,
+                    text=True
+                )
+                logger.debug(f"[FINGER2 OUTPUT] owner_id={owner_id} stdout={res.stdout.strip()}")
+                logger.debug(f"[FINGER2 STDERR] owner_id={owner_id} stderr={res.stderr.strip()}")
 
-        name = "unknown"
-        email = "unknown"
+                name = "unknown"
+                email = "unknown"
 
-        for line in res.stdout.splitlines():
-            if "Name" in line:
-                name = line.split(":")[1].strip()
-            if "E-mail" in line:
-                email = line.split(":")[1].strip()
-        logger.debug(f"[USER PARSED] owner_id={owner_id}, name={name}, email={email}")
-        return name, email
+                for line in res.stdout.splitlines():
+                    if "Name" in line:
+                        name = line.split(":")[1].strip()
+                    if "E-mail" in line:
+                        email = line.split(":")[1].strip()
+                logger.debug(f"[USER PARSED] owner_id={owner_id}, name={name}, email={email}")
+                return name, email
 
-    except Exception:
-        logger.error(f"[ERROR] Failed to get user info for owner_id={owner_id}")
-        return "unknown", "unknown"
+            except Exception:
+                logger.error(f"[ERROR] Failed to get user info for owner_id={owner_id}")
+                return "unknown", "unknown"
 
 # -------------------------
 # 사용자별 그룹핑
