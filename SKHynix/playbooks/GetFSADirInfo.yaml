@@ -199,7 +199,8 @@
         subtype: html
         body: "{{ item.html }}"
         from: "{{ email_from }}"
-        secure: never
+        # secure: never
+        secure: starttls
       loop: "{{ mail_list }}"
 
 
