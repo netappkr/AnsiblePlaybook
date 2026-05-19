@@ -97,12 +97,12 @@
         fsa_path: "{{ fsa_script.files[0].path }}"
 
     # -------------------------
-    # getauto auto.{{division}}
+    # getauto auto.{{automap}}
     # -------------------------
-    - name: Run getauto per division
-      command: "getauto auto.{{ item.autopath.automap }}"
+    - name: Run getauto
+      command: "getauto auto.{{ item }}"
       register: auto_result
-      loop: "{{ config.division }}"
+      loop: "{{ config.config.autopath.automap }}"
 
     - name: Save getauto raw result
       copy:
