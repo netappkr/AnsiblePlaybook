@@ -182,19 +182,24 @@
     - name: Parse mail result
       set_fact:
         mail_list: "{{ mail_result.stdout | from_yaml }}"
+
+
     # -------------------------
-    # 메일 발송
+    #  메일 발송
     # -------------------------
     - name: Send volume mail
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
-        username: "{{ smtp_username }}"
-        password: "{{ smtp_password }}"
-        to: "{{ item.emails | join(',') }}"
-        subject: "[FSA][{{ item.subject }}] Usage Report"
-        body: "{{ item.html }}"
+        #username: "{{ smtp_username }}"
+        #password: "{{ smtp_password }}"
+        to: "{{ ([email_to] + item.emails) | join(',') }}"
+        #to: "{{ email_to }}"
+        subject: "[Data Size Info Mail] {{ item.subject }} Project User Directory Used Size"
         subtype: html
+        body: "{{ item.html }}"
         from: "{{ email_from }}"
-        secure: starttls
+        secure: never
       loop: "{{ mail_list }}"
+
+

@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 
 # -------------------------
@@ -401,7 +402,7 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
             path, depth = queue.popleft()
 
             # depth 제한 및 방문 여부 체크
-            if depth > 7 or path in visited:
+            if depth > 2 or path in visited:
                 continue
 
             visited.add(path)
@@ -688,10 +689,9 @@ def build_mail(data):
         </head>
         <body>
 
-        <h2>디렉토리 사용량 / 사용자 정보 / 증감량 분석</h2>
         <table>
         <tr>
-            <th colspan="{len(root_map)*4}">{top_path}</th>
+            <th colspan="{len(root_map)*3}">{top_path}</th>
         </tr>
 
         """
@@ -701,7 +701,7 @@ def build_mail(data):
         # -----------------------
         html += "<tr>"
         for root in roots:
-            html += f"<th colspan='4'>{root}</th>"
+            html += f"<th colspan='3'>{root}</th>"
         html += "</tr>"
         # -----------------------
         # 2행: column header
@@ -709,10 +709,9 @@ def build_mail(data):
         html += "<tr>"
         for _ in roots:  
             html += """
-        <th>total (GB)</th>
-        <th>diff (GB)</th>
-        <th>dirname</th>
-        <th>user</th>
+        <th>Total(GB)</th>
+        <th>Dirname</th>
+        <th>User</th>
         """
         html += "</tr>"
 
@@ -731,6 +730,8 @@ def build_mail(data):
 
                     total_gb = d["bytes_used"] / (1024**3)
                     diff_gb = d["diff_bytes"] / (1024**3)
+                    total_format = f"{total_gb:,.0f}"
+                    diff_format = f"{diff_gb:,.0f}"
 
                     # 색상 처리
                     if diff_gb > 0:
@@ -746,15 +747,13 @@ def build_mail(data):
                     if len(username) > 4: # user_name: 홍길동(TL),Hong GilDONG
                         username = username.split(",")[0] # 홍길동(TL)만 표시
                     html += f"""
-                    <td>{total_gb:.2f}</td>
-                    <td style="color:{color}">{sign}{diff_gb:.2f}</td>
+                    <td>{total_format}</td>
                     <td>{d["user_dir"]}</td>
                     <td>{username}</td>
                     """
                 else:
                     # 🔥 빈칸 처리
                     html += """
-                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -816,3 +815,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
