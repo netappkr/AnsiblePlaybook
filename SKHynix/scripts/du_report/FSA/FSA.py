@@ -834,7 +834,7 @@ def build_mail(data):
         <meta charset="UTF-8">
         <style>
             body {{ font-family: Arial; background-color:white; color:block; font-size: 12px }}
-            table {{ border-collapse: collapse; margin-top: 20px; width:100%; table-layout:fixed }}
+            table {{ border-collapse: collapse; margin-top: 20px; table-layout:auto }}
             th, td {{ border: 1px solid #ccc; padding: 8px; text-align: center; }}
             th {{ background-color: #1f2a44; }}
         </style>
