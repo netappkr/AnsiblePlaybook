@@ -237,7 +237,7 @@ def get_scan_objects(data, config):
 
     logger.info("[START] get_scan_objects")
     scan_objects = []
-    cfg = config["config"]
+    cfg = config
     exportpolicy_names = [
         e["name"]
         for e in cfg.get("exportpolicy", [])
@@ -376,11 +376,6 @@ def get_scan_objects(data, config):
 # USER 디렉토리 찾기 + 사용량 수집
 # -------------------------
 def find_and_collect_usage(scan_objects,usage_latest_path):
-    """
-    BFS 방식으로 디렉토리 탐색
-    1. target 디렉토리(USER 등) 찾기
-    2. 해당 하위 디렉토리 usage 수집
-    """
     # -----------------------
     # 이전 데이터 로딩
     # -----------------------
