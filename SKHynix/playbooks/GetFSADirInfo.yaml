@@ -97,7 +97,7 @@
         fsa_path: "{{ fsa_script.files[0].path }}"
 
     # -------------------------
-    # getauto auto.{{automap}}
+    # getauto auto.{{autopath}}
     # -------------------------
     - name: Run getauto
       command: "getauto auto.{{ item }}"
