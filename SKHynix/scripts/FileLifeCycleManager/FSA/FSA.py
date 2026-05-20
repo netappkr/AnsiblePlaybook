@@ -132,14 +132,47 @@ def read_yaml(path):
 def check_yaml_integrity(file_path):
     """
     config YAML 구조 검증
-    - division key 필수
+    config:
+        autopath:
+            - sim
+            - library
+
+        exportpolicy:
+            - name: "default"
+            - name: "export-svm_CVO2-vol1"
+            - name: "export-svm_CVO2-vol2"
+        fsa_option:
+            type: directory
+            analytics_bytes_used: ">=1M"
+            listdir:
+            - dir: CAE
+            - dir: SCH
+            - dir: LAY
+            - dir: dir1/dir2/CAE
+            - dir: dir3/SCH
+            path: 
+            - dir: USER
+            - dir: BE
+            - dir: user
+            - dir: FE
+            - dir: INTERFACE
+            - dir: WORK_DIR
+            - dir: DK
+        cli:                                   
+            volumename: "!*spot*,!effi*"
+            policy: "!*_ro,!*_ro1,!*exportro*,!no_access"
+            type: "rw"
+            total: ">=1MB"
+            LogicalUsedPercent: ">=4"
     """
     try:
         with open(file_path) as file:
             config = yaml.safe_load(file)
 
-        if "division" not in config:
-            raise ValueError("division key missing")
+        if "fsa_option" not in config:
+            raise ValueError("fsa_option key missing")
+        if "autopath" not in config:
+            raise ValueError("autopath key missing")
 
         return config
 

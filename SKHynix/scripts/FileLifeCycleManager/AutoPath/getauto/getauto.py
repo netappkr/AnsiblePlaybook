@@ -61,10 +61,10 @@ def main():
         description="getauto: auto map 조회 도구",
         epilog="""
 예시:
-  getauto auto.DRAM
-  getauto auto.DRAM --alias fg02_sim
-  getauto auto.DRAM --path /fg2
-  getauto auto.DRAM --search vol2
+  getauto auto.sim
+  getauto auto.sim --alias fg02_sim
+  getauto auto.sim --path /fg2
+  getauto auto.sim --search vol2
 """
     )
 
