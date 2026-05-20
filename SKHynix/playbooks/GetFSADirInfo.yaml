@@ -191,8 +191,8 @@
       mail:
         host: "{{ smtp_server }}"
         port: "{{ smtp_port }}"
-        #username: "{{ smtp_username }}"
-        #password: "{{ smtp_password }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
         to: "{{ ([email_to] + item.emails) | join(',') }}"
         #to: "{{ email_to }}"
         subject: "[Data Size Info Mail] {{ item.subject }} Project User Directory Used Size"
