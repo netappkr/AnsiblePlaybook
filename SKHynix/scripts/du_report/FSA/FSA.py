@@ -375,20 +375,23 @@ def get_scan_objects(data, config):
 # -------------------------
 # USER 디렉토리 찾기 + 사용량 수집
 # -------------------------
-def find_and_collect_usage(scan_objects,usage_latest_path):
+def find_and_collect_usage(scan_objects, usage_latest_path):
+
+    logger.info(f"[START] find_and_collect_usage count={len(scan_objects)}")
+
     # -----------------------
     # 이전 데이터 로딩
     # -----------------------
-    logger.info(f"[START] find_and_collect_usage count={len(scan_objects)}")
-
     prev_map = {}
 
     try:
+
         if usage_latest_path and os.path.exists(usage_latest_path):
             prev_data = read_yaml(usage_latest_path)
-
             if not prev_data:
-                logger.warning(f"[WARN] empty previous file: {usage_latest_path}")
+                logger.warning(
+                    f"[WARN] empty previous file: {usage_latest_path}"
+                )
                 prev_data = []
 
             for d in prev_data:
@@ -398,7 +401,6 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                     used = d.get("bytes_used", 0)
 
                     if not key:
-                        logger.error(f"[ERROR] {key}key does not exsit")
                         continue
 
                     if not isinstance(used, (int, float)):
@@ -410,165 +412,337 @@ def find_and_collect_usage(scan_objects,usage_latest_path):
                     prev_map[volume][key] = used
 
                 except Exception as e:
-                    logger.warning(f"[WARN] invalid record skipped: {str(e)}")
-
-        else:
-            logger.info(f"[FIRST RUN] no previous file")
-
-    except Exception as e:
-        logger.error(f"[ERROR] failed to load previous data: {str(e)}")
-
-    logger.debug("[prev_map]")
-    logger.debug(json.dumps(prev_map, indent=2, ensure_ascii=False))
-
-    
-
-    session = requests.Session()
-    session.verify = False  # SSL 인증서 검증 비활성화
-
-    results = []
-    seen_paths = set()  # 중복 path 방지
-
-    for obj in scan_objects:
-        cluster = obj["cluster"]
-
-        # ONTAP REST API URL 구성
-        base_url = f"https://{cluster['ip']}/api/storage/volumes/{obj['vol_uuid']}/files"
-        auth = (cluster["ID"], cluster["PW"])
-
-        # 탐색 대상 디렉토리 목록
-        targets = [p.get("dir") for p in obj["fsa_option"].get("path", [])]
-
-        logger.info(f"[SEARCH] volume={obj['volume']} targets={targets}")
-
-        search_roots = [
-            "/" + d["dir"].strip("/")
-            for d in obj["fsa_option"].get("listdir", [])
-        ]
-
-        targets = [
-            p.get("dir")
-            for p in obj["fsa_option"].get("path", [])
-        ]
-
-        for root_path in search_roots:
-
-            try:
-
-                encoded_path = quote(root_path, safe="")
-
-                url = f"{base_url}/{encoded_path}"
-
-                logger.debug(f"[DIRECT SEARCH] {url}")
-
-                res = session.get(
-                    url,
-                    auth=auth,
-                    params={
-                        "type": "directory",
-                        "fields": "name,path,type"
-                    },
-                    timeout=30
-                )
-
-                res.raise_for_status()
-
-                records = res.json().get("records", [])
-
-                for r in records:
-
-                    name = r.get("name")
-
-                    if name not in targets:
-                        continue
-
-                    full_path = f"{root_path}/{name}"
-                    logger.info(f"[FOUND ROOT] {full_path}")
-                    encoded_sub = quote(full_path, safe="")
-                    sub_url = f"{base_url}/{encoded_sub}"
-                    params = {
-                        "fields": "name,path,owner_id,analytics.bytes_used,type"
-                    }
-
-                    res2 = session.get(
-                        url=sub_url,
-                        auth=auth,
-                        params=params,
-                        timeout=30
+                    logger.warning(
+                        f"[WARN] invalid record skipped: {str(e)}"
                     )
 
-                    res2.raise_for_status()
+        else:
+            logger.info("[FIRST RUN] no previous file")
 
-                    sub_records = res2.json().get("records", [])
+    except Exception as e:
+        logger.error(
+            f"[ERROR] failed to load previous data: {str(e)}"
+        )
 
-                    for sr in sub_records:
+    logger.debug("[prev_map]")
+    logger.debug(
+        json.dumps(prev_map, indent=2, ensure_ascii=False)
+    )
 
-                        sub_name = sr.get("name")
+    # -----------------------
+    # requests session
+    # -----------------------
+    session = requests.Session()
+    session.verify = False
 
-                        sub_parent = sr.get("path") or full_path
+    results = []
 
-                        sub_type = sr.get("type")
+    # -----------------------
+    # scan object loop
+    # -----------------------
+    for obj in scan_objects:
 
-                        if sub_type != "directory":
+        try:
+
+            cluster = obj["cluster"]
+            base_url = (
+                f"https://{cluster['ip']}"
+                f"/api/storage/volumes/{obj['vol_uuid']}/files"
+            )
+            auth = (
+                cluster["ID"],
+                cluster["PW"]
+            )
+            logger.info(
+                f"[SEARCH] volume={obj['volume']}"
+            )
+
+            # -----------------------
+            # filter
+            # -----------------------
+            filter_expr = obj["fsa_option"].get(
+                "analytics_bytes_used"
+            )
+            if filter_expr:
+                op, threshold = parse_size_filter(
+                    filter_expr
+                )
+
+            # -----------------------
+            # inventory config
+            # -----------------------
+            listdir_targets = set(
+                d["dir"].split("/")[-1]
+                for d in obj["fsa_option"].get("listdir", [])
+            )
+
+            path_targets = set(
+                d["dir"]
+                for d in obj["fsa_option"].get("path", [])
+            )
+
+            logger.debug(
+                f"[LISTDIR TARGETS] {listdir_targets}"
+            )
+
+            logger.debug(
+                f"[PATH TARGETS] {path_targets}"
+            )
+
+            # ==================================================
+            # STEP 1
+            # ROOT(/) 조회
+            # ==================================================
+            root_url = f"{base_url}/%2F"
+            logger.debug(
+                f"[ROOT SEARCH] {root_url}"
+            )
+            root_res = session.get(
+                root_url,
+                auth=auth,
+                params={
+                    "type": "directory",
+                    "fields": "name,path,type"
+                },
+                timeout=30
+            )
+            root_res.raise_for_status()
+            root_records = root_res.json().get(
+                "records",
+                []
+            )
+
+            # ==================================================
+            # STEP 2
+            # listdir 발견
+            # ==================================================
+            found_listdirs = []
+            for r in root_records:
+                name = r.get("name")
+                if name in listdir_targets:
+                    full_path = (
+                        f"/{name}"
+                    )
+                    found_listdirs.append(
+                        full_path
+                    )
+                    logger.info(
+                        f"[FOUND LISTDIR] {full_path}"
+                    )
+
+            # ==================================================
+            # STEP 3
+            # 발견된 listdir 만 조회
+            # ==================================================
+            for listdir_path in found_listdirs:
+                try:
+                    encoded_path = quote(
+                        listdir_path,
+                        safe=""
+                    )
+                    url = (
+                        f"{base_url}/{encoded_path}"
+                    )
+                    logger.debug(
+                        f"[LISTDIR SEARCH] {url}"
+                    )
+                    res = session.get(
+                        url,
+                        auth=auth,
+                        params={
+                            "type": "directory",
+                            "fields": "name,path,type"
+                        },
+                        timeout=30
+                    )
+                    res.raise_for_status()
+                    records = res.json().get(
+                        "records",
+                        []
+                    )
+
+                    # ==================================================
+                    # STEP 4
+                    # USER/BE/... 탐색
+                    # ==================================================
+                    for r in records:
+                        name = r.get("name")
+                        if name not in path_targets:
                             continue
 
-                        used = sr.get("analytics", {}).get("bytes_used", 0)
+                        target_path = (
+                            f"{listdir_path}/{name}"
+                        )
 
-                        if filter_expr:
-                            if not check_condition(used, op, threshold):
+                        logger.info(
+                            f"[FOUND TARGET] {target_path}"
+                        )
+
+                        # ==================================================
+                        # STEP 5
+                        # USER 내부 usage 조회
+                        # ==================================================
+                        encoded_sub = quote(
+                            target_path,
+                            safe=""
+                        )
+
+                        sub_url = (
+                            f"{base_url}/{encoded_sub}"
+                        )
+
+                        params = {
+                            "fields": (
+                                "name,"
+                                "path,"
+                                "owner_id,"
+                                "analytics.bytes_used,"
+                                "type"
+                            )
+                        }
+
+                        res2 = session.get(
+                            url=sub_url,
+                            auth=auth,
+                            params=params,
+                            timeout=30
+                        )
+
+                        res2.raise_for_status()
+
+                        sub_records = res2.json().get(
+                            "records",
+                            []
+                        )
+
+                        # ==================================================
+                        # STEP 6
+                        # 사용자 디렉토리 usage 수집
+                        # ==================================================
+                        for sr in sub_records:
+                            sub_name = sr.get("name")
+                            sub_parent = (
+                                sr.get("path")
+                                or target_path
+                            )
+                            sub_type = sr.get("type")
+
+                            if sub_type != "directory":
                                 continue
 
-                        owner = sr.get("owner_id")
+                            used = sr.get(
+                                "analytics",
+                                {}
+                            ).get(
+                                "bytes_used",
+                                0
+                            )
 
-                        username, email = get_user_info(owner)
+                            # -----------------------
+                            # analytics filter
+                            # -----------------------
+                            if filter_expr:
+                                if not check_condition(
+                                    used,
+                                    op,
+                                    threshold
+                                ):
+                                    continue
 
-                        results.append({
-                            "svm_domain": obj.get("svm_domain"),
-                            "volume": obj["volume"],
-                            "auto_alias": obj.get("auto_alias"),
-                            "user_dir": sub_name,
-                            "full_path": f"{sub_parent}/{sub_name}",
-                            "owner_id": owner,
-                            "user_name": username,
-                            "email": email,
-                            "bytes_used": used
-                        })
+                            # -----------------------
+                            # diff 계산
+                            # -----------------------
+                            full_user_path = (
+                                f"{sub_parent}/{sub_name}"
+                            )
 
-            except Exception as e:
+                            prev_used = prev_map.get(
+                                obj["volume"],
+                                {}
+                            ).get(
+                                full_user_path,
+                                0
+                            )
 
-                logger.error(f"[ERROR] root_path={root_path} {str(e)}")
+                            diff = (
+                                used - prev_used
+                            )
 
-        # -------------------------
-        # 사용자 정보 조회
-        # -------------------------
-        def get_user_info(owner_id):
-            """
-            owner_id → 사용자 이름 / 이메일 변환
-            (finger2 명령어 활용)
-            """
-            try:
-                res = subprocess.run(
-                    ["/sw/bin/finger2", str(owner_id)],
-                    capture_output=True,
-                    text=True
-                )
-                logger.debug(f"[FINGER2 OUTPUT] owner_id={owner_id} stdout={res.stdout.strip()}")
-                logger.debug(f"[FINGER2 STDERR] owner_id={owner_id} stderr={res.stderr.strip()}")
+                            owner = sr.get(
+                                "owner_id"
+                            )
 
-                name = "unknown"
-                email = "unknown"
+                            username, email = (
+                                get_user_info(owner)
+                            )
 
-                for line in res.stdout.splitlines():
-                    if "Name" in line:
-                        name = line.split(":")[1].strip()
-                    if "E-mail" in line:
-                        email = line.split(":")[1].strip()
-                logger.debug(f"[USER PARSED] owner_id={owner_id}, name={name}, email={email}")
-                return name, email
+                            results.append({
+                                "svm_domain":obj.get("svm_domain"),
+                                "volume":obj["volume"],
+                                "auto_alias":obj.get("auto_alias"),
+                                "automap":obj.get("automap"),
+                                "user_dir":sub_name,
+                                "full_path":full_user_path,
+                                "owner_id":owner,
+                                "user_name":username,
+                                "email":email,
+                                "bytes_used":used,
+                                "diff_bytes":diff
+                            })
 
-            except Exception:
-                logger.error(f"[ERROR] Failed to get user info for owner_id={owner_id}")
-                return "unknown", "unknown"
+                except Exception as e:
+
+                    logger.error(
+                        f"[ERROR] listdir_path="
+                        f"{listdir_path} "
+                        f"{str(e)}"
+                    )
+
+        except Exception as e:
+
+            logger.error(
+                f"[ERROR] volume={obj['volume']} "
+                f"{str(e)}"
+            )
+
+    logger.info(
+        f"[END] find_and_collect_usage "
+        f"result_count={len(results)}"
+    )
+
+    return results
+
+# -------------------------
+# 사용자 정보 조회
+# -------------------------
+def get_user_info(owner_id):
+    """
+    owner_id → 사용자 이름 / 이메일 변환
+    (finger2 명령어 활용)
+    """
+    try:
+        res = subprocess.run(
+            ["/sw/bin/finger2", str(owner_id)],
+            capture_output=True,
+            text=True
+        )
+        logger.debug(f"[FINGER2 OUTPUT] owner_id={owner_id} stdout={res.stdout.strip()}")
+        logger.debug(f"[FINGER2 STDERR] owner_id={owner_id} stderr={res.stderr.strip()}")
+
+        name = "unknown"
+        email = "unknown"
+
+        for line in res.stdout.splitlines():
+            if "Name" in line:
+                name = line.split(":")[1].strip()
+            if "E-mail" in line:
+                email = line.split(":")[1].strip()
+        logger.debug(f"[USER PARSED] owner_id={owner_id}, name={name}, email={email}")
+        return name, email
+
+    except Exception:
+        logger.error(f"[ERROR] Failed to get user info for owner_id={owner_id}")
+        return "unknown", "unknown"
 
 # -------------------------
 # 사용자별 그룹핑
