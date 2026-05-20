@@ -191,7 +191,7 @@ def build_auto_yaml_from_file(path):
     final = {}
 
     for item in data:
-        automap_name = item["item"].get("autopath", {}).get("automap")
+        automap_name = item.get("item")
 
         if not automap_name:
             continue
