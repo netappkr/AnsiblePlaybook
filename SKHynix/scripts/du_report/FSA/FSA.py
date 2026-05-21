@@ -372,6 +372,7 @@ def get_scan_objects(data, config):
     return scan_objects
 
 
+
 # -------------------------
 # USER 디렉토리 찾기 + 사용량 수집
 # -------------------------
@@ -387,7 +388,9 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
     try:
 
         if usage_latest_path and os.path.exists(usage_latest_path):
+
             prev_data = read_yaml(usage_latest_path)
+
             if not prev_data:
                 logger.warning(
                     f"[WARN] empty previous file: {usage_latest_path}"
@@ -395,7 +398,9 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                 prev_data = []
 
             for d in prev_data:
+
                 try:
+
                     volume = d.get("volume")
                     key = d.get("full_path")
                     used = d.get("bytes_used", 0)
@@ -412,14 +417,17 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                     prev_map[volume][key] = used
 
                 except Exception as e:
+
                     logger.warning(
                         f"[WARN] invalid record skipped: {str(e)}"
                     )
 
         else:
+
             logger.info("[FIRST RUN] no previous file")
 
     except Exception as e:
+
         logger.error(
             f"[ERROR] failed to load previous data: {str(e)}"
         )
@@ -445,14 +453,17 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
         try:
 
             cluster = obj["cluster"]
+
             base_url = (
                 f"https://{cluster['ip']}"
                 f"/api/storage/volumes/{obj['vol_uuid']}/files"
             )
+
             auth = (
                 cluster["ID"],
                 cluster["PW"]
             )
+
             logger.info(
                 f"[SEARCH] volume={obj['volume']}"
             )
@@ -463,6 +474,7 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
             filter_expr = obj["fsa_option"].get(
                 "analytics_bytes_used"
             )
+
             if filter_expr:
                 op, threshold = parse_size_filter(
                     filter_expr
@@ -471,81 +483,155 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
             # -----------------------
             # inventory config
             # -----------------------
-            listdir_targets = set(
-                d["dir"].split("/")[-1]
+            listdir_paths = [
+                d["dir"].strip("/").split("/")
                 for d in obj["fsa_option"].get("listdir", [])
-            )
+            ]
 
-            path_targets = set(
+            path_targets = {
                 d["dir"]
                 for d in obj["fsa_option"].get("path", [])
-            )
+            }
 
-            logger.debug(
-                f"[LISTDIR TARGETS] {listdir_targets}"
-            )
+            logger.debug(f"[LISTDIR PATHS] {listdir_paths}")
+            logger.debug(f"[PATH TARGETS] {path_targets}")
 
-            logger.debug(
-                f"[PATH TARGETS] {path_targets}"
-            )
+            # -----------------------
+            # traversal cache
+            # -----------------------
+            path_cache = {}
 
             # ==================================================
             # STEP 1
-            # ROOT(/) 조회
+            # selective traversal
             # ==================================================
-            root_url = f"{base_url}/%2F"
-            logger.debug(
-                f"[ROOT SEARCH] {root_url}"
-            )
-            root_res = session.get(
-                root_url,
-                auth=auth,
-                params={
-                    "type": "directory",
-                    "fields": "name,path,type"
-                },
-                timeout=30
-            )
-            root_res.raise_for_status()
-            root_records = root_res.json().get(
-                "records",
-                []
-            )
+            found_listdirs = set()
+
+            for path_parts in listdir_paths:
+
+                current_path = "/"
+                found = True
+
+                for part in path_parts:
+
+                    try:
+
+                        # -----------------------
+                        # cache hit
+                        # -----------------------
+                        if current_path in path_cache:
+
+                            records = path_cache[current_path]
+
+                        else:
+
+                            encoded_path = quote(
+                                current_path,
+                                safe=""
+                            )
+
+                            url = (
+                                f"{base_url}/{encoded_path}"
+                            )
+
+                            logger.debug(
+                                f"[TRAVERSAL SEARCH] "
+                                f"path={current_path}"
+                            )
+
+                            res = session.get(
+                                url,
+                                auth=auth,
+                                params={
+                                    "type": "directory",
+                                    "fields": "name,path,type"
+                                },
+                                timeout=30
+                            )
+
+                            res.raise_for_status()
+
+                            records = res.json().get(
+                                "records",
+                                []
+                            )
+
+                            path_cache[current_path] = records
+
+                        matched = False
+
+                        for r in records:
+
+                            name = r.get("name")
+
+                            if name == part:
+
+                                current_path = (
+                                    f"/{name}"
+                                    if current_path == "/"
+                                    else f"{current_path}/{name}"
+                                )
+
+                                matched = True
+
+                                logger.debug(
+                                    f"[FOUND PATH PART] "
+                                    f"{current_path}"
+                                )
+
+                                break
+
+                        if not matched:
+
+                            logger.debug(
+                                f"[PATH NOT FOUND] "
+                                f"part={part}, "
+                                f"current={current_path}"
+                            )
+
+                            found = False
+                            break
+
+                    except Exception as e:
+
+                        logger.error(
+                            f"[ERROR] traversal "
+                            f"path={current_path} "
+                            f"error={str(e)}"
+                        )
+
+                        found = False
+                        break
+
+                if found:
+
+                    logger.info(
+                        f"[FOUND LISTDIR] {current_path}"
+                    )
+
+                    found_listdirs.add(current_path)
 
             # ==================================================
             # STEP 2
-            # listdir 발견
-            # ==================================================
-            found_listdirs = []
-            for r in root_records:
-                name = r.get("name")
-                if name in listdir_targets:
-                    full_path = (
-                        f"/{name}"
-                    )
-                    found_listdirs.append(
-                        full_path
-                    )
-                    logger.info(
-                        f"[FOUND LISTDIR] {full_path}"
-                    )
-
-            # ==================================================
-            # STEP 3
-            # 발견된 listdir 만 조회
+            # 발견된 listdir 조회
             # ==================================================
             for listdir_path in found_listdirs:
+
                 try:
+
                     encoded_path = quote(
                         listdir_path,
                         safe=""
                     )
+
                     url = (
                         f"{base_url}/{encoded_path}"
                     )
+
                     logger.debug(
                         f"[LISTDIR SEARCH] {url}"
                     )
+
                     res = session.get(
                         url,
                         auth=auth,
@@ -555,18 +641,22 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                         },
                         timeout=30
                     )
+
                     res.raise_for_status()
+
                     records = res.json().get(
                         "records",
                         []
                     )
 
                     # ==================================================
-                    # STEP 4
+                    # STEP 3
                     # USER/BE/... 탐색
                     # ==================================================
                     for r in records:
+
                         name = r.get("name")
+
                         if name not in path_targets:
                             continue
 
@@ -579,8 +669,8 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                         )
 
                         # ==================================================
-                        # STEP 5
-                        # USER 내부 usage 조회
+                        # STEP 4
+                        # usage 조회
                         # ==================================================
                         encoded_sub = quote(
                             target_path,
@@ -591,20 +681,15 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                             f"{base_url}/{encoded_sub}"
                         )
 
-                        params = {
-                            "fields": (
-                                "name,"
-                                "path,"
-                                "owner_id,"
-                                "analytics.bytes_used,"
-                                "type"
-                            )
-                        }
-
                         res2 = session.get(
                             url=sub_url,
                             auth=auth,
-                            params=params,
+                            params={
+                                "fields": (
+                                    "name,path,owner_id,"
+                                    "analytics.bytes_used,type"
+                                )
+                            },
                             timeout=30
                         )
 
@@ -616,19 +701,20 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                         )
 
                         # ==================================================
-                        # STEP 6
-                        # 사용자 디렉토리 usage 수집
+                        # STEP 5
+                        # 사용자 usage 수집
                         # ==================================================
                         for sr in sub_records:
+
+                            if sr.get("type") != "directory":
+                                continue
+
                             sub_name = sr.get("name")
+
                             sub_parent = (
                                 sr.get("path")
                                 or target_path
                             )
-                            sub_type = sr.get("type")
-
-                            if sub_type != "directory":
-                                continue
 
                             used = sr.get(
                                 "analytics",
@@ -638,10 +724,9 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                                 0
                             )
 
-                            # -----------------------
                             # analytics filter
-                            # -----------------------
                             if filter_expr:
+
                                 if not check_condition(
                                     used,
                                     op,
@@ -649,9 +734,6 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                                 ):
                                     continue
 
-                            # -----------------------
-                            # diff 계산
-                            # -----------------------
                             full_user_path = (
                                 f"{sub_parent}/{sub_name}"
                             )
@@ -677,17 +759,39 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                             )
 
                             results.append({
-                                "svm_domain":obj.get("svm_domain"),
-                                "volume":obj["volume"],
-                                "auto_alias":obj.get("auto_alias"),
-                                "automap":obj.get("automap"),
-                                "user_dir":sub_name,
-                                "full_path":full_user_path,
-                                "owner_id":owner,
-                                "user_name":username,
-                                "email":email,
-                                "bytes_used":used,
-                                "diff_bytes":diff
+
+                                "svm_domain":
+                                    obj.get("svm_domain"),
+
+                                "volume":
+                                    obj["volume"],
+
+                                "auto_alias":
+                                    obj.get("auto_alias"),
+
+                                "automap":
+                                    obj.get("automap"),
+
+                                "user_dir":
+                                    sub_name,
+
+                                "full_path":
+                                    full_user_path,
+
+                                "owner_id":
+                                    owner,
+
+                                "user_name":
+                                    username,
+
+                                "email":
+                                    email,
+
+                                "bytes_used":
+                                    used,
+
+                                "diff_bytes":
+                                    diff
                             })
 
                 except Exception as e:
@@ -711,6 +815,7 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
     )
 
     return results
+
 
 # -------------------------
 # 사용자 정보 조회
