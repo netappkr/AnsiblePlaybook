@@ -22,19 +22,17 @@ clusters:
 # FSA 설정 영역
 # =========================
 config:
-  # -------------------------
-  # Division 설정 (업무 단위)
-  # -------------------------
-  division:
-    - name: "DRAM"
+  autopath:
+    - sim
+    - library
       # -------------------------
       # div 구분을 위한 Export Policy 필터
       # 해당 policy를 가진 volume만 대상
       # -------------------------
-      exportpolicy:
-        - name: "default"
-        - name: "export-svm_CVO2-vol1"
-        - name: "export-svm_CVO2-vol2"
+  exportpolicy:
+    - name: "default"
+    - name: "export-svm_CVO2-vol1"
+    - name: "export-svm_CVO2-vol2"
       # -------------------------
       # getauto automap 이름
       # ex) getauto auto.sim
@@ -44,19 +42,28 @@ config:
       # ------------------------
       # FSA 수집 옵션
       # -------------------------
-      fsa_option:
-        type: directory
-        # 최소 사용량 필터 (1GB 이상)
-        analytics_bytes_used: ">1G"
-        # 탐색 대상 디렉토리
-        path:
-          - dir: USER
-          - dir: BE
-          - dir: user
-          - dir: FE
-          - dir: INTERFACE
-          - dir: WORK_DIR
-          - dir: DK
+  fsa_option:
+    type: directory
+    # 최소 사용량 필터 너무 적은 용량의 디렉토리는 제외 (예: 1MB 이상)
+    analytics_bytes_used: ">=1M"
+      # listdir로 수집할 디렉토리 경로 지정 (예시)
+    listdir:
+      - dir: CAE
+      - dir: SCH
+      - dir: LAY
+      - dir: test/test2/SCH
+      - dir: test/test2/CAE
+      - dir: test/LAY
+    # path으로 리포팅할 디렉토리 경로 지정 (예시)
+    # listdir 결과에서 path에 해당하는 디렉토리만 리포팅 대상으로 포함
+    path: 
+      - dir: USER
+      - dir: BE
+      - dir: user
+      - dir: FE
+      - dir: INTERFACE
+      - dir: WORK_DIR
+      - dir: DK
   # -------------------------
   # ONTAP CLI 필터 조건
   # volume 조회 시 사용됨
@@ -92,3 +99,46 @@ smtp_port: 587
 # 인증 정보 (반드시 Vault 권장)
 smtp_username: "<SMTP_USER>"
 smtp_password: "<SMTP_PASSWORD>"
+
+
+
+config:
+  autopath:
+    - sim
+    - library
+
+  exportpolicy:
+    - name: "default"
+    - name: "export-svm_CVO2-vol1"
+    - name: "export-svm_CVO2-vol2"
+  fsa_option:
+    type: directory
+    analytics_bytes_used: ">=1M"
+    listdir:
+      - dir: CAE
+      - dir: SCH
+      - dir: LAY
+      - dir: test/test2/SCH
+      - dir: test/test2/CAE
+      - dir: test/LAY
+    path: 
+      - dir: USER
+      - dir: BE
+      - dir: user
+      - dir: FE
+      - dir: INTERFACE
+      - dir: WORK_DIR
+      - dir: DK
+  cli:                                   
+    volumename: "!*spot*,!effi*"
+    policy: "!*_ro,!*_ro1,!*exportro*,!no_access"
+    type: "rw"
+    total: ">=1MB"
+    LogicalUsedPercent: ">=4"
+scripts_dir: '/opt/awx/projects'
+email_to: "wooyoung.ahn@netapp.com"
+email_from: "netappkrcibu@gmail.com"
+smtp_server: "smtp.gmail.com"
+smtp_port: 587
+smtp_username: "netappkrcibu@gmail.com"
+smtp_password: "okreidfycxzwupww"
