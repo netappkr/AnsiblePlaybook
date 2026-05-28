@@ -22,6 +22,10 @@ clusters:
 # FSA 설정 영역
 # =========================
 config:
+      # -------------------------
+      # getauto automap 이름
+      # ex) getauto auto.sim
+      # -------------------------
   autopath:
     - sim
     - library
@@ -33,12 +37,6 @@ config:
     - name: "default"
     - name: "export-svm_CVO2-vol1"
     - name: "export-svm_CVO2-vol2"
-      # -------------------------
-      # getauto automap 이름
-      # ex) getauto auto.sim
-      # -------------------------
-      autopath:
-        automap: sim
       # ------------------------
       # FSA 수집 옵션
       # -------------------------
