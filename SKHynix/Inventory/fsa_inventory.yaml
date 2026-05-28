@@ -22,17 +22,17 @@ clusters:
 # FSA 설정 영역
 # =========================
 config:
-      # -------------------------
-      # getauto automap 이름
-      # ex) getauto auto.sim
-      # -------------------------
+  # -------------------------
+  # getauto automap 이름
+  # ex) getauto auto.sim
+  # -------------------------
   autopath:
     - sim
     - library
-      # -------------------------
-      # div 구분을 위한 Export Policy 필터
-      # 해당 policy를 가진 volume만 대상
-      # -------------------------
+  # -------------------------
+  # 스캔대상 볼륨 구분을 위한 Export Policy 필터
+  # 해당 policy를 가진 volume만 대상
+  # -------------------------
   exportpolicy:
     - name: "default"
     - name: "export-svm_CVO2-vol1"
