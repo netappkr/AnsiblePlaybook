@@ -5,7 +5,7 @@
     - netapp.ontap
 
   vars:
-    work_dir: "/tmp/temp"
+    work_dir: "/tmp"
 
   tasks:
     # -------------------------
