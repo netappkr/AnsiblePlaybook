@@ -561,8 +561,10 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                         matched = False
 
                         for r in records:
-
                             name = r.get("name")
+                            ### api 응답중 ., .. 디렉토리 필터링
+                            if name in (".", ".."):
+                                continue
 
                             if name == part:
 
