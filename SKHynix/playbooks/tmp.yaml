@@ -1,0 +1,43 @@
+- name: Ontap API request test
+  hosts: task_server_1_fsa
+  gather_facts: no
+  collections:
+    - netapp.ontap
+
+  vars:
+    work_dir: "/tmp/temp"
+
+  tasks:
+    # -------------------------
+    # ONTAP 볼륨 조회
+    # -------------------------
+    - name: Get volume information
+      na_ontap_rest_cli:
+        hostname: "{{ cluster.ip }}"
+        username: "{{ cluster.ID }}"
+        password: "{{ cluster.PW }}"
+        https: true
+        validate_certs: false
+        verb: GET
+        command: "volume"
+        params:
+          type: "{{ config.cli.type }}"
+          total: "{{ config.cli.total }}"
+          logical-used-percent: "{{ config.cli.LogicalUsedPercent }}"
+          is-space-reporting-logical: true
+          analytics-state: "on"
+          volume: "{{ config.cli.volumename }}"
+          policy: "{{ config.cli.policy }}"
+          fields: "vserver,volume,junction-path,analytics-state,policy,type,is-flexgroup,instance-uuid,comment"
+      register: ontap_volumes
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+
+    # -------------------------
+    # JSON 저장
+    # -------------------------
+    - name: Save volume JSON
+      copy:
+        dest: "{{ work_dir }}/volume.json"
+        content: "{{ ontap_volumes.results | to_nice_json }}"
