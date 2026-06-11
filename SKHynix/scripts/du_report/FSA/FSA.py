@@ -658,7 +658,9 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                     for r in records:
 
                         name = r.get("name")
-
+                        ### api 응답중 ., .. 디렉토리 필터링
+                        if name in (".", ".."):
+                            continue
                         if name not in path_targets:
                             continue
 
@@ -712,7 +714,9 @@ def find_and_collect_usage(scan_objects, usage_latest_path):
                                 continue
 
                             sub_name = sr.get("name")
-
+                            ### api 응답중 ., .. 디렉토리 필터링
+                            if sub_name in (".", ".."):
+                                continue
                             sub_parent = (
                                 sr.get("path")
                                 or target_path
